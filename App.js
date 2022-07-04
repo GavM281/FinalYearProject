@@ -6,9 +6,11 @@
  * @flow strict-local
  */
 
-import React from 'react';
+import React, {useState} from 'react';
 import type {Node} from 'react';
 import {
+  Button,
+  Alert,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -25,7 +27,7 @@ import {
   LearnMoreLinks,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
-
+import Auth0 from 'react-native-auth0';
 const Section = ({children, title}): Node => {
   const isDarkMode = useColorScheme() === 'dark';
   return (
@@ -52,41 +54,46 @@ const Section = ({children, title}): Node => {
   );
 };
 
-const App: () => Node = () => {
-  const isDarkMode = useColorScheme() === 'dark';
+var credentials = require('./auth0-configuration');
+const auth0 = new Auth0(credentials);
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+const App = () => {
+  let [accessToken, setAccessToken] = useState(null);
+
+  const onLogin = () => {
+    auth0.webAuth
+      .authorize({
+        scope: 'openid profile email',
+      })
+      .then(credentials => {
+        Alert.alert('AccessToken: ' + credentials.accessToken);
+        setAccessToken(credentials.accessToken);
+      })
+      .catch(error => console.log(error));
   };
 
+  const onLogout = () => {
+    auth0.webAuth
+      .clearSession({})
+      .then(success => {
+        Alert.alert('Logged out!');
+        setAccessToken(null);
+      })
+      .catch(error => {
+        console.log('Log out cancelled');
+      });
+  };
+
+  let loggedIn = accessToken !== null;
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.js</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+    <View style={styles.container}>
+      <Text style={styles.header}> Auth0Sample - Login </Text>
+      <Text>You are{loggedIn ? ' ' : ' not '}logged in. </Text>
+      <Button
+        onPress={loggedIn ? onLogout : onLogin}
+        title={loggedIn ? 'Log Out' : 'Log In'}
+      />
+    </View>
   );
 };
 
