@@ -27,6 +27,9 @@ import {
   LearnMoreLinks,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
+import DeviceInfo from 'react-native-device-info';
+console.log('@ device   ', DeviceInfo.getBundleId());
+
 import Auth0 from 'react-native-auth0';
 const Section = ({children, title}): Node => {
   const isDarkMode = useColorScheme() === 'dark';
