@@ -1,47 +1,24 @@
-import React, {useState} from 'react';
-import Auth0 from 'react-native-auth0';
+import React, {useContext, useEffect} from 'react';
 import {Alert, Button, StyleSheet, Text, View} from 'react-native';
+import {StackActions} from '@react-navigation/native';
+import { AuthContext } from '../context/AuthContext';
 
-var credentials = require('../auth0-configuration');
-const auth0 = new Auth0(credentials);
+const SignInScreen = ({navigation}) => {
+  const {loggedIn} = useContext(AuthContext);
 
-const SignInScreen = () => {
-  let [accessToken, setAccessToken] = useState(null);
+  useEffect(() => {
+    if (loggedIn) {
+      navigation.dispatch(StackActions.replace('Home'));
+    }
+  }, [loggedIn]);
 
-  const onLogin = () => {
-    auth0.webAuth
-      .authorize({
-        scope: 'openid profile email',
-      })
-      .then(credentials => {
-        Alert.alert('AccessToken: ' + credentials.accessToken);
-        setAccessToken(credentials.accessToken);
-      })
-      .catch(error => console.log(error));
-  };
-
-  const onLogout = () => {
-    auth0.webAuth
-      .clearSession({})
-      .then(success => {
-        Alert.alert('Logged out!');
-        setAccessToken(null);
-      })
-      .catch(error => {
-        console.log('Log out cancelled');
-      });
-  };
-
-  let loggedIn = accessToken !== null;
+  const {login} = useContext(AuthContext);
 
   return (
-    <View style={styles.sectionContainer}>
-      <Text style={styles.header}> Auth0Sample - Login </Text>
-      <Text>You are{loggedIn ? ' ' : ' not '}logged in. </Text>
-      <Button
-        onPress={loggedIn ? onLogout : onLogin}
-        title={loggedIn ? 'Log Out' : 'Log In'}
-      />
+    <View style={[styles.sectionContainer]}>
+      <Button mode="contained" onPress={() => login()} title={'Login button'}>
+        Login with Auth0
+      </Button>
     </View>
   );
 };

@@ -3,7 +3,6 @@ import type {Node} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {NavigationContainer} from '@react-navigation/native';
-
 /*
 Gets Bundle identifer and displays it when app runs
 
@@ -13,17 +12,22 @@ console.log('@ device   ', DeviceInfo.getBundleId());
 /*
 Components
  */
-import homeScreen from './components/homeScreen';
+//import homeScreen from './components/homeScreen';
 import SignInScreen from './components/SignInScreen';
+import {AuthContextProvider} from './context/AuthContext';
+import HomeScreen from './components/HomeScreen';
 const Stack = createNativeStackNavigator();
 
 const App = () => {
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="Sign In" component={SignInScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <AuthContextProvider>
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen name="Home" component={HomeScreen} />
+          <Stack.Screen name="Sign In" component={SignInScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </AuthContextProvider>
   );
 };
 /*
@@ -44,6 +48,7 @@ const styles = StyleSheet.create({
     fontWeight: '400',
   },
   highlight: {
+    fontSize: 20,
     fontWeight: '700',
   },
 });
