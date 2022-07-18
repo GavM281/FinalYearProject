@@ -1,6 +1,7 @@
 import React, {useState, useEffect, createContext} from 'react';
 import SInfo from 'react-native-sensitive-info';
-import {AUTH0_DOMAIN, AUTH0_CLIENT_ID} from 'react-native-dotenv';
+import {AUTH0_DOMAIN} from 'react-native-dotenv';
+import {AUTH0_CLIENT_ID} from 'react-native-dotenv';
 import Auth0 from 'react-native-auth0';
 import jwtDecode from 'jwt-decode';
 const auth0 = new Auth0({

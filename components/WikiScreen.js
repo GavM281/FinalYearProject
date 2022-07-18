@@ -1,24 +1,21 @@
 import React, {useContext, useEffect} from 'react';
-import {Alert, Button, StyleSheet, Text, View} from 'react-native';
+import {View, Text, StyleSheet, Button} from 'react-native';
 import {StackActions} from '@react-navigation/native';
+
 import {AuthContext} from '../context/AuthContext';
 
-const SignInScreen = ({navigation}) => {
+const WikiScreen = ({navigation}) => {
   const {loggedIn} = useContext(AuthContext);
 
   useEffect(() => {
-    if (loggedIn) {
-      navigation.dispatch(StackActions.replace('Home'));
+    if (loggedIn === false) {
+      navigation.dispatch(StackActions.replace('Sign In'));
     }
   }, [loggedIn]);
 
-  const {login} = useContext(AuthContext);
-
   return (
     <View style={[styles.sectionContainer]}>
-      <Button mode="contained" onPress={() => login()} title={'Login button'}>
-        Login with Auth0
-      </Button>
+      <Text>This is the Wiki screen</Text>
     </View>
   );
 };
@@ -42,4 +39,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SignInScreen;
+export default WikiScreen;

@@ -5,8 +5,8 @@ import {StackActions} from '@react-navigation/native';
 
 import {AuthContext} from '../context/AuthContext';
 
-const HomeScreen = ({navigation}) => {
-  const {loggedIn } = useContext(AuthContext);
+const ProfileScreen = ({navigation}) => {
+  const {logout, loggedIn, userData} = useContext(AuthContext);
 
   useEffect(() => {
     if (loggedIn === false) {
@@ -16,24 +16,23 @@ const HomeScreen = ({navigation}) => {
 
   return (
     <View style={[styles.container]}>
-      <Text style={[styles.textContainer]}>What will you learn to day</Text>
-      <Button
-        title={'Analytics'}
-        onPress={() => navigation.navigate('Analytics')}
-      />
-      <Button
-        title={'Chat'}
-        onPress={() => navigation.navigate('Chat')}
-      />
-      <Button
-        title={'Wiki'}
-        onPress={() => navigation.navigate('Wiki')}
-      />
+      {userData && (
+        <View style={styles.userContainer}>
+          <Avatar.Image size={100} source={{uri: userData.picture}} />
+          <View style={styles.textContainer}>
+            <Text>{userData.name}</Text>
+          </View>
+        </View>
+      )}
+
+      <Button title="Logout" onPress={() => logout()}>
+        Logout
+      </Button>
     </View>
   );
 };
 
-export default HomeScreen;
+export default ProfileScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -48,9 +47,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 20,
   },
-  textContainer: {
-    marginTop: 10,
-    fontSize: 30,
-    fontWeight: 'bold',
-  },
+  textContainer: {marginTop: 10},
 });

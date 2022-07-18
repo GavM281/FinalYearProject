@@ -1,8 +1,9 @@
 import React, {useState} from 'react';
-import type {Node} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {NavigationContainer} from '@react-navigation/native';
+import 'react-native-gesture-handler';
+
 /*
 Gets Bundle identifer and displays it when app runs
 
@@ -12,10 +13,14 @@ console.log('@ device   ', DeviceInfo.getBundleId());
 /*
 Components
  */
-//import homeScreen from './components/homeScreen';
 import SignInScreen from './components/SignInScreen';
 import {AuthContextProvider} from './context/AuthContext';
 import HomeScreen from './components/HomeScreen';
+import ProfileScreen from './components/ProfileScreen';
+import AnalyticsScreen from './components/AnalyticsScreen';
+import ChatScreen from './components/ChatScreen';
+import WikiScreen from './components/WikiScreen';
+import HamburgerMenu from './components/HamburgerMenu';
 const Stack = createNativeStackNavigator();
 
 const App = () => {
@@ -23,8 +28,17 @@ const App = () => {
     <AuthContextProvider>
       <NavigationContainer>
         <Stack.Navigator>
+          <Stack.Screen
+            name="Hamburger"
+            component={HamburgerMenu}
+            options={{headerShown: false}}
+          />
           <Stack.Screen name="Home" component={HomeScreen} />
           <Stack.Screen name="Sign In" component={SignInScreen} />
+          <Stack.Screen name="Profile" component={ProfileScreen} />
+          <Stack.Screen name="Analytics" component={AnalyticsScreen} />
+          <Stack.Screen name="Chat" component={ChatScreen} />
+          <Stack.Screen name="Wiki" component={WikiScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </AuthContextProvider>
