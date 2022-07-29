@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {Button, Image, StyleSheet, Text, View} from 'react-native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {NavigationContainer} from '@react-navigation/native';
 import 'react-native-gesture-handler';
@@ -18,9 +18,10 @@ import {AuthContextProvider} from './context/AuthContext';
 import HomeScreen from './components/HomeScreen';
 import ProfileScreen from './components/ProfileScreen';
 import AnalyticsScreen from './components/AnalyticsScreen';
-import ChatScreen from './components/ChatScreen';
+import GroupHomeScreen from './components/GroupHomeScreen';
 import WikiScreen from './components/WikiScreen';
 import HamburgerMenu from './components/HamburgerMenu';
+import GroupScreen from './components/GroupScreen';
 const Stack = createNativeStackNavigator();
 
 const App = () => {
@@ -37,7 +38,8 @@ const App = () => {
           <Stack.Screen name="Sign In" component={SignInScreen} />
           <Stack.Screen name="Profile" component={ProfileScreen} />
           <Stack.Screen name="Analytics" component={AnalyticsScreen} />
-          <Stack.Screen name="Chat" component={ChatScreen} />
+          <Stack.Screen name="GroupHome" component={GroupHomeScreen} />
+          <Stack.Screen name="Group" component={GroupScreen} />
           <Stack.Screen name="Wiki" component={WikiScreen} />
         </Stack.Navigator>
       </NavigationContainer>

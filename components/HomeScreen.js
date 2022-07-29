@@ -1,12 +1,11 @@
 import React, {useContext, useEffect} from 'react';
 import {View, Text, StyleSheet, Button} from 'react-native';
-import {Avatar} from 'react-native-paper';
 import {StackActions} from '@react-navigation/native';
 
 import {AuthContext} from '../context/AuthContext';
 
 const HomeScreen = ({navigation}) => {
-  const {loggedIn } = useContext(AuthContext);
+  const {loggedIn, userData} = useContext(AuthContext);
 
   useEffect(() => {
     if (loggedIn === false) {
@@ -16,19 +15,18 @@ const HomeScreen = ({navigation}) => {
 
   return (
     <View style={[styles.container]}>
-      <Text style={[styles.textContainer]}>What will you learn to day</Text>
+      <Text style={[styles.textContainer]}>
+        This is the home screen navigate below
+      </Text>
       <Button
         title={'Analytics'}
         onPress={() => navigation.navigate('Analytics')}
       />
       <Button
-        title={'Chat'}
-        onPress={() => navigation.navigate('Chat')}
+        title={'Group'}
+        onPress={() => navigation.navigate('GroupHome')}
       />
-      <Button
-        title={'Wiki'}
-        onPress={() => navigation.navigate('Wiki')}
-      />
+      <Button title={'Wiki'} onPress={() => navigation.navigate('Wiki')} />
     </View>
   );
 };
