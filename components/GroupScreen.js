@@ -1,10 +1,16 @@
 import React, {useContext, useEffect, useRef, useState} from 'react';
-import {View, Text, StyleSheet, Pressable} from 'react-native';
+import {View, Text, StyleSheet, Pressable, FlatList} from 'react-native';
 import {StackActions} from '@react-navigation/native';
 import {AuthContext} from '../context/AuthContext';
 import io from 'socket.io-client';
 import {List} from 'react-native-paper';
 import axios from 'axios';
+
+const Item = ({title}) => (
+  <View>
+    <Text>{title}</Text>
+  </View>
+);
 
 const GroupScreen = ({navigation}) => {
   const {loggedIn} = useContext(AuthContext);
@@ -18,14 +24,14 @@ const GroupScreen = ({navigation}) => {
 
   useEffect(() => {
     axios
-      .get('https://192.168.0.21:4000/groups')
+      .get('https://staidr-heroku.herokuapp.com/groups')
       .then(response => {
-        console.log(response);
+        setGroups(JSON.parse(JSON.stringify(response.data)));
       })
       .catch(error => {
         console.log(error);
       });
-  });
+  }, []);
 
   /*
   socket io userEffect
@@ -48,7 +54,7 @@ const GroupScreen = ({navigation}) => {
    *
    * Fourthly each room should showcase a
    */
-
-  return <View />;
+  if (!groups) return null;
+  return <View>{groups}</View>;
 };
 export default GroupScreen;
