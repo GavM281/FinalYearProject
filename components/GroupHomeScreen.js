@@ -2,11 +2,13 @@ import React, {useContext, useEffect, useRef, useState} from 'react';
 import {View, Text, StyleSheet, Pressable} from 'react-native';
 import {StackActions} from '@react-navigation/native';
 import {AuthContext} from '../context/AuthContext';
-import io from 'socket.io-client';
-
+import GroupchatFlatList from './SmallComponents/GroupchatFlatList';
+import DividerLine from './SmallComponents/DividerLine';
+import HeaderLine from './SmallComponents/HeaderLine';
+import BubbleButton from './Buttons/BubbleButton';
+import ComingSoon from './Buttons/ComingSoon';
 const GroupHomeScreen = ({navigation}) => {
   const {loggedIn} = useContext(AuthContext);
-  const socketRef = useRef();
   const [buttonPresses, setButtonPresses] = useState(0);
   useEffect(() => {
     if (loggedIn === false) {
@@ -20,7 +22,50 @@ const GroupHomeScreen = ({navigation}) => {
    * This button should lead to a list of socket rooms where they can join their labs
    */
   return (
-    <View style={[styles.sectionContainer]}>
+    <View style={styles.screenContainer}>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          padding: '2%',
+        }}>
+        <Text style={styles.header}>CS620C</Text>
+        <Text style={styles.header}>Members: 32</Text>
+      </View>
+      <HeaderLine />
+      <BubbleButton
+        title="Statistics"
+        Groups="2"
+        Messages="85"
+        Notes="21"
+        Days="7"
+        buttonColour={'#1E1E1E'}
+      />
+      <DividerLine title={'Group Chats'} />
+      <GroupchatFlatList />
+
+      <DividerLine title={'Notes'} />
+      <ComingSoon title="Coming soon" buttonColour={'#C4C4CA'} />
+    </View>
+  );
+};
+const styles = StyleSheet.create({
+  screenContainer: {
+    flex: 1,
+    justifyContent: 'space-evenly',
+    padding: 16,
+    paddingHorizontal: 16,
+    marginTop: '-20%',
+  },
+  header: {
+    fontSize: 22,
+    color: '#30B283',
+  },
+});
+
+export default GroupHomeScreen;
+/*
+<View style={[styles.sectionContainer]}>
       <Pressable
         style={styles.button}
         onPress={() => {
@@ -37,37 +82,4 @@ const GroupHomeScreen = ({navigation}) => {
       </Pressable>
       <Text>{buttonPresses}</Text>
     </View>
-  );
-};
-
-const styles = StyleSheet.create({
-  sectionContainer: {
-    flex: 1,
-    justifyContent: 'space-evenly',
-    //alignContent: 'space-around',
-    alignItems: 'center',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    paddingTop: 30,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-  button: {
-    paddingHorizontal: 20,
-    paddingVertical: 50,
-    borderRadius: 20,
-    backgroundColor: '#30D5C8',
-  },
-});
-
-export default GroupHomeScreen;
+ */

@@ -1,12 +1,17 @@
-import React, {useContext, useEffect} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {View, Text, StyleSheet, Button} from 'react-native';
 import {StackActions} from '@react-navigation/native';
 
 import {AuthContext} from '../context/AuthContext';
 
+import BubbleButton from './Buttons/BubbleButton';
+import BubbleButton2 from './Buttons/BubbleButton2';
+import DividerLine from './SmallComponents/DividerLine';
+import ComingSoon from './Buttons/ComingSoon';
+
 const HomeScreen = ({navigation}) => {
   const {loggedIn, userData} = useContext(AuthContext);
-
+  const userName = useState('Welcome');
   useEffect(() => {
     if (loggedIn === false) {
       navigation.dispatch(StackActions.replace('Sign In'));
@@ -14,19 +19,34 @@ const HomeScreen = ({navigation}) => {
   }, [loggedIn]);
 
   return (
-    <View style={[styles.container]}>
-      <Text style={[styles.textContainer]}>
-        This is the home screen navigate below
-      </Text>
-      <Button
-        title={'Analytics'}
-        onPress={() => navigation.navigate('Analytics')}
+    <View style={styles.screenContainer}>
+      <BubbleButton
+        title={userName || userData.nickname}
+        Groups="2"
+        Messages="85"
+        Notes="21"
+        Days="7"
+        onPress={() => navigation.navigate('Profile')}
       />
-      <Button
-        title={'Group'}
-        onPress={() => navigation.navigate('GroupHome')}
-      />
-      <Button title={'Wiki'} onPress={() => navigation.navigate('Wiki')} />
+      <DividerLine title={'Recent Groups'} />
+
+      <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
+        <BubbleButton2
+          title="CS620C"
+          Students="32"
+          Notes="45"
+          buttonColour={'#30B283'}
+          onPress={() => navigation.navigate('GroupHome')}
+        />
+        <BubbleButton2
+          title="CS161"
+          Students="540"
+          Notes="320"
+          buttonColour={'#30B283'}
+        />
+      </View>
+      <DividerLine title={'Notes'} />
+      <ComingSoon title="Coming soon" buttonColour={'#C4C4CA'} />
     </View>
   );
 };
@@ -34,7 +54,7 @@ const HomeScreen = ({navigation}) => {
 export default HomeScreen;
 
 const styles = StyleSheet.create({
-  container: {
+  /*container: {
     flex: 1,
     paddingRight: 30,
     paddingLeft: 30,
@@ -50,5 +70,23 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 30,
     fontWeight: 'bold',
+  },*/
+  screenContainer: {
+    flex: 1,
+    justifyContent: 'space-evenly',
+    paddingHorizontal: 16,
+    marginTop: '-20%',
   },
 });
+/*
+   <View style={[styles.container]}>
+        <Text style={[styles.textContainer]}>
+          This is the home screen navigate below
+        </Text>
+        <Button
+          title={'Analytics'}
+          onPress={() => navigation.navigate('Analytics')}
+        />
+        <Button title={'Wiki'} onPress={() => navigation.navigate('Wiki')} />
+      </View>
+ */

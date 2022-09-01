@@ -22,6 +22,7 @@ import GroupHomeScreen from './components/GroupHomeScreen';
 import WikiScreen from './components/WikiScreen';
 import HamburgerMenu from './components/HamburgerMenu';
 import GroupScreen from './components/GroupScreen';
+import ChatScreen from './components/ChatScreen';
 const Stack = createNativeStackNavigator();
 
 const App = () => {
@@ -40,6 +41,19 @@ const App = () => {
           <Stack.Screen name="Analytics" component={AnalyticsScreen} />
           <Stack.Screen name="GroupHome" component={GroupHomeScreen} />
           <Stack.Screen name="Group" component={GroupScreen} />
+          <Stack.Screen
+            name="Chat"
+            component={ChatScreen}
+            options={({route}) => ({
+              headerRight: () => (
+                <Button
+                  onPress={() => alert('This should log you out')}
+                  title="log out"
+                  color="#00cc00"
+                />
+              ),
+            })}
+          />
           <Stack.Screen name="Wiki" component={WikiScreen} />
         </Stack.Navigator>
       </NavigationContainer>

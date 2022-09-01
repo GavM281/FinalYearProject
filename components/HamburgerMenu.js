@@ -23,13 +23,13 @@ const HamburgerMenu = ({navigation}) => {
         component={HomeScreen}
         options={{
           headerTitle: 'Home',
-          headerRight: () => (
-            <Button
+          /*headerRight: () => (
+            Button
               onPress={() => alert('This is a button!')}
               title="Info"
               color="#000"
             />
-          ),
+          ),*/
         }}
       />
       <Drawer.Screen name="Profile" component={ProfileScreen} />
