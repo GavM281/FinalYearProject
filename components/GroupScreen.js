@@ -1,12 +1,5 @@
-import React, {useContext, useEffect, useRef, useState} from 'react';
-import {
-  View,
-  Button,
-  Text,
-  FlatList,
-  TouchableHighlight,
-  TouchableOpacity,
-} from 'react-native';
+import React, {useContext, useEffect, useState} from 'react';
+import {View, Button, Text, FlatList, TouchableOpacity} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {StackActions} from '@react-navigation/native';
 import {AuthContext} from '../context/AuthContext';
@@ -142,13 +135,13 @@ const GroupScreen = ({navigation}) => {
    * Mongo db should have a collection of rooms with the room name, messages sent and images sent and the username of the sender
    * and time sent
    *
-   * Secondly I want the user to be able to see ow mnay peropel are currently in a room and if there is free space
+   * Secondly I want the user to be able to see how many people are currently in a room and if there is free space
    * be able to join said chatroom
    *
    * Thirdly each chat room should contain a modern looking chat with features such as image upload,download and previews
    * There should be a notes feature which gets saved back to a users notes section
    * These notes / images should be deletable
-   * Users should be able to reply to chats, mark chats as questions, answers
+   * Users should be able to reply to chat, mark chats as questions, answers
    *
    * Fourthly each room should showcase a
    */

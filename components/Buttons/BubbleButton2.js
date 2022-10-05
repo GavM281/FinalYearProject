@@ -1,5 +1,5 @@
-import React from 'react'
-import { StyleSheet, TouchableOpacity, Text, View } from 'react-native'
+import React from 'react';
+import {StyleSheet, TouchableOpacity, Text, View} from 'react-native';
 
 const BubbleButton = ({
   title,
@@ -18,24 +18,21 @@ const BubbleButton = ({
         ...buttonStyle,
         backgroundColor: buttonColour || '#F29947',
       }}
-      onPress={onPress}
-    >
+      onPress={onPress}>
       <View
         style={{
           justifyContent: 'space-between',
           paddingHorizontal: 10,
           paddingVertical: 10,
           marginTop: '-10%',
-        }}
-      >
+        }}>
         <Text
           style={{
             ...styles.appButtonText,
             ...textStyle,
             color: titleColour || '#FFF6F6',
             fontSize: 18,
-          }}
-        >
+          }}>
           {title}
         </Text>
       </View>
@@ -45,8 +42,7 @@ const BubbleButton = ({
           justifyContent: 'space-between',
           paddingHorizontal: 10,
           paddingVertical: 5,
-        }}
-      >
+        }}>
         <View>
           <Text
             style={{
@@ -54,8 +50,7 @@ const BubbleButton = ({
               ...textStyle,
               color: titleColour || '#FFF6F6',
               fontSize: 14,
-            }}
-          >
+            }}>
             Number of Students
           </Text>
           <Text
@@ -64,8 +59,7 @@ const BubbleButton = ({
               ...textStyle,
               color: titleColour || '#FFF6F6',
               fontSize: 14,
-            }}
-          >
+            }}>
             {Students}
           </Text>
         </View>
@@ -86,8 +80,7 @@ const BubbleButton = ({
           paddingHorizontal: 10,
           paddingVertical: 10,
           marginBottom: '-10%',
-        }}
-      >
+        }}>
         <View>
           <Text
             style={{
@@ -95,8 +88,7 @@ const BubbleButton = ({
               ...textStyle,
               color: titleColour || '#FFF6F6',
               fontSize: 14,
-            }}
-          >
+            }}>
             Notes uploaded
           </Text>
           <Text
@@ -105,22 +97,21 @@ const BubbleButton = ({
               ...textStyle,
               color: titleColour || '#FFF6F6',
               fontSize: 14,
-            }}
-          >
+            }}>
             {Notes}
           </Text>
         </View>
       </View>
     </TouchableOpacity>
-  )
-}
+  );
+};
 const styles = StyleSheet.create({
   // ...
   appButtonContainer: {
     elevation: 8,
     borderRadius: 14,
     shadowColor: '#000', // IOS
-    shadowOffset: { height: 4, width: 0 }, // IOS
+    shadowOffset: {height: 4, width: 0}, // IOS
     shadowOpacity: 0.3, // IOS
     shadowRadius: 4.5, //IOS
     padding: 6,
@@ -133,6 +124,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     justifyContent: 'flex-start',
   },
-})
+});
 
-export default BubbleButton
+export default BubbleButton;

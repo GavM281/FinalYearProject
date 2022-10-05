@@ -1,5 +1,5 @@
 import React, {useContext, useEffect} from 'react';
-import {View, Text, StyleSheet, Button} from 'react-native';
+import {View, Text, StyleSheet} from 'react-native';
 import {StackActions} from '@react-navigation/native';
 
 import {AuthContext} from '../context/AuthContext';
@@ -11,7 +11,7 @@ const WikiScreen = ({navigation}) => {
     if (loggedIn === false) {
       navigation.dispatch(StackActions.replace('Sign In'));
     }
-  }, [loggedIn]);
+  }, [loggedIn, navigation]);
 
   return (
     <View style={[styles.sectionContainer]}>

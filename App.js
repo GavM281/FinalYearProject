@@ -1,11 +1,11 @@
-import React, {useState} from 'react';
-import {Button, Image, StyleSheet, Text, View} from 'react-native';
+import React from 'react';
+import {Button, StyleSheet} from 'react-native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {NavigationContainer} from '@react-navigation/native';
 import 'react-native-gesture-handler';
 
 /*
-Gets Bundle identifer and displays it when app runs
+Gets Bundle identifier and displays it when app runs
 
 import DeviceInfo from 'react-native-device-info';
 console.log('@ device   ', DeviceInfo.getBundleId());
@@ -62,7 +62,7 @@ const App = () => {
 };
 /*
 
- */
+
 const styles = StyleSheet.create({
   sectionContainer: {
     marginTop: 32,
@@ -82,5 +82,5 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
 });
-
+*/
 export default App;

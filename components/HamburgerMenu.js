@@ -1,5 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
-import {Button, StyleSheet, Text, View} from 'react-native';
+import React, {useContext, useEffect} from 'react';
 import {createDrawerNavigator} from '@react-navigation/drawer';
 import HomeScreen from './HomeScreen';
 import ProfileScreen from './ProfileScreen';
@@ -9,7 +8,7 @@ import {AuthContext} from '../context/AuthContext';
 const Drawer = createDrawerNavigator();
 
 const HamburgerMenu = ({navigation}) => {
-  const {loggedIn, userData} = useContext(AuthContext);
+  const {loggedIn} = useContext(AuthContext);
 
   useEffect(() => {
     if (loggedIn === false) {

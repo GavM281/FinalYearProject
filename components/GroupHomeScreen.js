@@ -1,5 +1,5 @@
-import React, {useContext, useEffect, useRef, useState} from 'react';
-import {View, Text, StyleSheet, Pressable} from 'react-native';
+import React, {useContext, useEffect, useState} from 'react';
+import {View, Text, StyleSheet} from 'react-native';
 import {StackActions} from '@react-navigation/native';
 import {AuthContext} from '../context/AuthContext';
 import GroupchatFlatList from './SmallComponents/GroupchatFlatList';
@@ -7,9 +7,9 @@ import DividerLine from './SmallComponents/DividerLine';
 import HeaderLine from './SmallComponents/HeaderLine';
 import BubbleButton from './Buttons/BubbleButton';
 import ComingSoon from './Buttons/ComingSoon';
+import ChatScreen from './ChatScreen';
 const GroupHomeScreen = ({navigation}) => {
   const {loggedIn} = useContext(AuthContext);
-  const [buttonPresses, setButtonPresses] = useState(0);
   useEffect(() => {
     if (loggedIn === false) {
       navigation.dispatch(StackActions.replace('Sign In'));
@@ -40,6 +40,7 @@ const GroupHomeScreen = ({navigation}) => {
         Notes="21"
         Days="7"
         buttonColour={'#1E1E1E'}
+        onPress={navigation.navigate('Chat')}
       />
       <DividerLine title={'Group Chats'} />
       <GroupchatFlatList />

@@ -1,10 +1,4 @@
-import React, {
-  useContext,
-  useEffect,
-  useCallback,
-  useState,
-  useRef,
-} from 'react';
+import React, {useContext, useEffect, useCallback, useState} from 'react';
 import {Platform} from 'react-native';
 import emojiUtils from 'emoji-utils';
 import {StackActions} from '@react-navigation/native';
@@ -14,7 +8,7 @@ import {io} from 'socket.io-client';
 import axios from 'axios';
 import {GiftedChat} from 'react-native-gifted-chat';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import events from './SocketComponents/events';
 let STORAGE_KEY = 'sessionID';
 const storeData = async value => {
   try {
@@ -36,8 +30,8 @@ const getData = async () => {
 };
 
 const ChatScreen = ({navigation: {goBack, navigation}, route}) => {
-  let roomName = route.params.roomDetails;
-  let UserID = route.params.userID;
+  let roomName = 'route.params.roomDetails;';
+  let UserID = 'route.params.userID';
   //let sessionID = route.params.sessionID;
   // const room_id = room; //id for room socket
   const {loggedIn, userData} = useContext(AuthContext);
@@ -66,11 +60,14 @@ const ChatScreen = ({navigation: {goBack, navigation}, route}) => {
     if (loggedIn === false) {
       navigation.dispatch(StackActions.replace('Sign In'));
     }
-  }, [loggedIn]);
+  }, [loggedIn, navigation]);
   useEffect(() => {
     axios
       .get('https://staidr-heroku.herokuapp.com/users/' + userEmail)
       .then(response => {
+        // don't know what im doing here
+        // TODO
+        // Figure out what im doing here
         let Data = JSON.parse(JSON.stringify(response.data));
         let correctId = JSON.stringify(Data[0]._id);
       })
@@ -184,6 +181,25 @@ const ChatScreen = ({navigation: {goBack, navigation}, route}) => {
     };
   }, [socket]);
 
+  /* Todo
+    When user joins run socket initialise
+    The past chats
+  */
+
+  useEffect(() => {
+    socket.emit(events.INIT_MESSAGES, 'CS620C', 'Niamh');
+  }, []); //empty brackets means will run once. Incase of sokcet disconnect display your disconeccetd and leave caht
+
+  useEffect(() => {
+    socket.on(events.INIT_MESSAGES, messages1 => {
+      initMessages(messages1);
+      console.log('emitting happened');
+      console.log(messages1);
+    });
+  }, [socket]);
+  const initMessages = messages2 => {
+    console.log('Hey delete me after ' + JSON.stringify(messages2));
+  };
   const disconnectSocket = () => {
     setIsDisconnecting(true);
     socket.emit('leaveRoom', roomName, userID, userData.nickname);
@@ -217,8 +233,8 @@ const ChatScreen = ({navigation: {goBack, navigation}, route}) => {
   /*
    * Thirdly each chat room should contain a modern looking chat with features such as image upload,download and previews
    * There should be a notes feature which gets saved back to a users notes section
-   * These notes/ images shoudl eb delatable
-   * Users should be able to reply to chats, mark chats as questions, answers
+   * These notes/ images should be relatable
+   * Users should be able to reply to chat, mark chats as questions, answers
    *
    * Fourthly each room should showcase a
    */
@@ -233,7 +249,7 @@ const ChatScreen = ({navigation: {goBack, navigation}, route}) => {
           console.log('messages', responseData);
           //List of rooms = responseData[0].Rooms
           /*
-          Issues witj the user array below and gettign session data on this page keeps comign up as undefined
+          Issues with the user array below and getting session data on this page keeps coming up as undefined
 
            */
           let ListOfMessages = responseData.map(message => ({
@@ -263,9 +279,9 @@ const ChatScreen = ({navigation: {goBack, navigation}, route}) => {
 
   const onSend = useCallback(
     (messages = []) => {
-      console.log(roomName + 'on sned' + userData.Email + userData.picture);
+      console.log(roomName + 'on send' + userData.Email + userData.picture);
       console.log(messages[0]);
-      let userID = JSON.parse(JSON.stringify(UserID));
+      userID = JSON.parse(JSON.stringify(UserID));
       console.log('user id ' + userID);
       setMessages(previousMessages =>
         GiftedChat.append(previousMessages, messages),

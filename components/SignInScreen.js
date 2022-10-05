@@ -1,5 +1,5 @@
 import React, {useContext, useEffect} from 'react';
-import {Alert, Button, StyleSheet, Text, View} from 'react-native';
+import {Button, StyleSheet, View} from 'react-native';
 import {StackActions} from '@react-navigation/native';
 import {AuthContext} from '../context/AuthContext';
 

@@ -1,7 +1,7 @@
-import { Dimensions, StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import {Dimensions, StyleSheet, Text, View} from 'react-native';
+import React from 'react';
 
-const { width } = Dimensions.get('window')
+const {width} = Dimensions.get('window');
 const HeaderLine = () => {
   return (
     <View style={styles.PageFitter}>
@@ -10,8 +10,8 @@ const HeaderLine = () => {
         <View style={styles.hrLine} />
       </View>
     </View>
-  )
-}
+  );
+};
 const styles = StyleSheet.create({
   PageFitter: {
     justifyContent: 'center',
@@ -28,6 +28,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'black',
     height: 1,
   },
-})
+});
 
-export default HeaderLine
+export default HeaderLine;
