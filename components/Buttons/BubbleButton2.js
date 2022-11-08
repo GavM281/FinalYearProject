@@ -1,7 +1,7 @@
 import React from 'react';
 import {StyleSheet, TouchableOpacity, Text, View} from 'react-native';
 
-const BubbleButton = ({
+const BubbleButton2 = ({
   title,
   Students,
   Notes,
@@ -126,4 +126,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default BubbleButton;
+export default BubbleButton2;

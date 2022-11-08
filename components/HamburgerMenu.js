@@ -2,6 +2,7 @@ import React, {useContext, useEffect} from 'react';
 import {createDrawerNavigator} from '@react-navigation/drawer';
 import HomeScreen from './HomeScreen';
 import ProfileScreen from './ProfileScreen';
+import ChatTestScreen from './testComponents/ChatTestScreen';
 import {StackActions} from '@react-navigation/native';
 
 import {AuthContext} from '../context/AuthContext';
@@ -32,6 +33,7 @@ const HamburgerMenu = ({navigation}) => {
         }}
       />
       <Drawer.Screen name="Profile" component={ProfileScreen} />
+      <Drawer.Screen name="ChatTest" component={ChatTestScreen} />
     </Drawer.Navigator>
   );
 };

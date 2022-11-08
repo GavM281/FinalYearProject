@@ -21,7 +21,7 @@ const HomeScreen = ({navigation}) => {
   return (
     <View style={styles.screenContainer}>
       <BubbleButton
-        title={userName || userData.nickname}
+        title="Welcome"
         Groups="2"
         Messages="85"
         Notes="21"
@@ -36,13 +36,22 @@ const HomeScreen = ({navigation}) => {
           Students="32"
           Notes="45"
           buttonColour={'#30B283'}
-          onPress={() => navigation.navigate('GroupHome')}
+          onPress={() =>
+            navigation.navigate('GroupHome', {
+              GroupName: 'CS620C',
+            })
+          }
         />
         <BubbleButton2
           title="CS161"
           Students="540"
           Notes="320"
           buttonColour={'#30B283'}
+          onPress={() =>
+            navigation.navigate('GroupHome', {
+              GroupName: 'CS161',
+            })
+          }
         />
       </View>
       <DividerLine title={'Notes'} />

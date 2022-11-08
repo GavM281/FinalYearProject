@@ -4,8 +4,8 @@ import {AUTH0_DOMAIN} from 'react-native-dotenv';
 import {AUTH0_CLIENT_ID} from 'react-native-dotenv';
 import Auth0 from 'react-native-auth0';
 const auth0 = new Auth0({
-  domain: AUTH0_DOMAIN,
-  clientId: AUTH0_CLIENT_ID,
+  domain: 'dev-ulxwc1q3.eu.auth0.com',
+  clientId: 'lVZ8BO9u9dgnkAUKScoMpWoZqxRcaUFf',
 });
 
 const AuthContext = createContext();
