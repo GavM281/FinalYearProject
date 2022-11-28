@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity, FlatList} from 'react-native';
 import {StackActions} from '@react-navigation/native';
 import {AuthContext} from '../context/AuthContext';
 import DividerLine from './SmallComponents/DividerLine';
@@ -42,7 +42,8 @@ const GroupHomeScreen = ({navigation, route}) => {
         //onPress={navigation.navigate('Chat')}
       />
       <DividerLine title={'Group Chats'} />
-      <GroupchatFlatList user={userData.email} />
+      {/*<GroupchatFlatList user={userData.email} />*/}
+      <Text>Email: {userData.email}</Text>
 
       <DividerLine title={'Notes'} />
       <ComingSoon title="Coming soon" buttonColour={'#C4C4CA'} />

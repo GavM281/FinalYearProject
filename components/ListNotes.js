@@ -1,15 +1,44 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {View, Button, Text, FlatList, TouchableOpacity, StyleSheet} from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {View, Text, StyleSheet, FlatList} from 'react-native';
 import {StackActions} from '@react-navigation/native';
-import {AuthContext} from '../context/AuthContext';
-import {io} from 'socket.io-client';
-import axios from 'axios';
-import WikiModule from './Buttons/WikiModule';
 
-const WikiScreen = ({navigation}) => {
+import {AuthContext} from '../context/AuthContext';
+import NoteButton from './Buttons/NoteButton';
+import axios from 'axios';
+import WikiModule from "./Buttons/WikiModule";
+
+const ListNotes = ({navigation}) => {
   const {loggedIn} = useContext(AuthContext);
-  const [rooms, setRooms] = useState(null);
+  const [notes, setNotes] = useState(null);
+
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      // When the screen is focused (like loading from another screen), call function to refresh data
+      getNotes();
+    });
+
+    // Return the function to unsubscribe from the event so it gets removed on unmount
+    return unsubscribe;
+  }, [navigation]);
+
+  const getNotes = () => {
+    axios
+      // .get('https://staidr-heroku.herokuapp.com/groups')
+      .get('http://192.168.2.135:3000/')
+      .then(response => {
+        // console.log('main res', response);
+        // console.log('data', JSON.parse(JSON.stringify(response.data)));
+        let responseData = JSON.parse(JSON.stringify(response.data));
+        console.log('RESPONSE DATA: ', responseData);
+        // console.log('rooms', responseData[0].Rooms);
+        console.log('name', responseData[0].name);
+        //List of rooms = responseData[0].Rooms
+        setNotes(responseData);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  };
 
   useEffect(() => {
     if (loggedIn === false) {
@@ -17,62 +46,24 @@ const WikiScreen = ({navigation}) => {
     }
   }, [loggedIn, navigation]);
 
-  React.useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      // When the screen is focused (like loading from another screen), call function to refresh data
-      getRooms();
-    });
-
-    // Return the function to unsubscribe from the event so it gets removed on unmount
-    return unsubscribe;
-  }, [navigation]);
-
-  const getRooms = () => {
-    axios
-      .get('https://staidr-heroku.herokuapp.com/groups')
-      // .get('http://192.168.2.135:3000/')
-      .then(response => {
-        // console.log('main res', response);
-        // console.log('data', JSON.parse(JSON.stringify(response.data)));
-        let responseData = JSON.parse(JSON.stringify(response.data));
-        console.log('RESPONSE DATA: ', responseData);
-        console.log('rooms', responseData[0].Rooms);
-        console.log('name', responseData[0].Name);
-        //List of rooms = responseData[0].Rooms
-        setRooms(responseData);
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  };
-
   return (
     <View style={[styles.sectionContainer]}>
-      {/*<Button title="Get Rooms" onPress={() => getRooms()} />*/}
       <FlatList
-        data={rooms}
+        data={notes}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({item}) => (
-          <WikiModule
-            title={item.Name}
-            Notes="45"
+          <NoteButton
+            title={item.name}
             buttonColour={'#30B283'}
-            onPress={() => navigation.navigate('ListNotes')}
+            onPress={() => navigation.navigate('NoteScreen')}
           />
         )}
       />
-      <WikiModule
-        title="CS161"
-        Notes="45"
-        buttonColour={'#30B283'}
-        onPress={() => navigation.navigate('ListNotes')}
-      />
-      <WikiModule
-        title="CS162"
-        Notes="14"
-        buttonColour={'#30B283'}
-        onPress={() => navigation.navigate('ListNotes')}
-      />
+      {/*<NoteButton*/}
+      {/*  title="Arrays"*/}
+      {/*  buttonColour={'#30B283'}*/}
+      {/*  onPress={() => navigation.navigate('NoteScreen')}*/}
+      {/*/>*/}
     </View>
   );
 };
@@ -96,4 +87,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default WikiScreen;
+export default ListNotes;
