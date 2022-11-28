@@ -4,8 +4,10 @@ const app = express();
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
+const uri = process.env.MONGODB_URI;
+
 // use the express-static middleware
-app.use(express.static('public'));
+// app.use(express.static('public'));
 
 const Schema = new mongoose.Schema({
   name: String,
