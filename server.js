@@ -46,9 +46,10 @@ app.get('/', (req, res) => {
 app.post('/createUser', (req, res) => {
   console.log('Creating user');
   const note = new Note({
-    // name: req.body.name,
-    name: 'stuff',
-    content: 'info',
+    name: req.body.name,
+    content: req.body.content,
+    // name: 'note name',
+    // content: 'info',
   });
   note
     .save()

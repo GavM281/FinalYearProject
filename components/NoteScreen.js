@@ -1,10 +1,59 @@
-import React from 'react';
-import {TouchableOpacity, Text, View, TextInput, StyleSheet} from 'react-native';
+import React, {useState} from 'react';
+import {TouchableOpacity, Text, View, TextInput, StyleSheet, FlatList} from 'react-native';
+import axios from "axios";
+import NoteButton from "./Buttons/NoteButton";
 
 function NoteScreen({navigation}) {
+  const [notes, setNotes] = useState(null);
+
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      // When the screen is focused (like loading from another screen), call function to refresh data
+      getNotes();
+    });
+
+    // Return the function to unsubscribe from the event so it gets removed on unmount
+    return unsubscribe;
+  }, [navigation]);
+
+  const getNotes = () => {
+    axios
+      // .get('https://staidr-heroku.herokuapp.com/groups')
+      .get('https://gavin-fyp.herokuapp.com/')
+      .then(response => {
+        // console.log('main res', response);
+        // console.log('data', JSON.parse(JSON.stringify(response.data)));
+        let responseData = JSON.parse(JSON.stringify(response.data));
+        console.log('RESPONSE DATA: ', responseData);
+        // console.log('rooms', responseData[0].Rooms);
+        console.log('name', responseData[0].name);
+        //List of rooms = responseData[0].Rooms
+        setNotes(responseData);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  };
+
   // Display
   return (
     <View style={[styles.sectionContainer]}>
+      <FlatList
+        data={notes}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({item}) => (
+          // <View style={[styles.note]}>
+          <TextInput editable placeholder={item.name}></TextInput>
+          // <TextInput
+          //   style={[styles.textInput]}
+          //   editable
+          //   placeholder="Enter Note"
+          //   multiline={true}
+          // />
+          // </View>
+        )}
+
+      />
       <TextInput
         style={[styles.textInput]}
         editable
@@ -25,11 +74,12 @@ const styles = StyleSheet.create({
     // padding: 6,
     paddingVertical: 10,
     height: '95%',
+    backgroundColor: '#ededed',
     // margin: '2%',
   },
   textInput: {
     textAlignVertical: 'top',
-    backgroundColor: 'white',
+    backgroundColor: '#ffffff',
     elevation: 5,
     // borderColor: 'gray',
     width: '100%',
@@ -39,6 +89,9 @@ const styles = StyleSheet.create({
     // height: '100%',
     flex: 1,
   },
+  note: {
+    height: '100%',
+  }
 });
 
 export default NoteScreen;

@@ -29,15 +29,16 @@ const WikiScreen = ({navigation}) => {
 
   const getRooms = () => {
     axios
-      .get('https://staidr-heroku.herokuapp.com/groups')
+      // .get('https://staidr-heroku.herokuapp.com/groups')
+      .get('https://gavin-fyp.herokuapp.com/')
       // .get('http://192.168.2.135:3000/')
       .then(response => {
         // console.log('main res', response);
         // console.log('data', JSON.parse(JSON.stringify(response.data)));
         let responseData = JSON.parse(JSON.stringify(response.data));
         console.log('RESPONSE DATA: ', responseData);
-        console.log('rooms', responseData[0].Rooms);
-        console.log('name', responseData[0].Name);
+        console.log('name', responseData[0].name);
+        console.log('content', responseData[0].content);
         //List of rooms = responseData[0].Rooms
         setRooms(responseData);
       })
@@ -54,7 +55,7 @@ const WikiScreen = ({navigation}) => {
         keyExtractor={(item, index) => index.toString()}
         renderItem={({item}) => (
           <WikiModule
-            title={item.Name}
+            title={item.name}
             Notes="45"
             buttonColour={'#30B283'}
             onPress={() => navigation.navigate('ListNotes')}
