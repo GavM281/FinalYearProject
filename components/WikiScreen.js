@@ -29,7 +29,6 @@ const WikiScreen = ({navigation}) => {
 
   const getRooms = () => {
     axios
-      // .get('https://staidr-heroku.herokuapp.com/groups')
       .get('https://gavin-fyp.herokuapp.com/')
       // .get('http://192.168.2.135:3000/')
       .then(response => {

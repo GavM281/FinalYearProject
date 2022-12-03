@@ -7,7 +7,9 @@ const mongoose = require('mongoose');
 const uri = process.env.MONGODB_URI;
 
 // use the express-static middleware
-// app.use(express.static('public'));
+app.use(express.static('public'));
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 const Schema = new mongoose.Schema({
   name: String,
@@ -43,13 +45,11 @@ app.get('/', (req, res) => {
     });
 });
 
-app.post('/createUser', (req, res) => {
-  console.log('Creating user');
+app.post('/createNote', (req, res) => {
+  console.log('Creating Note');
   const note = new Note({
     name: req.body.name,
     content: req.body.content,
-    // name: 'note name',
-    // content: 'info',
   });
   note
     .save()

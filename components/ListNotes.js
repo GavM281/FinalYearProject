@@ -43,19 +43,14 @@ const ListNotes = ({navigation}) => {
 
   const createNote = () => {
     axios
-      // .get('https://staidr-heroku.herokuapp.com/groups')
-      .post('https://gavin-fyp.herokuapp.com/createUser', {
+      .post('https://gavin-fyp.herokuapp.com/createNote', {
         name: name,
         content: 'Note content',
       })
       .then(response => {
-        // console.log('main res', response);
-        // console.log('data', JSON.parse(JSON.stringify(response.data)));
         let responseData = JSON.parse(JSON.stringify(response.data));
         console.log('RESPONSE DATA: ', responseData);
-        // console.log('rooms', responseData[0].Rooms);
         console.log('name', responseData[0].name);
-        //List of rooms = responseData[0].Rooms
         setNotes(responseData);
       })
       .catch(error => {
@@ -78,11 +73,14 @@ const ListNotes = ({navigation}) => {
           style={styles.input}
           onChangeText={text => setName(text)}
           placeholder="Enter Name"
-          label='Name'
+          label="Name"
         />
 
-        <TouchableOpacity style={styles.button} onPress={() => createNote()} title="Save" >
-          <Text style={{ color: 'black' }}>Save</Text>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => createNote()}
+          title="Save">
+          <Text style={{color: 'black'}}>Save</Text>
         </TouchableOpacity>
       </View>
 
@@ -130,7 +128,16 @@ const styles = StyleSheet.create({
     padding: 10,
     margin: 10,
     borderRadius: 10,
-  }
+  },
+  input: {
+    height: 40,
+    margin: 12,
+    borderWidth: 1,
+    borderRadius: 5,
+    padding: 10,
+    width: 200,
+    color: 'black',
+  },
 });
 
 export default ListNotes;
