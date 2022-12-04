@@ -50,7 +50,6 @@ const ListNotes = ({navigation}) => {
       .then(response => {
         let responseData = JSON.parse(JSON.stringify(response.data));
         console.log('RESPONSE DATA: ', responseData);
-        console.log('name', responseData[0].name);
         setNotes(responseData);
       })
       .catch(error => {
@@ -67,7 +66,7 @@ const ListNotes = ({navigation}) => {
   return (
     <View style={[styles.sectionContainer]}>
       <View style={[styles.sectionContainer]}>
-        <Text style={styles.header}>Create User</Text>
+        <Text style={{color: 'black'}}>Enter note name</Text>
 
         <TextInput
           style={styles.input}
@@ -90,7 +89,10 @@ const ListNotes = ({navigation}) => {
         renderItem={({item}) => (
           <NoteButton
             title={item.name}
+            content={item.content}
             buttonColour={'#30B283'}
+            navigation={navigation}
+            id={item._id}
             onPress={() => navigation.navigate('NoteScreen')}
           />
         )}

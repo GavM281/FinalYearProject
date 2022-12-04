@@ -8,7 +8,7 @@ const uri = process.env.MONGODB_URI;
 
 // use the express-static middleware
 app.use(express.static('public'));
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
 const Schema = new mongoose.Schema({
@@ -55,6 +55,18 @@ app.post('/createNote', (req, res) => {
     .save()
     .then(data => {
       console.log(data);
+      res.send(data);
+    })
+    .catch(err => {
+      console.log('error', err);
+    });
+});
+
+app.post('/deleteNote', (req, res) => {
+  console.log('Going to delete');
+  Note.findByIdAndRemove(req.body.id)
+    .then(data => {
+      console.log('data ', data);
       res.send(data);
     })
     .catch(err => {
