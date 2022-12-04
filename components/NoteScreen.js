@@ -16,6 +16,8 @@ function NoteScreen({navigation}) {
     return unsubscribe;
   }, [navigation]);
 
+
+  // Change to find by id that's passed in
   const getNotes = () => {
     axios
       // .get('https://staidr-heroku.herokuapp.com/groups')
