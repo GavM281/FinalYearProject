@@ -50,7 +50,7 @@ const ListNotes = ({navigation}) => {
       .then(response => {
         let responseData = JSON.parse(JSON.stringify(response.data));
         console.log('RESPONSE DATA: ', responseData);
-        setNotes(responseData);
+        getNotes();
       })
       .catch(error => {
         console.log(error);

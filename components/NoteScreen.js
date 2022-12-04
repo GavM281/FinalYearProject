@@ -1,7 +1,14 @@
 import React, {useState} from 'react';
-import {TouchableOpacity, Text, View, TextInput, StyleSheet, FlatList} from 'react-native';
-import axios from "axios";
-import NoteButton from "./Buttons/NoteButton";
+import {
+  TouchableOpacity,
+  Text,
+  View,
+  TextInput,
+  StyleSheet,
+  FlatList,
+} from 'react-native';
+import axios from 'axios';
+import NoteButton from './Buttons/NoteButton';
 
 function NoteScreen({navigation}) {
   const [notes, setNotes] = useState(null);
@@ -15,7 +22,6 @@ function NoteScreen({navigation}) {
     // Return the function to unsubscribe from the event so it gets removed on unmount
     return unsubscribe;
   }, [navigation]);
-
 
   // Change to find by id that's passed in
   const getNotes = () => {
@@ -40,12 +46,18 @@ function NoteScreen({navigation}) {
   // Display
   return (
     <View style={[styles.sectionContainer]}>
+      <TextInput
+        style={[styles.textInput]}
+        editable
+        placeholder="Enter Note"
+        multiline={true}
+      />
       <FlatList
         data={notes}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({item}) => (
           // <View style={[styles.note]}>
-          <TextInput editable placeholder={item.name}></TextInput>
+          <TextInput style={{color: 'black'}} editable placeholder={item.name} />
           // <TextInput
           //   style={[styles.textInput]}
           //   editable
@@ -54,13 +66,6 @@ function NoteScreen({navigation}) {
           // />
           // </View>
         )}
-
-      />
-      <TextInput
-        style={[styles.textInput]}
-        editable
-        placeholder="Enter Note"
-        multiline={true}
       />
     </View>
   );
@@ -83,6 +88,7 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
     backgroundColor: '#ffffff',
     elevation: 5,
+    color: 'black',
     // borderColor: 'gray',
     width: '100%',
     // borderWidth: 1,
@@ -93,7 +99,7 @@ const styles = StyleSheet.create({
   },
   note: {
     height: '100%',
-  }
+  },
 });
 
 export default NoteScreen;

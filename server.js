@@ -62,8 +62,8 @@ app.post('/createNote', (req, res) => {
     });
 });
 
-app.delete('/deleteNote', (req, res) => {
-  console.log('Going to delete');
+app.post('/deleteNote', (req, res) => {
+  console.log('Going to delete note with id:  ', req.body.id);
   Note.findByIdAndRemove(req.body.id)
     .then(data => {
       console.log('data ', data);

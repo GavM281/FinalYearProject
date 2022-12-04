@@ -5,7 +5,7 @@ import axios from 'axios';
 
 const deleteNote = id => {
   axios
-    .delete('https://gavin-fyp.herokuapp.com/deleteNote', {
+    .post('https://gavin-fyp.herokuapp.com/deleteNote', {
       id: id,
     })
     .then(response => {
