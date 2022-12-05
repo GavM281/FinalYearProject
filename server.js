@@ -34,7 +34,7 @@ mongoose.connection.on('error', err => {
 });
 
 app.get('/', (req, res) => {
-  console.log('Getting Users');
+  console.log('Getting Notes');
   Note.find({})
     .then(data => {
       console.log('data: ', data);
@@ -45,6 +45,20 @@ app.get('/', (req, res) => {
     });
 });
 
+app.get('/getNote', (req, res) => {
+  console.log('Getting Note');
+  Note.findById({_id: req.body.id})
+    .then(data => {
+      console.log('data: ', data);
+      console.log('name: ', data.name);
+      console.log('content: ', data.content);
+      res.send(data);
+    })
+    .catch(err => {
+      console.log(err);
+    });
+});
+//
 app.post('/createNote', (req, res) => {
   console.log('Creating Note');
   const note = new Note({

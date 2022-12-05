@@ -6,17 +6,22 @@ import {
   TextInput,
   StyleSheet,
   FlatList,
+  Button,
 } from 'react-native';
 import axios from 'axios';
 import NoteButton from './Buttons/NoteButton';
+import {useRoute} from '@react-navigation/native';
 
-function NoteScreen({navigation}) {
+function NoteScreen({navigation, id, name}) {
   const [notes, setNotes] = useState(null);
+  const [content, setContent] = useState('');
+  const route = useRoute();
+  console.log('### id is:  ' + route.params.id);
 
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       // When the screen is focused (like loading from another screen), call function to refresh data
-      getNotes();
+      getNote();
     });
 
     // Return the function to unsubscribe from the event so it gets removed on unmount
@@ -43,21 +48,66 @@ function NoteScreen({navigation}) {
       });
   };
 
+  const getNote = () => {
+    axios
+      // .get('https://staidr-heroku.herokuapp.com/groups')
+      .get('https://gavin-fyp.herokuapp.com/getNote', {
+        id: id,
+      })
+      .then(response => {
+        // console.log('main res', response);
+        // console.log('data', JSON.parse(JSON.stringify(response.data)));
+        let responseData = JSON.parse(JSON.stringify(response.data));
+        console.log('RESPONSE DATA: ', responseData);
+        // console.log('rooms', responseData[0].Rooms);
+        console.log('name', responseData.name);
+        //List of rooms = responseData[0].Rooms
+        setNotes(responseData);
+        setContent(responseData.content);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  };
+
+  const saveNoteContent = () => {
+    axios
+      .post('https://gavin-fyp.herokuapp.com/createNote', {
+        content: content,
+      })
+      .then(response => {
+        let responseData = JSON.parse(JSON.stringify(response.data));
+        console.log('RESPONSE DATA: ', responseData);
+        getNotes();
+      })
+      .catch(error => {
+        console.log('content: ' + content);
+        console.log(error);
+      });
+  };
+
   // Display
   return (
     <View style={[styles.sectionContainer]}>
+      <Text style={{color: 'black'}}>Name:{route.params.name}</Text>
+      <Text style={{color: 'black'}}>ID:{route.params.id}</Text>
+      {/*Note text */}
       <TextInput
         style={[styles.textInput]}
         editable
         placeholder="Enter Note"
         multiline={true}
+        onChangeText={newText => setContent(newText)}
+        defaultValue={content}
       />
+      {/*Name*/}
       <FlatList
         data={notes}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({item}) => (
           // <View style={[styles.note]}>
-          <TextInput style={{color: 'black'}} editable placeholder={item.name} />
+          // <TextInput style={{color: 'black'}} editable placeholder={item.name} />
+          <Text style={{color: 'black'}}>{item.name}</Text>
           // <TextInput
           //   style={[styles.textInput]}
           //   editable
@@ -67,6 +117,7 @@ function NoteScreen({navigation}) {
           // </View>
         )}
       />
+      {/*<Button onPress={() => saveNoteContent()}>Save</Button>*/}
     </View>
   );
 }

@@ -86,6 +86,7 @@ const ListNotes = ({navigation}) => {
       <FlatList
         data={notes}
         keyExtractor={(item, index) => index.toString()}
+        // setId({notes._id});
         renderItem={({item}) => (
           <NoteButton
             title={item.name}
@@ -93,15 +94,10 @@ const ListNotes = ({navigation}) => {
             buttonColour={'#30B283'}
             navigation={navigation}
             id={item._id}
-            onPress={() => navigation.navigate('NoteScreen')}
+            onPress={() => navigation.navigate('NoteScreen', {id: item._id, name: item.name})}
           />
         )}
       />
-      {/*<NoteButton*/}
-      {/*  title="Arrays"*/}
-      {/*  buttonColour={'#30B283'}*/}
-      {/*  onPress={() => navigation.navigate('NoteScreen')}*/}
-      {/*/>*/}
     </View>
   );
 };

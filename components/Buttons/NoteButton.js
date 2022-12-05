@@ -67,8 +67,9 @@ const NoteButton = ({
           name="delete"
           color="#ccc"
           size={30}
-          onPress={() => deleteNote(id)}
-          // onPress={() => navigation.navigate('Wiki')}
+          onPress={() => {
+            deleteNote(id), navigation.navigate('ListNotes');
+          }}
         />
       </View>
       <View
@@ -80,7 +81,9 @@ const NoteButton = ({
           alignItems: 'center',
           // marginTop: '-10%',
         }}>
-        <Text>{id}</Text>
+        <Text>{content}</Text>
+      </View>
+      <View>
         <Text
           style={{
             ...styles.appButtonText,
@@ -90,7 +93,7 @@ const NoteButton = ({
             flex: 1,
             numberOfLines: 1,
           }}>
-          {content}
+          {id}
         </Text>
       </View>
     </TouchableOpacity>
