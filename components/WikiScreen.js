@@ -11,6 +11,8 @@ const WikiScreen = ({navigation}) => {
   const {loggedIn} = useContext(AuthContext);
   const [rooms, setRooms] = useState(null);
 
+  console.log('\n      || WIKISCREEN ||');
+
   useEffect(() => {
     if (loggedIn === false) {
       navigation.dispatch(StackActions.replace('Sign In'));
@@ -49,18 +51,18 @@ const WikiScreen = ({navigation}) => {
   return (
     <View style={[styles.sectionContainer]}>
       {/*<Button title="Get Rooms" onPress={() => getRooms()} />*/}
-      <FlatList
-        data={rooms}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({item}) => (
-          <WikiModule
-            title={item.name}
-            Notes="45"
-            buttonColour={'#30B283'}
-            onPress={() => navigation.navigate('ListNotes')}
-          />
-        )}
-      />
+      {/*<FlatList*/}
+      {/*  data={rooms}*/}
+      {/*  keyExtractor={(item, index) => index.toString()}*/}
+      {/*  renderItem={({item}) => (*/}
+      {/*    <WikiModule*/}
+      {/*      title={item.name}*/}
+      {/*      Notes="45"*/}
+      {/*      buttonColour={'#30B283'}*/}
+      {/*      onPress={() => navigation.navigate('ListNotes')}*/}
+      {/*    />*/}
+      {/*  )}*/}
+      {/*/>*/}
       <WikiModule
         title="CS161"
         Notes="45"

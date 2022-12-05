@@ -16,11 +16,13 @@ function NoteScreen({navigation, id, name}) {
   const [notes, setNotes] = useState(null);
   const [content, setContent] = useState('');
   const route = useRoute();
+  console.log('\n      || NOTESCREEN ||');
   console.log('### id is:  ' + route.params.id);
 
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       // When the screen is focused (like loading from another screen), call function to refresh data
+      console.log('On NoteScreen');
       getNote();
     });
 
@@ -41,7 +43,8 @@ function NoteScreen({navigation, id, name}) {
         // console.log('rooms', responseData[0].Rooms);
         console.log('name', responseData[0].name);
         //List of rooms = responseData[0].Rooms
-        setNotes(responseData);
+        // setNotes(responseData);
+        setContent(responseData[0].content);
       })
       .catch(error => {
         console.log(error);
@@ -49,31 +52,58 @@ function NoteScreen({navigation, id, name}) {
   };
 
   const getNote = () => {
+    console.log('The id is: ' + id);
+    console.log('The content is: ' + content);
     axios
-      // .get('https://staidr-heroku.herokuapp.com/groups')
       .get('https://gavin-fyp.herokuapp.com/getNote', {
-        id: id,
+        params: {
+          id: '638d39924e3cead24376d0b2',
+        },
       })
       .then(response => {
-        // console.log('main res', response);
-        // console.log('data', JSON.parse(JSON.stringify(response.data)));
-        let responseData = JSON.parse(JSON.stringify(response.data));
-        console.log('RESPONSE DATA: ', responseData);
-        // console.log('rooms', responseData[0].Rooms);
-        console.log('name', responseData.name);
-        //List of rooms = responseData[0].Rooms
-        setNotes(responseData);
-        setContent(responseData.content);
+        // handle success
+        console.log('Made request');
+        console.log(response);
+        console.log('The id is: ' + id);
+        console.log('The content is: ' + content);
       })
       .catch(error => {
+        console.log('Failed request');
+        // handle error
         console.log(error);
       });
+
+    // axios
+    //   // .get('https://staidr-heroku.herokuapp.com/groups')
+    //   .get('https://gavin-fyp.herokuapp.com/getNote', {
+    //     id: route.params.id,
+    //   })
+    //   .then(response => {
+    //     // console.log('main res', response);
+    //     // console.log('data', JSON.parse(JSON.stringify(response.data)));
+    //     let responseData = JSON.parse(JSON.stringify(response.data));
+    //     console.log('RESPONSE DATA: ', responseData);
+    //     // console.log('rooms', responseData[0].Rooms);
+    //     console.log('name', responseData.name);
+    //     console.log('content', responseData.content);
+    //     //List of rooms = responseData[0].Rooms
+    //     setNotes(responseData);
+    //     setContent(responseData.content);
+    //   })
+    //   .catch(error => {
+    //     console.log(error);
+    //   });
   };
 
   const saveNoteContent = () => {
+    console.log('id in saving note is: ', {id});
+    console.log('name in saving note is: ', {name});
+    console.log('content in saving note is: ', {content});
     axios
-      .post('https://gavin-fyp.herokuapp.com/createNote', {
-        content: content,
+      .put('https://gavin-fyp.herokuapp.com/updateNote', {
+        id: {id},
+        name: {name},
+        content: {content},
       })
       .then(response => {
         let responseData = JSON.parse(JSON.stringify(response.data));
@@ -89,35 +119,26 @@ function NoteScreen({navigation, id, name}) {
   // Display
   return (
     <View style={[styles.sectionContainer]}>
-      <Text style={{color: 'black'}}>Name:{route.params.name}</Text>
+      <Text style={[styles.header]}>{route.params.name}</Text>
+      {/*<Text style={{color: 'black'}}>Name:{route.params.name}</Text>*/}
       <Text style={{color: 'black'}}>ID:{route.params.id}</Text>
+      {/*<Text style={{color: 'black'}}>content: {content}</Text>*/}
+      {/*<Text style={{color: 'black'}}>notes: {notes}</Text>*/}
       {/*Note text */}
       <TextInput
         style={[styles.textInput]}
         editable
-        placeholder="Enter Note"
         multiline={true}
         onChangeText={newText => setContent(newText)}
-        defaultValue={content}
+        value={content}
       />
-      {/*Name*/}
-      <FlatList
-        data={notes}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({item}) => (
-          // <View style={[styles.note]}>
-          // <TextInput style={{color: 'black'}} editable placeholder={item.name} />
-          <Text style={{color: 'black'}}>{item.name}</Text>
-          // <TextInput
-          //   style={[styles.textInput]}
-          //   editable
-          //   placeholder="Enter Note"
-          //   multiline={true}
-          // />
-          // </View>
-        )}
-      />
-      {/*<Button onPress={() => saveNoteContent()}>Save</Button>*/}
+      <Button
+        style={[styles.button]}
+        styleDisabled={{color: 'red'}}
+        onPress={() => saveNoteContent()}
+        title="Press Me">
+        Save
+      </Button>
     </View>
   );
 }
@@ -125,12 +146,12 @@ function NoteScreen({navigation, id, name}) {
 const styles = StyleSheet.create({
   sectionContainer: {
     textAlignVertical: 'top',
-    marginTop: 20,
+    // marginTop: 20,
     paddingHorizontal: 14,
     shadowColor: '#000', // IOS
     // shadowOffset: {height: 1, width: 0}, // IOS
     // padding: 6,
-    paddingVertical: 10,
+    // paddingVertical: 10,
     height: '95%',
     backgroundColor: '#ededed',
     // margin: '2%',
@@ -145,12 +166,26 @@ const styles = StyleSheet.create({
     // borderWidth: 1,
     borderRadius: 10,
     padding: 10,
-    // height: '100%',
+    height: '100%',
+    marginVertical: 20,
     flex: 1,
   },
-  note: {
-    height: '100%',
+  button: {
+    fontSize: 20,
+    color: 'green',
+    margin: '20px',
+    textAlignVertical: 'bottom',
   },
+  header: {
+    fontWeight: 'bold',
+    textAlign: 'center',
+    fontSize: 20,
+    color: 'black',
+    marginTop: 10,
+  },
+  // note: {
+  //   height: '100%',
+  // },
 });
 
 export default NoteScreen;

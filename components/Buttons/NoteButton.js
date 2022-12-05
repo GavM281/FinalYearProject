@@ -35,7 +35,7 @@ const NoteButton = ({
         ...buttonStyle,
         backgroundColor: buttonColour || '#F29947',
       }}
-      onPress={onPress}>
+      onPress={() => navigation.navigate('NoteScreen', {id: id, name: title})}>
       {/*Module name*/}
       <View
         style={{
@@ -91,7 +91,6 @@ const NoteButton = ({
             color: '#d1d1d1',
             fontSize: 15,
             flex: 1,
-            numberOfLines: 1,
           }}>
           {id}
         </Text>

@@ -11,6 +11,7 @@ const ListNotes = ({navigation}) => {
   const {loggedIn} = useContext(AuthContext);
   const [notes, setNotes] = useState(null);
   const [name, setName] = useState('');
+  console.log('\n      || LISTNOTES ||');
 
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
@@ -65,8 +66,8 @@ const ListNotes = ({navigation}) => {
 
   return (
     <View style={[styles.sectionContainer]}>
-      <View style={[styles.sectionContainer]}>
-        <Text style={{color: 'black'}}>Enter note name</Text>
+      <View style={[styles.createNote]}>
+        <Text style={{textAlign: 'center'}}>Enter note name</Text>
 
         <TextInput
           style={styles.input}
@@ -94,7 +95,7 @@ const ListNotes = ({navigation}) => {
             buttonColour={'#30B283'}
             navigation={navigation}
             id={item._id}
-            onPress={() => navigation.navigate('NoteScreen', {id: item._id, name: item.name})}
+            // onPress={() => navigation.navigate('NoteScreen', {id: item._id, name: item.name})}
           />
         )}
       />
@@ -129,12 +130,21 @@ const styles = StyleSheet.create({
   },
   input: {
     height: 40,
-    margin: 12,
+    marginVertical: 12,
     borderWidth: 1,
-    borderRadius: 5,
+    borderRadius: 12,
+    paddingVertical: 10,
+    // width: 200,
+    color: 'blue',
+    width: '100%',
+    textAlign: 'center',
+    backgroundColor: 'white',
+  },
+  createNote: {
+    backgroundColor: '#30B283',
+    borderRadius: 14,
+    margin: '2%',
     padding: 10,
-    width: 200,
-    color: 'black',
   },
 });
 

@@ -76,6 +76,20 @@ app.post('/createNote', (req, res) => {
     });
 });
 
+app.put('/updateNote', (req, res) => {
+  Note.findByIdAndUpdate(req.body.id, {
+    name: req.body.name,
+    content: req.body.content,
+  })
+    .then(data => {
+      console.log(data);
+      res.send(data);
+    })
+    .catch(err => {
+      console.log('error', err);
+    });
+});
+
 app.post('/deleteNote', (req, res) => {
   console.log('Going to delete note with id:  ', req.body.id);
   Note.findByIdAndRemove(req.body.id)
