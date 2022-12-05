@@ -56,16 +56,18 @@ function NoteScreen({navigation, id, name}) {
     console.log('The content is: ' + content);
     axios
       .get('https://gavin-fyp.herokuapp.com/getNote', {
-        params: {
+
           id: '638d39924e3cead24376d0b2',
-        },
+
       })
       .then(response => {
         // handle success
         console.log('Made request');
         console.log(response);
-        console.log('The id is: ' + id);
-        console.log('The content is: ' + content);
+        let responseData = JSON.parse(JSON.stringify(response.data));
+        console.log('The id is: ' + responseData._id);
+        console.log('The content is: ' + responseData.content);
+        setContent(responseData.content);
       })
       .catch(error => {
         console.log('Failed request');
@@ -96,24 +98,25 @@ function NoteScreen({navigation, id, name}) {
   };
 
   const saveNoteContent = () => {
-    console.log('id in saving note is: ', {id});
-    console.log('name in saving note is: ', {name});
+    console.log('id in saving note is: ', route.params.id);
+    console.log('name in saving note is: ', route.params.name);
     console.log('content in saving note is: ', {content});
-    axios
-      .put('https://gavin-fyp.herokuapp.com/updateNote', {
-        id: {id},
-        name: {name},
-        content: {content},
-      })
-      .then(response => {
-        let responseData = JSON.parse(JSON.stringify(response.data));
-        console.log('RESPONSE DATA: ', responseData);
-        getNotes();
-      })
-      .catch(error => {
-        console.log('content: ' + content);
-        console.log(error);
-      });
+    console.log('content in saving note is: ', content);
+    // axios
+    //   .put('https://gavin-fyp.herokuapp.com/updateNote', {
+    //     id: route.params.id,
+    //     name: route.params.name,
+    //     content: {content},
+    //   })
+    //   .then(response => {
+    //     let responseData = JSON.parse(JSON.stringify(response.data));
+    //     console.log('RESPONSE DATA: ', responseData);
+    //     getNotes();
+    //   })
+    //   .catch(error => {
+    //     console.log('content: ' + content);
+    //     console.log(error);
+    //   });
   };
 
   // Display
@@ -122,7 +125,7 @@ function NoteScreen({navigation, id, name}) {
       <Text style={[styles.header]}>{route.params.name}</Text>
       {/*<Text style={{color: 'black'}}>Name:{route.params.name}</Text>*/}
       <Text style={{color: 'black'}}>ID:{route.params.id}</Text>
-      {/*<Text style={{color: 'black'}}>content: {content}</Text>*/}
+      <Text style={{color: 'black'}}>content: {content}</Text>
       {/*<Text style={{color: 'black'}}>notes: {notes}</Text>*/}
       {/*Note text */}
       <TextInput

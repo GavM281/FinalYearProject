@@ -47,7 +47,7 @@ app.get('/', (req, res) => {
 
 app.get('/getNote', (req, res) => {
   console.log('Getting Note');
-  Note.findById({_id: req.body.id})
+  Note.findById(req.body.id)
     .then(data => {
       console.log('data: ', data);
       console.log('name: ', data.name);
