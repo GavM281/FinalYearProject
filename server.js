@@ -15,6 +15,7 @@ const Schema = new mongoose.Schema({
   name: String,
   content: String,
   userEmail: String,
+  privacy: String,
 });
 
 mongoose.model('note', Schema);
@@ -66,6 +67,7 @@ app.post('/createNote', (req, res) => {
     name: req.body.name,
     content: req.body.content,
     userEmail: req.body.userEmail,
+    privacy: req.body.privacy,
   });
   note
     .save()

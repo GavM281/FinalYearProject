@@ -6,9 +6,10 @@ import {
   FlatList,
   TextInput,
   TouchableOpacity,
+  ScrollView,
 } from 'react-native';
 import {StackActions} from '@react-navigation/native';
-
+import DropDownPicker from 'react-native-dropdown-picker';
 import {AuthContext} from '../context/AuthContext';
 // import NoteButton from './Buttons/NoteButton';
 import axios from 'axios';
@@ -19,10 +20,20 @@ const ListNotes = ({navigation}) => {
   const {loggedIn, userData} = useContext(AuthContext);
   const [notes, setNotes] = useState(null);
   const [name, setName] = useState('');
+
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState('private');
+  const [items, setItems] = useState([
+    {label: 'Private', value: 'private'},
+    {label: 'Public', value: 'public'}
+  ]);
+
   console.log('');
   console.log(' || LISTNOTES ||');
+
   console.log('email: ' + userData.email);
-  const userEmail = userData.email;
+  const currentUsersEmail = userData.email;
+
   const deleteNote = id => {
     axios
       .post('https://gavin-fyp.herokuapp.com/deleteNote', {
@@ -48,6 +59,8 @@ const ListNotes = ({navigation}) => {
     textStyle,
     navigation,
     id,
+    userEmail,
+    privacy,
   }) => {
     return (
       <TouchableOpacity
@@ -55,15 +68,20 @@ const ListNotes = ({navigation}) => {
           ...styles.appButtonContainer,
           ...buttonStyle,
           backgroundColor: buttonColour || '#F29947',
+          paddingLeft: 10,
         }}
         onPress={() =>
-          navigation.navigate('NoteScreen', {id: id, name: title, contents: content})
+          navigation.navigate('NoteScreen', {
+            id: id,
+            name: title,
+            contents: content,
+          })
         }>
         {/*Module name*/}
         <View
           style={{
             justifyContent: 'space-between',
-            paddingHorizontal: 10,
+            // paddingHorizontal: 10,
             paddingVertical: 10,
             flexDirection: 'row',
             alignItems: 'center',
@@ -98,14 +116,18 @@ const ListNotes = ({navigation}) => {
         <View
           style={{
             justifyContent: 'space-between',
-            paddingHorizontal: 10,
-            paddingVertical: 10,
+            // paddingHorizontal: 10,
+            paddingBottom: 10,
             flexDirection: 'row',
             alignItems: 'center',
             // marginTop: '-10%',
           }}>
-          <Text numberOfLines={1} style={{ width: '100%', flex: 1 }}>{content}</Text>
+          <Text numberOfLines={1} style={{width: '100%', flex: 1}}>
+            {content}
+          </Text>
         </View>
+        <Text>{userEmail}</Text>
+        <Text>{privacy}</Text>
         {/*<View>*/}
         {/*  <Text*/}
         {/*    style={{*/}
@@ -156,7 +178,8 @@ const ListNotes = ({navigation}) => {
       .post('https://gavin-fyp.herokuapp.com/createNote', {
         name: name,
         content: '',
-        userEmail: userEmail,
+        userEmail: currentUsersEmail,
+        privacy: value,
       })
       .then(response => {
         let responseData = JSON.parse(JSON.stringify(response.data));
@@ -173,11 +196,21 @@ const ListNotes = ({navigation}) => {
       navigation.dispatch(StackActions.replace('Sign In'));
     }
   }, [loggedIn, navigation]);
-
+  //
+  // TESTING: True to show all users notes regardless of creator. False to only show current users notes
+  let showAllUsers = false;
   return (
-    <View style={[styles.sectionContainer]}>
+    <ScrollView style={[styles.sectionContainer]}>
       <View style={[styles.createNote]}>
-        <Text style={{textAlign: 'center', fontWeight: 'bold', color:'white', fontSize: 20}}>Enter note name</Text>
+        <Text
+          style={{
+            textAlign: 'center',
+            fontWeight: 'bold',
+            color: 'white',
+            fontSize: 20,
+          }}>
+          Enter note name
+        </Text>
 
         <TextInput
           style={styles.input}
@@ -186,38 +219,52 @@ const ListNotes = ({navigation}) => {
           label="Name"
         />
 
+        <DropDownPicker
+          open={open}
+          value={value}
+          items={items}
+          setOpen={setOpen}
+          setValue={setValue}
+          setItems={setItems}
+        />
+
         <TouchableOpacity
           style={styles.button}
           onPress={() => createNote()}
           title="Save">
-          <Text style={{color: 'white'}}>Save</Text>
+          <Text style={{color: 'white'}}>Create</Text>
         </TouchableOpacity>
       </View>
-
       <FlatList
         data={notes}
         keyExtractor={(item, index) => index.toString()}
         // setId({notes._id});
-        renderItem={({item}) => (
-          <NoteButton
-            title={item.name}
-            content={item.content}
-            buttonColour={'#30B283'}
-            navigation={navigation}
-            id={item._id}
-            // onPress={() => navigation.navigate('NoteScreen', {id: item._id, name: item.name})}
-          />
-        )}
+        renderItem={({item}) => {
+          if (item.userEmail === currentUsersEmail || showAllUsers == true || item.privacy === "public") {
+            return (
+              <NoteButton
+                title={item.name}
+                content={item.content}
+                buttonColour={'#30B283'}
+                navigation={navigation}
+                id={item._id}
+                userEmail={item.userEmail}
+                privacy={item.privacy}
+                // onPress={() => navigation.navigate('NoteScreen', {id: item._id, name: item.name})}
+              />
+            );
+          }
+        }}
       />
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   sectionContainer: {
-    marginTop: 32,
+    // marginTop: 32,
     paddingHorizontal: 24,
-    marginBottom: 20,
+    // marginBottom: 20,
   },
   sectionTitle: {
     fontSize: 24,

@@ -19,6 +19,7 @@ const deleteNote = id => {
 const NoteButton = ({
   title,
   content,
+  userEmail,
   Notes,
   onPress,
   buttonColour,
@@ -56,7 +57,7 @@ const NoteButton = ({
             color: titleColour || '#FFF6F6',
             fontSize: 25,
           }}>
-          {title}
+          {userEmail} fesnfesnfne
         </Text>
         <Icon
           style={{
@@ -95,6 +96,7 @@ const NoteButton = ({
           {id}
         </Text>
       </View>
+      <Text>{userEmail}</Text>
     </TouchableOpacity>
   );
 };
