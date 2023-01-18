@@ -14,6 +14,7 @@ app.use(bodyParser.json());
 const Schema = new mongoose.Schema({
   name: String,
   content: String,
+  userEmail: String,
 });
 
 mongoose.model('note', Schema);
@@ -64,6 +65,7 @@ app.post('/createNote', (req, res) => {
   const note = new Note({
     name: req.body.name,
     content: req.body.content,
+    userEmail: req.body.userEmail,
   });
   note
     .save()

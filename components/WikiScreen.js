@@ -11,7 +11,7 @@ const WikiScreen = ({navigation}) => {
   const {loggedIn} = useContext(AuthContext);
   const [rooms, setRooms] = useState(null);
 
-  console.log('\n      || WIKISCREEN ||');
+
 
   useEffect(() => {
     if (loggedIn === false) {
@@ -22,6 +22,8 @@ const WikiScreen = ({navigation}) => {
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       // When the screen is focused (like loading from another screen), call function to refresh data
+      console.log('');
+      console.log('  || WIKISCREEN ||');
       getRooms();
     });
 

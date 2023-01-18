@@ -7,7 +7,17 @@ import {AuthContext} from '../context/AuthContext';
 
 const ProfileScreen = ({navigation}) => {
   const {logout, loggedIn, userData} = useContext(AuthContext);
-
+  console.log('');
+  console.log('userData  ' + userData);
+  console.log('userData email: ' + userData.email);
+  console.log('userData nickname: ' + userData.nickname);
+  console.log('userData Name: ' + userData.name);
+  console.log('userData  ' + userData.given_name);
+  console.log('userData  ' + userData.user_id);
+  console.log('userData  ' + userData.family_name);
+  console.log('loggedIn  ' + loggedIn);
+  console.log('token  ' + userData.accessToken);
+  console.log('token  ' + userData.sub);
   useEffect(() => {
     if (loggedIn === false) {
       navigation.dispatch(StackActions.replace('Sign In'));
@@ -20,7 +30,8 @@ const ProfileScreen = ({navigation}) => {
         <View style={styles.userContainer}>
           <Avatar.Image size={100} source={{uri: userData.picture}} />
           <View style={styles.textContainer}>
-            <Text>{userData.name}</Text>
+            <Text style={{color: 'black'}}>{userData.name}</Text>
+            <Text style={{color: 'black'}}>{userData.name}</Text>
           </View>
         </View>
       )}
@@ -47,5 +58,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 20,
   },
-  textContainer: {marginTop: 10},
+  textContainer: {
+    marginTop: 10,
+    fontColor: 'black',
+    color: 'black',
+  },
 });
