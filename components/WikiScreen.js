@@ -33,8 +33,8 @@ const WikiScreen = ({navigation}) => {
 
   const getRooms = () => {
     axios
-      .get('https://gavin-fyp.herokuapp.com/')
-      // .get('http://192.168.2.135:3000/')
+      .get('https://gavin-fyp.herokuapp.com/getModules')
+      // .get('http://192.168.2.135:3000/getModules')
       .then(response => {
         // console.log('main res', response);
         // console.log('data', JSON.parse(JSON.stringify(response.data)));
@@ -53,30 +53,30 @@ const WikiScreen = ({navigation}) => {
   return (
     <View style={[styles.sectionContainer]}>
       {/*<Button title="Get Rooms" onPress={() => getRooms()} />*/}
-      {/*<FlatList*/}
-      {/*  data={rooms}*/}
-      {/*  keyExtractor={(item, index) => index.toString()}*/}
-      {/*  renderItem={({item}) => (*/}
-      {/*    <WikiModule*/}
-      {/*      title={item.name}*/}
-      {/*      Notes="45"*/}
-      {/*      buttonColour={'#30B283'}*/}
-      {/*      onPress={() => navigation.navigate('ListNotes')}*/}
-      {/*    />*/}
-      {/*  )}*/}
+      <FlatList
+        data={rooms}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({item}) => (
+          <WikiModule
+            title={item.name}
+            Notes="45"
+            buttonColour={'#30B283'}
+            onPress={() => navigation.navigate('ListNotes', {moduleCode: item.name})}
+          />
+        )}
+      />
+      {/*<WikiModule*/}
+      {/*  title="CS161"*/}
+      {/*  Notes="45"*/}
+      {/*  buttonColour={'#30B283'}*/}
+      {/*  onPress={() => navigation.navigate('ListNotes', {moduleCode: 'CS161'})}*/}
       {/*/>*/}
-      <WikiModule
-        title="CS161"
-        Notes="45"
-        buttonColour={'#30B283'}
-        onPress={() => navigation.navigate('ListNotes')}
-      />
-      <WikiModule
-        title="CS162"
-        Notes="14"
-        buttonColour={'#30B283'}
-        onPress={() => navigation.navigate('ListNotes')}
-      />
+      {/*<WikiModule*/}
+      {/*  title="CS162"*/}
+      {/*  Notes="14"*/}
+      {/*  buttonColour={'#30B283'}*/}
+      {/*  onPress={() => navigation.navigate('ListNotes')}*/}
+      {/*/>*/}
     </View>
   );
 };

@@ -14,7 +14,8 @@ import {useRoute} from '@react-navigation/native';
 
 function NoteScreen({navigation, id, name, contents}) {
   const [notes, setNotes] = useState(null);
-  const [content, setContent] = useState('route.params.contents');
+  const [content, setContent] = useState(contents);
+  const [header, setHeader] = useState(name);
   const route = useRoute();
 
   React.useEffect(() => {
@@ -80,13 +81,13 @@ function NoteScreen({navigation, id, name, contents}) {
   };
 
   const saveNoteContent = () => {
-    console.log('id in saving note is: ', route.params.id);
-    console.log('name in saving note is: ', route.params.name);
+    console.log('id in saving note is : ', route.params.id);
+    console.log('name in saving note is: ', header);
     console.log('content in saving note is: ', content);
     axios
       .put('https://gavin-fyp.herokuapp.com/updateNote', {
         id: route.params.id,
-        name: route.params.name,
+        name: header,
         content: content,
       })
       .then(response => {
@@ -103,7 +104,7 @@ function NoteScreen({navigation, id, name, contents}) {
   // Display
   return (
     <View style={[styles.sectionContainer]}>
-      <Text style={[styles.header]}>{route.params.name}</Text>
+      <TextInput style={[styles.header]} onChangeText={header => setHeader(header)}>{route.params.name}</TextInput>
       {/*<Text style={{color: 'black'}}>Name:{route.params.name}</Text>*/}
       {/*<Text style={{color: 'black'}}>ID:{route.params.id}</Text>*/}
       {/*<Text style={{color: 'black'}}>content: {content}</Text>*/}
@@ -120,9 +121,8 @@ function NoteScreen({navigation, id, name, contents}) {
         style={[styles.button]}
         styleDisabled={{color: 'red'}}
         onPress={() => saveNoteContent()}
-        title="Save">
-
-      </Button>
+        title="Save"
+      />
     </View>
   );
 }

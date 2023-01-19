@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import {StackActions} from '@react-navigation/native';
+import {StackActions, useRoute} from '@react-navigation/native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import {AuthContext} from '../context/AuthContext';
 // import NoteButton from './Buttons/NoteButton';
@@ -16,7 +16,9 @@ import axios from 'axios';
 import WikiModule from './Buttons/WikiModule';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const ListNotes = ({navigation}) => {
+const ListNotes = ({navigation, moduleCode}) => {
+  const route = useRoute();
+
   const {loggedIn, userData} = useContext(AuthContext);
   const [notes, setNotes] = useState(null);
   const [name, setName] = useState('');
@@ -32,6 +34,7 @@ const ListNotes = ({navigation}) => {
   console.log(' || LISTNOTES ||');
 
   console.log('email: ' + userData.email);
+  console.log('code: ' + route.params.moduleCode);
   const currentUsersEmail = userData.email;
 
   const deleteNote = id => {
@@ -201,6 +204,9 @@ const ListNotes = ({navigation}) => {
   let showAllUsers = false;
   return (
     <ScrollView style={[styles.sectionContainer]}>
+      <Text style={{color: 'black', fontSize: 15}}>
+        {route.params.moduleCode}
+      </Text>
       <View style={[styles.createNote]}>
         <Text
           style={{

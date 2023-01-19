@@ -17,9 +17,20 @@ const Schema = new mongoose.Schema({
   userEmail: String,
   privacy: String,
 });
+//
+mongoose.model('Note', Schema);
+const Note = mongoose.model('Note');
 
-mongoose.model('note', Schema);
-const Note = mongoose.model('note');
+
+const Group = mongoose.model('Group', {
+  name: String,
+  notes: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Note',
+    },
+  ],
+});
 
 mongoose.connect(
   'mongodb+srv://admin:adminpw@cluster0.p8vqsyf.mongodb.net/?retryWrites=true&w=majority',
@@ -38,6 +49,18 @@ mongoose.connection.on('error', err => {
 app.get('/', (req, res) => {
   console.log('Getting Notes');
   Note.find({})
+    .then(data => {
+      console.log('data: ', data);
+      res.send(data);
+    })
+    .catch(err => {
+      console.log(err);
+    });
+});
+//
+app.get('/getModules', (req, res) => {
+  console.log('Getting Module');
+  Group.find({})
     .then(data => {
       console.log('data: ', data);
       res.send(data);
