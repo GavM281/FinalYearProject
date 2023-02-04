@@ -16,11 +16,11 @@ const Schema = new mongoose.Schema({
   content: String,
   userEmail: String,
   privacy: String,
+  groupID: {type: mongoose.Schema.ObjectId, ref: 'Group'},
 });
 //
 mongoose.model('Note', Schema);
 const Note = mongoose.model('Note');
-
 
 const Group = mongoose.model('Group', {
   name: String,
@@ -46,8 +46,22 @@ mongoose.connection.on('error', err => {
   console.log('error', err);
 });
 
-app.get('/', (req, res) => {
+app.get('/getNotes', (req, res) => {
   console.log('Getting Notes');
+  console.log('getNotes array: ' + req.body.ids);
+  // Note.find({_ids: {$in: [req.body.ids]}})
+
+  // Note.find({"_id" : {"$in" : [ObjectId("63c968a8c4afba376c71dae1"), ObjectId("63c740fee0dcd7e242a5e63a")]}})
+
+  // Note.find({
+  //   '_id': { $in: [
+  //       mongoose.Types.ObjectId('63c968a8c4afba376c71dae1'),
+  //       mongoose.Types.ObjectId('63c740fee0dcd7e242a5e63a'),
+  //       // mongoose.Types.ObjectId('4ed3f18132f50c491100000e')
+  //     ]}
+  // Note.find( { _id : { $in : [mongoose.Types.ObjectId('63c73ece03e5b856270ab63b'),mongoose.Types.ObjectId('63c740fee0dcd7e242a5e63a')] } } )
+  // Note.find( { _id : { $in : [mongoose.Types.ObjectId({$req.params.ids[0]}),mongoose.Types.ObjectId({req.body.ids[1]})] } } )
+
   Note.find({})
     .then(data => {
       console.log('data: ', data);
@@ -57,7 +71,7 @@ app.get('/', (req, res) => {
       console.log(err);
     });
 });
-//
+
 app.get('/getModules', (req, res) => {
   console.log('Getting Module');
   Group.find({})
@@ -91,16 +105,26 @@ app.post('/createNote', (req, res) => {
     content: req.body.content,
     userEmail: req.body.userEmail,
     privacy: req.body.privacy,
-  });
-  note
-    .save()
-    .then(data => {
-      console.log(data);
-      res.send(data);
-    })
-    .catch(err => {
-      console.log('error', err);
+    groupID: mongoose.Types.ObjectId(req.body.group),
+  }); //
+  note.save(function (err, comment) {
+    if (err) {
+      return res.send(err);
+    }
+    console.log("SAVING MODULE ID IS: " + req.body.groupID);
+    Group.findById(req.body.groupID, function (err, group) {
+      if (err) {
+        return res.send(err);
+      }
+      group.notes.push(note);
+      group.save(function (err) {
+        if (err) {
+          return res.send(err);
+        }
+        res.json({status: 'done'});
+      });
     });
+  });
 });
 
 app.put('/updateNote', (req, res) => {

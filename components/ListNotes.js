@@ -16,7 +16,7 @@ import axios from 'axios';
 import WikiModule from './Buttons/WikiModule';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const ListNotes = ({navigation, moduleCode}) => {
+const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
   const route = useRoute();
 
   const {loggedIn, userData} = useContext(AuthContext);
@@ -27,15 +27,20 @@ const ListNotes = ({navigation, moduleCode}) => {
   const [value, setValue] = useState('private');
   const [items, setItems] = useState([
     {label: 'Private', value: 'private'},
-    {label: 'Public', value: 'public'}
+    {label: 'Public', value: 'public'},
   ]);
 
   console.log('');
   console.log(' || LISTNOTES ||');
-
-  console.log('email: ' + userData.email);
-  console.log('code: ' + route.params.moduleCode);
   const currentUsersEmail = userData.email;
+  const noteIDs = route.params.moduleNotes;
+  const currentModuleCode = route.params.moduleCode;
+  const currentModuleID = route.params.moduleID;
+  // //
+  console.log('email: ' + userData.email);
+  console.log('code: ' + currentModuleCode);
+  console.log('Module ID: ' + currentModuleID);
+  console.log('IDs: ' + noteIDs);
 
   const deleteNote = id => {
     axios
@@ -44,6 +49,14 @@ const ListNotes = ({navigation, moduleCode}) => {
       })
       .then(response => {
         console.log('Deleted ', id);
+        // this.props.navigation.navigate({
+        //   routeName: 'ListNotes',
+        //   params: {
+        //     moduleCode: "currentModuleCode",
+        //     moduleNotes: "noteIDs",
+        //   },
+        //   key: 'ListNotes' + Math.random() * 10000,
+        // });
         getNotes(); // Refresh list of notes
       })
       .catch(error => {
@@ -160,7 +173,9 @@ const ListNotes = ({navigation, moduleCode}) => {
   const getNotes = () => {
     axios
       // .get('https://staidr-heroku.herokuapp.com/groups')
-      .get('https://gavin-fyp.herokuapp.com/')
+      .get('https://gavin-fyp.herokuapp.com/', {
+        // ids: ['63c73ece03e5b856270ab63b', '63c740fee0dcd7e242a5e63a'],
+      })
       .then(response => {
         // console.log('main res', response);
         // console.log('data', JSON.parse(JSON.stringify(response.data)));
@@ -173,6 +188,7 @@ const ListNotes = ({navigation, moduleCode}) => {
       })
       .catch(error => {
         console.log(error);
+        console.log('There was an error getting notes ^^');
       });
   };
 
@@ -183,6 +199,7 @@ const ListNotes = ({navigation, moduleCode}) => {
         content: '',
         userEmail: currentUsersEmail,
         privacy: value,
+        group: currentModuleID,
       })
       .then(response => {
         let responseData = JSON.parse(JSON.stringify(response.data));
@@ -205,7 +222,7 @@ const ListNotes = ({navigation, moduleCode}) => {
   return (
     <ScrollView style={[styles.sectionContainer]}>
       <Text style={{color: 'black', fontSize: 15}}>
-        {route.params.moduleCode}
+        {currentModuleCode}
       </Text>
       <View style={[styles.createNote]}>
         <Text
@@ -244,9 +261,10 @@ const ListNotes = ({navigation, moduleCode}) => {
       <FlatList
         data={notes}
         keyExtractor={(item, index) => index.toString()}
-        // setId({notes._id});
+        // setId ({notes._id});
         renderItem={({item}) => {
-          if (item.userEmail === currentUsersEmail || showAllUsers == true || item.privacy === "public") {
+          if ( (item.userEmail === currentUsersEmail || item.privacy === "public") && noteIDs.includes(item._id) || showAllUsers == true){
+          // if ( item.userEmail === currentUsersEmail || item.privacy === "public" || showAllUsers == true){
             return (
               <NoteButton
                 title={item.name}

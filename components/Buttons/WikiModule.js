@@ -4,6 +4,7 @@ import {StyleSheet, TouchableOpacity, Text, View} from 'react-native';
 const WikiModule = ({
   title,
   Notes,
+  ids,
   onPress,
   buttonColour,
   titleColour,
@@ -34,7 +35,7 @@ const WikiModule = ({
             color: titleColour || '#FFF6F6',
             fontSize: 25,
           }}>
-          {title}
+          {title} || {ids}
         </Text>
       </View>
       {/*Notes*/}
@@ -46,17 +47,17 @@ const WikiModule = ({
           // paddingVertical: 10,
           // marginBottom: '-10%',
         }}>
-        <View>
-          <Text
-            style={{
-              ...styles.appButtonText,
-              ...textStyle,
-              color: titleColour || '#FFF6F6',
-              fontSize: 14,
-            }}>
-            Notes uploaded: {Notes}
-          </Text>
-        </View>
+        {/*<View>*/}
+        {/*  <Text*/}
+        {/*    style={{*/}
+        {/*      ...styles.appButtonText,*/}
+        {/*      ...textStyle,*/}
+        {/*      color: titleColour || '#FFF6F6',*/}
+        {/*      fontSize: 14,*/}
+        {/*    }}>*/}
+        {/*    Notes uploaded: {Notes}*/}
+        {/*  </Text>*/}
+        {/*</View>*/}
       </View>
     </TouchableOpacity>
   );

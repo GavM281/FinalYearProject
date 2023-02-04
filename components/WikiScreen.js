@@ -40,8 +40,8 @@ const WikiScreen = ({navigation}) => {
         // console.log('data', JSON.parse(JSON.stringify(response.data)));
         let responseData = JSON.parse(JSON.stringify(response.data));
         console.log('RESPONSE DATA: ', responseData);
-        console.log('name', responseData[0].name);
-        console.log('content', responseData[0].content);
+        console.log();
+        console.log('content', responseData[0].name);
         //List of rooms = responseData[0].Rooms
         setRooms(responseData);
       })
@@ -59,9 +59,10 @@ const WikiScreen = ({navigation}) => {
         renderItem={({item}) => (
           <WikiModule
             title={item.name}
-            Notes="45"
+            Notes={item.notes.length}
+            ids={item.notes}
             buttonColour={'#30B283'}
-            onPress={() => navigation.navigate('ListNotes', {moduleCode: item.name})}
+            onPress={() => navigation.navigate('ListNotes', {moduleCode: item.name, moduleNotes: item.notes, moduleID: item._id})}
           />
         )}
       />
