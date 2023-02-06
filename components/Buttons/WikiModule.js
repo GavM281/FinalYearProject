@@ -35,7 +35,7 @@ const WikiModule = ({
             color: titleColour || '#FFF6F6',
             fontSize: 25,
           }}>
-          {title} || {ids}
+          {title}
         </Text>
       </View>
       {/*Notes*/}

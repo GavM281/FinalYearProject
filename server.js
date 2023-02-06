@@ -107,11 +107,10 @@ app.post('/createNote', (req, res) => {
     privacy: req.body.privacy,
     groupID: mongoose.Types.ObjectId(req.body.group),
   }); //
-  note.save(function (err, comment) {
+  note.save(function (err, note) {
     if (err) {
       return res.send(err);
     }
-    console.log("SAVING MODULE ID IS: " + req.body.groupID);
     Group.findById(req.body.groupID, function (err, group) {
       if (err) {
         return res.send(err);
@@ -121,7 +120,7 @@ app.post('/createNote', (req, res) => {
         if (err) {
           return res.send(err);
         }
-        res.json({status: 'done'});
+        res.json(note);
       });
     });
   });

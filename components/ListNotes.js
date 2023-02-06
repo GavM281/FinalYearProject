@@ -36,7 +36,7 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
   const noteIDs = route.params.moduleNotes;
   const currentModuleCode = route.params.moduleCode;
   const currentModuleID = route.params.moduleID;
-  // //
+  //
   console.log('email: ' + userData.email);
   console.log('code: ' + currentModuleCode);
   console.log('Module ID: ' + currentModuleID);
@@ -77,6 +77,7 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
     id,
     userEmail,
     privacy,
+    editable,
   }) => {
     return (
       <TouchableOpacity
@@ -91,6 +92,7 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
             id: id,
             name: title,
             contents: content,
+            editable: editable,
           })
         }>
         {/*Module name*/}
@@ -115,6 +117,7 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
             }}>
             {title}
           </Text>
+
           <Icon
             style={{
               alignItems: 'center',
@@ -125,7 +128,8 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
             color="#ccc"
             size={30}
             onPress={() => {
-              deleteNote(id), navigation.navigate('ListNotes');
+              deleteNote(id);
+              // navigation.navigate('ListNotes');
             }}
           />
         </View>
@@ -142,20 +146,14 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
             {content}
           </Text>
         </View>
-        <Text>{userEmail}</Text>
-        <Text>{privacy}</Text>
-        {/*<View>*/}
-        {/*  <Text*/}
-        {/*    style={{*/}
-        {/*      ...styles.appButtonText,*/}
-        {/*      ...textStyle,*/}
-        {/*      color: '#d1d1d1',*/}
-        {/*      fontSize: 15,*/}
-        {/*      flex: 1,*/}
-        {/*    }}>*/}
-        {/*    {id}*/}
-        {/*  </Text>*/}
-        {/*</View>*/}
+        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+          <Icon name="person" size={20} />
+          <Text>{userEmail}</Text>
+        </View>
+        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+          <Icon name="public" size={20} />
+          <Text>{privacy}</Text>
+        </View>
       </TouchableOpacity>
     );
   };
@@ -170,10 +168,10 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
     return unsubscribe;
   }, [navigation]);
 
-  const getNotes = () => {
-    axios
+  const getNotes = async () => {
+    await axios
       // .get('https://staidr-heroku.herokuapp.com/groups')
-      .get('https://gavin-fyp.herokuapp.com/', {
+      .get('https://gavin-fyp.herokuapp.com/getNotes', {
         // ids: ['63c73ece03e5b856270ab63b', '63c740fee0dcd7e242a5e63a'],
       })
       .then(response => {
@@ -192,14 +190,14 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
       });
   };
 
-  const createNote = () => {
-    axios
+  const createNote = async () => {
+    await axios
       .post('https://gavin-fyp.herokuapp.com/createNote', {
         name: name,
         content: '',
         userEmail: currentUsersEmail,
         privacy: value,
-        group: currentModuleID,
+        groupID: currentModuleID,
       })
       .then(response => {
         let responseData = JSON.parse(JSON.stringify(response.data));
@@ -220,67 +218,131 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
   // TESTING: True to show all users notes regardless of creator. False to only show current users notes
   let showAllUsers = false;
   return (
-    <ScrollView style={[styles.sectionContainer]}>
-      <Text style={{color: 'black', fontSize: 15}}>
+    <View style={[styles.sectionContainer]}>
+      <Text
+        style={{
+          color: 'black',
+          fontSize: 25,
+          textAlign: 'center',
+          fontWeight: 'bold',
+        }}>
         {currentModuleCode}
       </Text>
-      <View style={[styles.createNote]}>
-        <Text
-          style={{
-            textAlign: 'center',
-            fontWeight: 'bold',
-            color: 'white',
-            fontSize: 20,
-          }}>
-          Enter note name
-        </Text>
+      <TouchableOpacity
+        style={[styles.button]}
+        onPress={() =>
+          navigation.navigate('CreateNote', {
+            userEmail: currentUsersEmail,
+            moduleID: currentModuleID,
+          })
+        }>
+        <Text style={{color: 'white'}}>Create a new note</Text>
+      </TouchableOpacity>
+      {/*<View style={[styles.createNote]}>*/}
+      {/*  <Text*/}
+      {/*    style={{*/}
+      {/*      textAlign: 'center',*/}
+      {/*      fontWeight: 'bold',*/}
+      {/*      color: 'white',*/}
+      {/*      fontSize: 20,*/}
+      {/*    }}>*/}
+      {/*    Enter note name*/}
+      {/*  </Text>*/}
 
-        <TextInput
-          style={styles.input}
-          onChangeText={text => setName(text)}
-          placeholder="Enter Name"
-          label="Name"
-        />
+      {/*  <TextInput*/}
+      {/*    style={styles.input}*/}
+      {/*    onChangeText={text => setName(text)}*/}
+      {/*    placeholder="Enter Name"*/}
+      {/*    label="Name"*/}
+      {/*  />*/}
 
-        <DropDownPicker
-          open={open}
-          value={value}
-          items={items}
-          setOpen={setOpen}
-          setValue={setValue}
-          setItems={setItems}
-        />
+      {/*  <DropDownPicker*/}
+      {/*    open={open}*/}
+      {/*    value={value}*/}
+      {/*    items={items}*/}
+      {/*    setOpen={setOpen}*/}
+      {/*    setValue={setValue}*/}
+      {/*    setItems={setItems}*/}
+      {/*  />*/}
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => createNote()}
-          title="Save">
-          <Text style={{color: 'white'}}>Create</Text>
-        </TouchableOpacity>
-      </View>
+      {/*  <TouchableOpacity*/}
+      {/*    style={styles.button}*/}
+      {/*    onPress={() => createNote()}*/}
+      {/*    title="Save">*/}
+      {/*    <Text style={{color: 'white'}}>Create</Text>*/}
+      {/*  </TouchableOpacity>*/}
+      {/*</View>*/}
       <FlatList
         data={notes}
         keyExtractor={(item, index) => index.toString()}
         // setId ({notes._id});
         renderItem={({item}) => {
-          if ( (item.userEmail === currentUsersEmail || item.privacy === "public") && noteIDs.includes(item._id) || showAllUsers == true){
-          // if ( item.userEmail === currentUsersEmail || item.privacy === "public" || showAllUsers == true){
-            return (
-              <NoteButton
-                title={item.name}
-                content={item.content}
-                buttonColour={'#30B283'}
-                navigation={navigation}
-                id={item._id}
-                userEmail={item.userEmail}
-                privacy={item.privacy}
-                // onPress={() => navigation.navigate('NoteScreen', {id: item._id, name: item.name})}
-              />
-            );
+          // console.log(
+          //   'Checking verifications: notes email: ' +
+          //     item.userEmail +
+          //     ' and current email: ' +
+          //     currentUsersEmail +
+          //     ' privacy is ' +
+          //     item.privacy,
+          // );
+          let editableDoc = false;
+          // if (item.userEmail === currentUsersEmail) {
+          //   editableDoc = true;
+          // }
+          if (
+            ((item.userEmail === currentUsersEmail ||
+              item.privacy === 'public') &&
+              noteIDs.includes(item._id)) ||
+            showAllUsers == true
+          ) {
+            // console.log('In ListNotes, editable is: ' + editableDoc);
+            // if ( item.userEmail === currentUsersEmail || item.privacy === "public" || showAllUsers == true){
+            if (item.userEmail === currentUsersEmail) {
+              editableDoc = true;
+              return (
+                <NoteButton
+                  title={item.name}
+                  content={item.content}
+                  buttonColour={'#30B283'}
+                  navigation={navigation}
+                  id={item._id}
+                  userEmail={item.userEmail}
+                  privacy={item.privacy}
+                  editable={editableDoc}
+                  // onPress={() =>
+                  //   navigation.navigate('NoteScreen', {
+                  //     id: item._id,
+                  //     name: item.name,
+                  //     editableDoc: {editableDoc},
+                  //   })
+                  // }
+                />
+              );
+            } else {
+              return (
+                <NoteButton
+                  title={item.name}
+                  content={item.content}
+                  buttonColour={'#30B283'}
+                  navigation={navigation}
+                  id={item._id}
+                  userEmail={item.userEmail}
+                  privacy={item.privacy}
+                  editable={editableDoc}
+                  // onPress={() =>
+                  //   navigation.navigate('NoteScreen', {
+                  //     id: item._id,
+                  //     name: item.name,
+                  //     editableDoc: {editableDoc},
+                  //   })
+                  // }
+                />
+              );
+            }
           }
         }}
       />
-    </ScrollView>
+    </View>
   );
 };
 
@@ -288,7 +350,8 @@ const styles = StyleSheet.create({
   sectionContainer: {
     // marginTop: 32,
     paddingHorizontal: 24,
-    // marginBottom: 20,
+    marginBottom: 100,
+    // paddingBottom: 20,
   },
   sectionTitle: {
     fontSize: 24,

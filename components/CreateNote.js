@@ -13,10 +13,10 @@ import NoteButton from './Buttons/NoteButton';
 import {useRoute} from '@react-navigation/native';
 import DropDownPicker from 'react-native-dropdown-picker';
 
-function NoteScreen({navigation, id, name, contents, editable}) {
+function NoteScreen({navigation, contents, userEmail, moduleID}) {
   const [notes, setNotes] = useState(null);
-  const [content, setContent] = useState(contents);
-  const [header, setHeader] = useState(name);
+  const [content, setContent] = useState('');
+  const [header, setHeader] = useState('');
 
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState('private');
@@ -24,19 +24,21 @@ function NoteScreen({navigation, id, name, contents, editable}) {
     {label: 'Private', value: 'private'},
     {label: 'Public', value: 'public'},
   ]);
-
   const route = useRoute();
-  const editableDoc = route.params.editable;
+  const currentUsersEmail = route.params.userEmail;
+  const currentModuleID = route.params.moduleID;
+  console.log('Email: ' + currentUsersEmail);
+  console.log('id: ' + currentModuleID);
+
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       // When the screen is focused (like loading from another screen), call function to refresh data
       console.log('');
-      console.log(' || NOTESCREEN ||');
-      console.log('### id is:  ' + route.params.id);
-      console.log('contents: ', route.params.contents);
-      console.log('editable: ' + editableDoc);
-      setContent(route.params.contents);
-      getNote();
+      console.log(' || CreateNote ||');
+      // console.log('### id is:  ' + route.params.id);
+      // console.log('contents: ', route.params.contents);
+      // setContent(route.params.contents);
+      // getNote();
     });
 
     // Return the function to unsubscribe from the event so it gets removed on unmount
@@ -64,28 +66,52 @@ function NoteScreen({navigation, id, name, contents, editable}) {
   //     });
   // };
 
-  const getNote = () => {
-    console.log('The id is: ' + route.params.id);
-    console.log('The content is: ' + content);
+  // const getNote = () => {
+  //   console.log('The id is: ' + route.params.id);
+  //   console.log('The content is: ' + content);
+  //   axios
+  //     .get('https://gavin-fyp.herokuapp.com/getNote', {
+  //       params: {
+  //         id: route.params.id,
+  //       },
+  //     })
+  //     .then(response => {
+  //       // handle success
+  //       console.log('Made request');
+  //       console.log(response);
+  //       let responseData = JSON.parse(JSON.stringify(response.data));
+  //       console.log('The id is: ' + responseData._id);
+  //       console.log('The id is: ' + responseData.id);
+  //       console.log('The content is: ' + responseData.content);
+  //       setContent(responseData.content);
+  //     })
+  //     .catch(error => {
+  //       console.log('Failed request');
+  //       // handle error
+  //       console.log(error);
+  //     });
+  // };
+
+  const createNote = () => {
     axios
-      .get('https://gavin-fyp.herokuapp.com/getNote', {
-        params: {
-          id: route.params.id,
-        },
+      .post('https://gavin-fyp.herokuapp.com/createNote', {
+        name: header,
+        content: content,
+        userEmail: currentUsersEmail,
+        privacy: value,
+        groupID: currentModuleID,
       })
       .then(response => {
-        // handle success
-        console.log('Made request');
-        console.log(response);
         let responseData = JSON.parse(JSON.stringify(response.data));
-        console.log('The id is: ' + responseData._id);
-        console.log('The id is: ' + responseData.id);
-        console.log('The content is: ' + responseData.content);
-        setContent(responseData.content);
+        console.log('RESPONSE DATA after creating new note: ', responseData);
+        console.log('NEW NOTES ID IS: ', responseData._id);
+        navigation.navigate('NoteScreen', {
+          id: responseData._id,
+          name: header,
+        });
+        // getNotes();
       })
       .catch(error => {
-        console.log('Failed request');
-        // handle error
         console.log(error);
       });
   };
@@ -123,7 +149,7 @@ function NoteScreen({navigation, id, name, contents, editable}) {
         setItems={setItems}
         hideSelectedItemIcon={true}
       />
-      <TextInput style={[styles.header]} editable={editableDoc} onChangeText={header => setHeader(header)}>{route.params.name}</TextInput>
+      <TextInput style={[styles.header]} placeholder={'Enter Note Name'} placeholderTextColor="black" onChangeText={header => setHeader(header)}></TextInput>
       {/*<Text style={{color: 'black'}}>Name:{route.params.name}</Text>*/}
       {/*<Text style={{color: 'black'}}>ID:{route.params.id}</Text>*/}
       {/*<Text style={{color: 'black'}}>content: {content}</Text>*/}
@@ -131,7 +157,7 @@ function NoteScreen({navigation, id, name, contents, editable}) {
       {/*Note text */}
       <TextInput
         style={[styles.textInput]}
-        editable={editableDoc}
+        editable
         multiline={true}
         onChangeText={newText => setContent(newText)}
         value={content}
@@ -139,7 +165,7 @@ function NoteScreen({navigation, id, name, contents, editable}) {
       <Button
         style={[styles.button]}
         styleDisabled={{color: 'red'}}
-        onPress={() => saveNoteContent()}
+        onPress={() => createNote()}
         title="Save"
       />
     </View>

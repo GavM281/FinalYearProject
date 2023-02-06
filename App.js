@@ -12,7 +12,7 @@ import {
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {NavigationContainer} from '@react-navigation/native';
 import 'react-native-gesture-handler';
-
+// import {HeaderBackButton} from '@react-navigation/elements';
 /*
 Gets Bundle identifier and displays it when app runs
 
@@ -33,6 +33,8 @@ import HamburgerMenu from './components/HamburgerMenu';
 import GroupScreen from './components/GroupScreen';
 import NoteScreen from './components/NoteScreen';
 import ListNotes from './components/ListNotes';
+import CreateNote from './components/CreateNote';
+// import {HeaderBackButton} from "@react-navigation/elements";
 const Stack = createNativeStackNavigator();
 
 const App = () => {
@@ -87,7 +89,23 @@ const App = () => {
               ),
             })}
           />
-          <Stack.Screen name="NoteScreen" component={NoteScreen} />
+          <Stack.Screen
+            name="NoteScreen"
+            component={NoteScreen}
+            // options={({navigation}) => ({
+            //   title: 'Notes',
+            //   headerLeft: () => (
+            //     // <TouchableOpacity style={[styles.button]}
+            //     <HeaderBackButton
+            //       onPress={() => {
+            //         navigation.navigate('ListNotes');
+            //       }}
+            //     />
+            //   ),
+            // })}
+          />
+
+          <Stack.Screen name="CreateNote" component={CreateNote} />
         </Stack.Navigator>
       </NavigationContainer>
     </AuthContextProvider>
