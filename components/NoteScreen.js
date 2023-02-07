@@ -12,8 +12,9 @@ import axios from 'axios';
 import NoteButton from './Buttons/NoteButton';
 import {useRoute} from '@react-navigation/native';
 import DropDownPicker from 'react-native-dropdown-picker';
+import {HeaderBackButton} from "@react-navigation/elements";
 
-function NoteScreen({navigation, id, name, contents, editable}) {
+function NoteScreen({navigation, id, name, contents, editable, moduleInfo}) {
   const [notes, setNotes] = useState(null);
   const [content, setContent] = useState(contents);
   const [header, setHeader] = useState(name);
@@ -27,6 +28,7 @@ function NoteScreen({navigation, id, name, contents, editable}) {
 
   const route = useRoute();
   const editableDoc = route.params.editable;
+  let moduleInfos = route.params.moduleInfo;
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       // When the screen is focused (like loading from another screen), call function to refresh data
@@ -35,7 +37,20 @@ function NoteScreen({navigation, id, name, contents, editable}) {
       console.log('### id is:  ' + route.params.id);
       console.log('contents: ', route.params.contents);
       console.log('editable: ' + editableDoc);
+      console.log('currentModuleCode: ' + moduleInfos[0]);
+      // console.log('noteIDs: ' + moduleInfos[1]);
+      console.log('currentModuleID: ' + moduleInfos[2]);
       setContent(route.params.contents);
+      navigation.setOptions({
+        headerLeft: () => (
+          // <TouchableOpacity style={[styles.button]}
+          <HeaderBackButton
+            onPress={() => {
+              navigation.navigate('ListNotes', {moduleCode: moduleInfos[0], moduleNotes: moduleInfos[1], moduleID: moduleInfos[2]});
+            }}
+          />
+        ),
+      });
       getNote();
     });
 
@@ -43,30 +58,9 @@ function NoteScreen({navigation, id, name, contents, editable}) {
     return unsubscribe;
   }, [navigation]);
 
-  // Change to find by id that's passed in
-  // const getNotes = () => {
-  //   axios
-  //     // .get('https://staidr-heroku.herokuapp.com/groups')
-  //     .get('https://gavin-fyp.herokuapp.com/')
-  //     .then(response => {
-  //       // console.log('main res', response);
-  //       // console.log('data', JSON.parse(JSON.stringify(response.data)));
-  //       let responseData = JSON.parse(JSON.stringify(response.data));
-  //       console.log('RESPONSE DATA: ', responseData);
-  //       // console.log('rooms', responseData[0].Rooms);
-  //       console.log('name', responseData[0].name);
-  //       //List of rooms = responseData[0].Rooms
-  //       // setNotes(responseData);
-  //       setContent(responseData[0].content);
-  //     })
-  //     .catch(error => {
-  //       console.log(error);
-  //     });
-  // };
-
   const getNote = () => {
-    console.log('The id is: ' + route.params.id);
-    console.log('The content is: ' + content);
+    console.log('GET NOTE -> The id is: ' + route.params.id);
+    // console.log('The content is: ' + content);
     axios
       .get('https://gavin-fyp.herokuapp.com/getNote', {
         params: {
@@ -122,12 +116,9 @@ function NoteScreen({navigation, id, name, contents, editable}) {
         setValue={setValue}
         setItems={setItems}
         hideSelectedItemIcon={true}
+        disabled={!editableDoc}
       />
       <TextInput style={[styles.header]} editable={editableDoc} onChangeText={header => setHeader(header)}>{route.params.name}</TextInput>
-      {/*<Text style={{color: 'black'}}>Name:{route.params.name}</Text>*/}
-      {/*<Text style={{color: 'black'}}>ID:{route.params.id}</Text>*/}
-      {/*<Text style={{color: 'black'}}>content: {content}</Text>*/}
-      {/*<Text style={{color: 'black'}}>notes: {notes}</Text>*/}
       {/*Note text */}
       <TextInput
         style={[styles.textInput]}
@@ -152,9 +143,6 @@ const styles = StyleSheet.create({
     // marginTop: 20,
     paddingHorizontal: 14,
     shadowColor: '#000', // IOS
-    // shadowOffset: {height: 1, width: 0}, // IOS
-    // padding: 6,
-    // paddingVertical: 10,
     height: '95%',
     backgroundColor: '#ededed',
     // margin: '2%',
@@ -184,14 +172,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 25,
     color: 'black',
-    // marginTop: 10,
-    // flex: 1,
-    // alignItems: 'stretch',
-    // padding: 10,
   },
-  // note: {
-  //   height: '100%',
-  // },
 });
 
 export default NoteScreen;

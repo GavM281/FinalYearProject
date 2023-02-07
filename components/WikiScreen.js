@@ -11,8 +11,6 @@ const WikiScreen = ({navigation}) => {
   const {loggedIn} = useContext(AuthContext);
   const [rooms, setRooms] = useState(null);
 
-
-
   useEffect(() => {
     if (loggedIn === false) {
       navigation.dispatch(StackActions.replace('Sign In'));
@@ -66,18 +64,6 @@ const WikiScreen = ({navigation}) => {
           />
         )}
       />
-      {/*<WikiModule*/}
-      {/*  title="CS161"*/}
-      {/*  Notes="45"*/}
-      {/*  buttonColour={'#30B283'}*/}
-      {/*  onPress={() => navigation.navigate('ListNotes', {moduleCode: 'CS161'})}*/}
-      {/*/>*/}
-      {/*<WikiModule*/}
-      {/*  title="CS162"*/}
-      {/*  Notes="14"*/}
-      {/*  buttonColour={'#30B283'}*/}
-      {/*  onPress={() => navigation.navigate('ListNotes')}*/}
-      {/*/>*/}
     </View>
   );
 };

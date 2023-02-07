@@ -12,7 +12,7 @@ import {
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {NavigationContainer} from '@react-navigation/native';
 import 'react-native-gesture-handler';
-// import {HeaderBackButton} from '@react-navigation/elements';
+import {HeaderBackButton} from '@react-navigation/elements';
 /*
 Gets Bundle identifier and displays it when app runs
 
@@ -61,48 +61,21 @@ const App = () => {
             component={ListNotes}
             options={({navigation}) => ({
               title: 'Notes',
-              headerRight: () => (
-                <View>
-                  <TouchableOpacity onPress={() => setModalVisible(true)}>
-                    <Text style={{color: 'blue'}}>New</Text>
-                  </TouchableOpacity>
-                  <Modal
-                    animationType="slide"
-                    transparent={true}
-                    visible={modalVisible}
-                    onRequestClose={() => {
-                      Alert.alert('Modal has been closed.');
-                      setModalVisible(!modalVisible);
-                    }}>
-                    <View style={styles.centeredView}>
-                      <View style={styles.modalView}>
-                        <Text style={styles.modalText}>Name</Text>
-                        <Pressable
-                          style={[styles.button, styles.buttonClose]}
-                          onPress={() => setModalVisible(!modalVisible)}>
-                          <Text style={styles.textStyle}>Hide Modal</Text>
-                        </Pressable>
-                      </View>
-                    </View>
-                  </Modal>
-                </View>
-              ),
             })}
           />
           <Stack.Screen
             name="NoteScreen"
             component={NoteScreen}
-            // options={({navigation}) => ({
-            //   title: 'Notes',
-            //   headerLeft: () => (
-            //     // <TouchableOpacity style={[styles.button]}
-            //     <HeaderBackButton
-            //       onPress={() => {
-            //         navigation.navigate('ListNotes');
-            //       }}
-            //     />
-            //   ),
-            // })}
+            options={({navigation}) => ({
+              title: 'Notes',
+              headerLeft: () => (
+                <HeaderBackButton
+                  onPress={() => {
+                    navigation.navigate('ListNotes');
+                  }}
+                />
+              ),
+            })}
           />
 
           <Stack.Screen name="CreateNote" component={CreateNote} />

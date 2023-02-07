@@ -33,14 +33,20 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
   console.log('');
   console.log(' || LISTNOTES ||');
   const currentUsersEmail = userData.email;
-  const noteIDs = route.params.moduleNotes;
   const currentModuleCode = route.params.moduleCode;
+  const noteIDs = route.params.moduleNotes;
   const currentModuleID = route.params.moduleID;
+
+  const moduleInfo = [currentModuleCode, noteIDs, currentModuleID];
+  console.log('ListNotes moduleInfo: ');
+  console.log('  currentModuleCode: ' + moduleInfo[0]);
+  // console.log('noteIDs: ' + moduleInfo[1]);
+  console.log('  currentModuleID: ' + moduleInfo[2]);
   //
   console.log('email: ' + userData.email);
   console.log('code: ' + currentModuleCode);
   console.log('Module ID: ' + currentModuleID);
-  console.log('IDs: ' + noteIDs);
+  // console.log('IDs: ' + noteIDs);
 
   const deleteNote = id => {
     axios
@@ -49,14 +55,6 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
       })
       .then(response => {
         console.log('Deleted ', id);
-        // this.props.navigation.navigate({
-        //   routeName: 'ListNotes',
-        //   params: {
-        //     moduleCode: "currentModuleCode",
-        //     moduleNotes: "noteIDs",
-        //   },
-        //   key: 'ListNotes' + Math.random() * 10000,
-        // });
         getNotes(); // Refresh list of notes
       })
       .catch(error => {
@@ -93,9 +91,9 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
             name: title,
             contents: content,
             editable: editable,
+            moduleInfo: moduleInfo,
           })
         }>
-        {/*Module name*/}
         <View
           style={{
             justifyContent: 'space-between',
@@ -129,7 +127,6 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
             size={30}
             onPress={() => {
               deleteNote(id);
-              // navigation.navigate('ListNotes');
             }}
           />
         </View>
@@ -159,9 +156,12 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
   };
 
   React.useEffect(() => {
+    getNotes();
+    console.log('On ListNotes page');
     const unsubscribe = navigation.addListener('focus', () => {
       // When the screen is focused (like loading from another screen), call function to refresh data
       getNotes();
+      console.log('Getting notes on ListNotes');
     });
 
     // Return the function to unsubscribe from the event so it gets removed on unmount
@@ -175,13 +175,8 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
         // ids: ['63c73ece03e5b856270ab63b', '63c740fee0dcd7e242a5e63a'],
       })
       .then(response => {
-        // console.log('main res', response);
-        // console.log('data', JSON.parse(JSON.stringify(response.data)));
         let responseData = JSON.parse(JSON.stringify(response.data));
         console.log('RESPONSE DATA: ', responseData);
-        // console.log('rooms', responseData[0].Rooms);
-        console.log('name', responseData[0].name);
-        //List of rooms = responseData[0].Rooms
         setNotes(responseData);
       })
       .catch(error => {
@@ -190,8 +185,8 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
       });
   };
 
-  const createNote = async () => {
-    await axios
+  const createNote = () => {
+    axios
       .post('https://gavin-fyp.herokuapp.com/createNote', {
         name: name,
         content: '',
@@ -234,68 +229,23 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
           navigation.navigate('CreateNote', {
             userEmail: currentUsersEmail,
             moduleID: currentModuleID,
+            moduleInfo: moduleInfo,
           })
         }>
         <Text style={{color: 'white'}}>Create a new note</Text>
       </TouchableOpacity>
-      {/*<View style={[styles.createNote]}>*/}
-      {/*  <Text*/}
-      {/*    style={{*/}
-      {/*      textAlign: 'center',*/}
-      {/*      fontWeight: 'bold',*/}
-      {/*      color: 'white',*/}
-      {/*      fontSize: 20,*/}
-      {/*    }}>*/}
-      {/*    Enter note name*/}
-      {/*  </Text>*/}
-
-      {/*  <TextInput*/}
-      {/*    style={styles.input}*/}
-      {/*    onChangeText={text => setName(text)}*/}
-      {/*    placeholder="Enter Name"*/}
-      {/*    label="Name"*/}
-      {/*  />*/}
-
-      {/*  <DropDownPicker*/}
-      {/*    open={open}*/}
-      {/*    value={value}*/}
-      {/*    items={items}*/}
-      {/*    setOpen={setOpen}*/}
-      {/*    setValue={setValue}*/}
-      {/*    setItems={setItems}*/}
-      {/*  />*/}
-
-      {/*  <TouchableOpacity*/}
-      {/*    style={styles.button}*/}
-      {/*    onPress={() => createNote()}*/}
-      {/*    title="Save">*/}
-      {/*    <Text style={{color: 'white'}}>Create</Text>*/}
-      {/*  </TouchableOpacity>*/}
-      {/*</View>*/}
       <FlatList
         data={notes}
         keyExtractor={(item, index) => index.toString()}
         // setId ({notes._id});
         renderItem={({item}) => {
-          // console.log(
-          //   'Checking verifications: notes email: ' +
-          //     item.userEmail +
-          //     ' and current email: ' +
-          //     currentUsersEmail +
-          //     ' privacy is ' +
-          //     item.privacy,
-          // );
           let editableDoc = false;
-          // if (item.userEmail === currentUsersEmail) {
-          //   editableDoc = true;
-          // }
           if (
             ((item.userEmail === currentUsersEmail ||
               item.privacy === 'public') &&
               noteIDs.includes(item._id)) ||
             showAllUsers == true
           ) {
-            // console.log('In ListNotes, editable is: ' + editableDoc);
             // if ( item.userEmail === currentUsersEmail || item.privacy === "public" || showAllUsers == true){
             if (item.userEmail === currentUsersEmail) {
               editableDoc = true;
@@ -309,13 +259,6 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
                   userEmail={item.userEmail}
                   privacy={item.privacy}
                   editable={editableDoc}
-                  // onPress={() =>
-                  //   navigation.navigate('NoteScreen', {
-                  //     id: item._id,
-                  //     name: item.name,
-                  //     editableDoc: {editableDoc},
-                  //   })
-                  // }
                 />
               );
             } else {
@@ -329,13 +272,6 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
                   userEmail={item.userEmail}
                   privacy={item.privacy}
                   editable={editableDoc}
-                  // onPress={() =>
-                  //   navigation.navigate('NoteScreen', {
-                  //     id: item._id,
-                  //     name: item.name,
-                  //     editableDoc: {editableDoc},
-                  //   })
-                  // }
                 />
               );
             }
