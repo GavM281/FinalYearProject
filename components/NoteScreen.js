@@ -12,9 +12,18 @@ import axios from 'axios';
 import NoteButton from './Buttons/NoteButton';
 import {useRoute} from '@react-navigation/native';
 import DropDownPicker from 'react-native-dropdown-picker';
-import {HeaderBackButton} from "@react-navigation/elements";
+import {HeaderBackButton} from '@react-navigation/elements';
 
-function NoteScreen({navigation, id, name, contents, comments, editable, privacy, moduleInfo}) {
+function NoteScreen({
+  navigation,
+  id,
+  name,
+  contents,
+  comments,
+  editable,
+  privacy,
+  moduleInfo,
+}) {
   const route = useRoute();
 
   const [notes, setNotes] = useState(null);
@@ -39,6 +48,7 @@ function NoteScreen({navigation, id, name, contents, comments, editable, privacy
       console.log('### id is:  ' + route.params.id);
       console.log('contents: ', route.params.contents);
       console.log('editable: ' + editableDoc);
+      console.log('commentID: ' + route.params.comments);
       console.log('currentModuleCode: ' + moduleInfos[0]);
       // console.log('noteIDs: ' + moduleInfos[1]);
       console.log('currentModuleID: ' + moduleInfos[2]);
@@ -48,12 +58,16 @@ function NoteScreen({navigation, id, name, contents, comments, editable, privacy
           // <TouchableOpacity style={[styles.button]}
           <HeaderBackButton
             onPress={() => {
-              navigation.navigate('ListNotes', {moduleCode: moduleInfos[0], moduleNotes: moduleInfos[1], moduleID: moduleInfos[2]});
+              navigation.navigate('ListNotes', {
+                moduleCode: moduleInfos[0],
+                moduleNotes: moduleInfos[1],
+                moduleID: moduleInfos[2],
+              });
             }}
           />
         ),
       });
-      getNote();
+      // getNote();
     });
 
     // Return the function to unsubscribe from the event so it gets removed on unmount
@@ -86,23 +100,30 @@ function NoteScreen({navigation, id, name, contents, comments, editable, privacy
       });
   };
 
-  const getComment = (id) => {
-    // console.log('GET NOTE -> The id is: ' + route.params.id);
+  const getComment = commentID => {
+    console.log('GET Comment -> The id is: ' + commentID);
     // console.log('The content is: ' + content);
     axios
       .get('https://gavin-fyp.herokuapp.com/getComment', {
-        params: {
-          id: id,
+        data: {
+          _id: commentID,
         },
       })
       .then(response => {
         // handle success
         console.log('Made request');
-        console.log(response);
+        console.log('Response:  ' + response.data);
+        console.log('Response:  ' + response[0]);
+        console.log('Response:  ' + response);
+        console.log('Response:  ' + response.content);
+        console.log('Response:  ' + response.id);
+        console.log('Response:  ' + response._id);
+        // console.log('Response:  ' + response[0].data);
         let responseData = JSON.parse(JSON.stringify(response.data));
         // console.log('The id is: ' + responseData._id);
         // console.log('The id is: ' + responseData.id);
         // console.log('The content is: ' + responseData.content);
+        console.log('Response:  ' + responseData);
         setComment(responseData.content);
         setCommentEmail(responseData.userEmail);
       })
@@ -134,22 +155,24 @@ function NoteScreen({navigation, id, name, contents, comments, editable, privacy
       });
   };
 
-  const Comment = ({
-    commentContent,
-    userEmail,
-    }) => {
+  const Comment = ({commentContent, userEmail}) => {
     return (
       <View>
         <Text>{commentContent}</Text>
         <Text>{userEmail}</Text>
       </View>
-    )
-  }
+    );
+  };
 
   // Display
   return (
     <View style={[styles.sectionContainer]}>
-      <TextInput style={[styles.header]} editable={editableDoc} onChangeText={header => setHeader(header)}>{route.params.name}</TextInput>
+      <TextInput
+        style={[styles.header]}
+        editable={editableDoc}
+        onChangeText={header => setHeader(header)}>
+        {route.params.name}
+      </TextInput>
       {/*Note text */}
       <TextInput
         style={[styles.textInput]}
@@ -183,27 +206,33 @@ function NoteScreen({navigation, id, name, contents, comments, editable, privacy
         <Text style={{color: 'white'}}>Comments</Text>
       </TouchableOpacity>
       <TouchableOpacity
-        style={{...styles.button, borderBottomLeftRadius: 10, borderBottomRightRadius: 10, backgroundColor: '#666aff',}}
+        style={{
+          ...styles.button,
+          borderBottomLeftRadius: 10,
+          borderBottomRightRadius: 10,
+          backgroundColor: '#666aff',
+        }}
         onPress={() => saveNoteContent('Comments')}>
         <Text style={{color: 'white'}}>Save</Text>
       </TouchableOpacity>
       <View>
         <Text> Comments </Text>
-        <FlatList data={route.params.comments} renderItem={({id}) => {
-          console.log("id IS: " + id);
-          getComment(id);
+        <Text> {route.params.comments} </Text>
+        <FlatList
+          data={route.params.comments}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({item}) => {
+            console.log('id IS: ' + item);
+            // console.log('1: ' + route.params.comments);
+            // console.log('2: ' + route.params.comments[0]);
+            // console.log('3: ' + route.params.comments[1]);
+            getComment(item);
 
-          return (
-            <Comment
-              content={comment}
-              userEmail={commentEmail}
-            />
-          );
-        }}
-        ></FlatList>
+            return <Comment content={comment} userEmail={commentEmail} />;
+          }}
+        />
       </View>
     </View>
-
   );
 }
 

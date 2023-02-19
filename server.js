@@ -139,6 +139,7 @@ app.get('/getUser', (req, res) => {
 
 app.get('/getComment', (req, res) => {
   console.log('Getting Comment');
+  console.log('Id to find is: ' + req.body._id);
   Comment.find({_id: req.body._id})
     .then(data => {
       console.log('data: ' + data);
