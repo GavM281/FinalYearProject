@@ -17,6 +17,12 @@ const Schema = new mongoose.Schema({
   userEmail: String,
   privacy: String,
   groupID: {type: mongoose.Schema.ObjectId, ref: 'Group'},
+  comments: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Comment',
+    },
+  ],
 });
 //
 mongoose.model('Note', Schema);
@@ -42,6 +48,12 @@ const User = mongoose.model('User', {
       Group_name: String,
     },
   ],
+});
+
+const Comment = mongoose.model('Comment', {
+  content: String,
+  userEmail: String,
+  noteID: mongoose.Schema.Types.ObjectId,
 });
 
 mongoose.connect(
@@ -125,6 +137,21 @@ app.get('/getUser', (req, res) => {
     });
 });
 
+app.get('/getComment', (req, res) => {
+  console.log('Getting Comment');
+  Comment.find({_id: req.body._id})
+    .then(data => {
+      console.log('data: ' + data);
+      // console.log('Groups: ' + data[0].Groups);
+      // console.log('rooms: ' + data[0].Groups[0].Rooms);
+      // console.log('rooms2: ' + data.Groups[0]);
+      res.send(data);
+    })
+    .catch(err => {
+      console.log(err);
+    });
+});
+
 app.post('/createNote', (req, res) => {
   console.log('Creating Note');
   const note = new Note({
@@ -148,6 +175,32 @@ app.post('/createNote', (req, res) => {
           return res.send(err);
         }
         res.json(note);
+      });
+    });
+  });
+});
+
+app.post('/createComment', (req, res) => {
+  console.log('Creating Comment');
+  const comment = new Comment({
+    content: req.body.content,
+    userEmail: req.body.userEmail,
+    noteID: req.body.noteID,
+  }); //
+  comment.save(function (err, note) {
+    if (err) {
+      return res.send(err);
+    }
+    Note.findById(req.body.noteID, function (err, note) {
+      if (err) {
+        return res.send(err);
+      }
+      note.comments.push(comment);
+      note.save(function (err) {
+        if (err) {
+          return res.send(err);
+        }
+        res.json(comment);
       });
     });
   });

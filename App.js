@@ -34,6 +34,7 @@ import GroupScreen from './components/GroupScreen';
 import NoteScreen from './components/NoteScreen';
 import ListNotes from './components/ListNotes';
 import CreateNote from './components/CreateNote';
+import CommentsScreen from './components/Comments';
 // import {HeaderBackButton} from "@react-navigation/elements";
 const Stack = createNativeStackNavigator();
 
@@ -56,6 +57,7 @@ const App = () => {
           <Stack.Screen name="GroupHome" component={GroupHomeScreen} />
           <Stack.Screen name="Group" component={GroupScreen} />
           <Stack.Screen name="Wiki" component={WikiScreen} />
+          <Stack.Screen name="Comments" component={CommentsScreen} />
           <Stack.Screen
             name="ListNotes"
             component={ListNotes}

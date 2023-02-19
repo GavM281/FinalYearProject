@@ -14,11 +14,13 @@ import {useRoute} from '@react-navigation/native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import {HeaderBackButton} from "@react-navigation/elements";
 
-function NoteScreen({navigation, id, name, contents, editable, privacy, moduleInfo}) {
+function NoteScreen({navigation, id, name, contents, comments, editable, privacy, moduleInfo}) {
   const route = useRoute();
 
   const [notes, setNotes] = useState(null);
   const [content, setContent] = useState(contents);
+  const [comment, setComment] = useState('comment');
+  const [commentEmail, setCommentEmail] = useState('commentEmail');
   const [header, setHeader] = useState(name);
 
   const [open, setOpen] = useState(false);
@@ -84,6 +86,33 @@ function NoteScreen({navigation, id, name, contents, editable, privacy, moduleIn
       });
   };
 
+  const getComment = (id) => {
+    // console.log('GET NOTE -> The id is: ' + route.params.id);
+    // console.log('The content is: ' + content);
+    axios
+      .get('https://gavin-fyp.herokuapp.com/getComment', {
+        params: {
+          id: id,
+        },
+      })
+      .then(response => {
+        // handle success
+        console.log('Made request');
+        console.log(response);
+        let responseData = JSON.parse(JSON.stringify(response.data));
+        // console.log('The id is: ' + responseData._id);
+        // console.log('The id is: ' + responseData.id);
+        // console.log('The content is: ' + responseData.content);
+        setComment(responseData.content);
+        setCommentEmail(responseData.userEmail);
+      })
+      .catch(error => {
+        console.log('Failed request');
+        // handle error
+        console.log(error);
+      });
+  };
+
   const saveNoteContent = () => {
     console.log('id in saving note is : ', route.params.id);
     console.log('name in saving note is: ', header);
@@ -105,6 +134,18 @@ function NoteScreen({navigation, id, name, contents, editable, privacy, moduleIn
       });
   };
 
+  const Comment = ({
+    commentContent,
+    userEmail,
+    }) => {
+    return (
+      <View>
+        <Text>{commentContent}</Text>
+        <Text>{userEmail}</Text>
+      </View>
+    )
+  }
+
   // Display
   return (
     <View style={[styles.sectionContainer]}>
@@ -117,6 +158,7 @@ function NoteScreen({navigation, id, name, contents, editable, privacy, moduleIn
         onChangeText={newText => setContent(newText)}
         value={content}
       />
+
       <DropDownPicker
         style={[styles.dropdown]}
         open={open}
@@ -125,8 +167,9 @@ function NoteScreen({navigation, id, name, contents, editable, privacy, moduleIn
         setOpen={setOpen}
         setValue={setValue}
         setItems={setItems}
-        hideSelectedItemIcon={true}
+        // hideSelectedItemIcon={true}
         disabled={!editableDoc}
+        // ArrowDownIconComponent = ArrowUpIconComponent;
       />
       {/*<Button*/}
       {/*  style={[styles.button]}*/}
@@ -136,10 +179,31 @@ function NoteScreen({navigation, id, name, contents, editable, privacy, moduleIn
       {/*/>*/}
       <TouchableOpacity
         style={[styles.button]}
-        onPress={() => saveNoteContent()}>
+        onPress={() => navigation.navigate('Comments')}>
+        <Text style={{color: 'white'}}>Comments</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={{...styles.button, borderBottomLeftRadius: 10, borderBottomRightRadius: 10, backgroundColor: '#666aff',}}
+        onPress={() => saveNoteContent('Comments')}>
         <Text style={{color: 'white'}}>Save</Text>
       </TouchableOpacity>
+      <View>
+        <Text> Comments </Text>
+        <FlatList data={route.params.comments} renderItem={({id}) => {
+          console.log("id IS: " + id);
+          getComment(id);
+
+          return (
+            <Comment
+              content={comment}
+              userEmail={commentEmail}
+            />
+          );
+        }}
+        ></FlatList>
+      </View>
     </View>
+
   );
 }
 
@@ -174,11 +238,12 @@ const styles = StyleSheet.create({
     color: 'green',
     // borderRadius: 10,
     alignItems: 'center',
-    backgroundColor: '#666aff',
+    // backgroundColor: '#666aff',
+    backgroundColor: '#868686',
     padding: 10,
     // marginVertical: 10,
-    borderBottomLeftRadius: 10,
-    borderBottomRightRadius: 10,
+    // borderBottomLeftRadius: 10,
+    // borderBottomRightRadius: 10,
     // marginBottom: 10,
     // margin: '20px',
     // textAlignVertical: 'bottom',

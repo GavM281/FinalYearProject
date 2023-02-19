@@ -77,6 +77,7 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
     userEmail,
     privacy,
     editable,
+    comments,
   }) => {
     return (
       <TouchableOpacity
@@ -91,6 +92,7 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
             id: id,
             name: title,
             contents: content,
+            comments: comments,
             editable: editable,
             privacy: privacy,
             moduleInfo: moduleInfo,
@@ -251,6 +253,10 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
         // setId ({notes._id});
         renderItem={({item}) => {
           let editableDoc = false;
+          console.log("comments:  " + item.comments);
+          // console.log("comments:  " + item.comments[0]);
+          // console.log("comments:  " + item[0].comments[0]);
+          console.log("item:   " + item);
           if (
             ((item.userEmail === currentUsersEmail ||
               item.privacy === 'public') &&
@@ -270,6 +276,7 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
                   userEmail={item.userEmail}
                   privacy={item.privacy}
                   editable={editableDoc}
+                  comments={item.comments}
                 />
               );
             } else {
