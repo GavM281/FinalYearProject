@@ -32,6 +32,18 @@ const Group = mongoose.model('Group', {
   ],
 });
 
+const User = mongoose.model('User', {
+  email: String,
+  Groups: [
+    {
+      Rooms: [
+        {Room_name:String},
+      ],
+      Group_name: String,
+    },
+  ],
+});
+
 mongoose.connect(
   'mongodb+srv://admin:adminpw@cluster0.p8vqsyf.mongodb.net/?retryWrites=true&w=majority',
   {
@@ -97,7 +109,22 @@ app.get('/getNote', (req, res) => {
       console.log(err);
     });
 });
-//
+
+app.get('/getUser', (req, res) => {
+  console.log('Getting User');
+  User.find({})
+    .then(data => {
+      console.log('data: ' + data);
+      console.log('Groups: ' + data[0].Groups);
+      console.log('rooms: ' + data[0].Groups[0].Rooms);
+      // console.log('rooms2: ' + data.Groups[0]);
+      res.send(data);
+    })
+    .catch(err => {
+      console.log(err);
+    });
+});
+
 app.post('/createNote', (req, res) => {
   console.log('Creating Note');
   const note = new Note({

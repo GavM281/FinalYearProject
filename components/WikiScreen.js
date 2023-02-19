@@ -51,11 +51,14 @@ const WikiScreen = ({navigation}) => {
   return (
     <View style={[styles.sectionContainer]}>
       {/*<Button title="Get Rooms" onPress={() => getRooms()} />*/}
+      <Text style={[styles.header]}>Modules</Text>
       <FlatList
+        style={[styles.flatlist]}
         data={rooms}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({item}) => (
           <WikiModule
+            style={{elevation: 5}}
             title={item.name}
             Notes={item.notes.length}
             ids={item.notes}
@@ -70,8 +73,31 @@ const WikiScreen = ({navigation}) => {
 
 const styles = StyleSheet.create({
   sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+    marginTop: 10,
+    paddingHorizontal: 10,
+    // backgroundColor: 'white',
+  },
+  flatlist: {
+    backgroundColor: 'white',
+    elevation: 5,
+    // borderWidth: .5,
+    borderTopWidth: 0,
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+  },
+  header: {
+    color: 'black',
+    fontSize: 25,
+    textAlign: 'center',
+    fontWeight: 'bold',
+    // textDecorationLine: 'underline',
+    marginTop: 0,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    backgroundColor: 'white',
+    elevation: 5,
+    paddingVertical: 5,
+    borderBottomWidth: 1,
   },
   sectionTitle: {
     fontSize: 24,

@@ -7,6 +7,7 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
+  SafeAreaView,
 } from 'react-native';
 import {StackActions, useRoute} from '@react-navigation/native';
 import DropDownPicker from 'react-native-dropdown-picker';
@@ -91,6 +92,7 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
             name: title,
             contents: content,
             editable: editable,
+            privacy: privacy,
             moduleInfo: moduleInfo,
           })
         }>
@@ -98,7 +100,7 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
           style={{
             justifyContent: 'space-between',
             // paddingHorizontal: 10,
-            paddingVertical: 10,
+            // paddingVertical: 10,
             flexDirection: 'row',
             alignItems: 'center',
             // marginTop: '-10%',
@@ -117,11 +119,7 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
           </Text>
 
           <Icon
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              textAlign: 'right',
-            }}
+            style={[styles.icon]}
             name="delete"
             color="#ccc"
             size={30}
@@ -134,7 +132,7 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
           style={{
             justifyContent: 'space-between',
             // paddingHorizontal: 10,
-            paddingBottom: 10,
+            paddingBottom: 5,
             flexDirection: 'row',
             alignItems: 'center',
             // marginTop: '-10%',
@@ -144,11 +142,11 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
           </Text>
         </View>
         <View style={{flexDirection: 'row', alignItems: 'center'}}>
-          <Icon name="person" size={20} />
+          <Icon name="person" size={20} style={{marginRight: 5}} />
           <Text>{userEmail}</Text>
         </View>
         <View style={{flexDirection: 'row', alignItems: 'center'}}>
-          <Icon name="public" size={20} />
+          <Icon name="public" size={20} style={{marginRight: 5}} />
           <Text>{privacy}</Text>
         </View>
       </TouchableOpacity>
@@ -210,31 +208,44 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
     }
   }, [loggedIn, navigation]);
   //
+
+  const getHeader = () => {
+    return (
+      <View>
+        <Text style={[styles.header]}>{currentModuleCode}</Text>
+        <TouchableOpacity
+          style={[styles.button]}
+          onPress={() =>
+            navigation.navigate('CreateNote', {
+              userEmail: currentUsersEmail,
+              moduleID: currentModuleID,
+              moduleInfo: moduleInfo,
+            })
+          }>
+          <Text style={{color: 'white', fontSize: 17}}>Create</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
   // TESTING: True to show all users notes regardless of creator. False to only show current users notes
   let showAllUsers = false;
   return (
     <View style={[styles.sectionContainer]}>
-      <Text
-        style={{
-          color: 'black',
-          fontSize: 25,
-          textAlign: 'center',
-          fontWeight: 'bold',
-        }}>
-        {currentModuleCode}
-      </Text>
-      <TouchableOpacity
-        style={[styles.button]}
-        onPress={() =>
-          navigation.navigate('CreateNote', {
-            userEmail: currentUsersEmail,
-            moduleID: currentModuleID,
-            moduleInfo: moduleInfo,
-          })
-        }>
-        <Text style={{color: 'white'}}>Create a new note</Text>
-      </TouchableOpacity>
+    {/*//   /!*<Text style={[styles.header]}>{currentModuleCode}</Text>*!/*/}
+    {/*//   /!*<TouchableOpacity*!/*/}
+    {/*//   /!*  style={[styles.button]}*!/*/}
+    {/*//   /!*  onPress={() =>*!/*/}
+    {/*//   /!*    navigation.navigate('CreateNote', {*!/*/}
+    {/*//   /!*      userEmail: currentUsersEmail,*!/*/}
+    {/*//   /!*      moduleID: currentModuleID,*!/*/}
+    {/*//   /!*      moduleInfo: moduleInfo,*!/*/}
+    {/*//   /!*    })*!/*/}
+    {/*//   /!*  }>*!/*/}
+    {/*//   /!*  <Text style={{color: 'white', fontSize: 17}}>Create</Text>*!/*/}
+    {/*//   /!*</TouchableOpacity> *!/*/}
       <FlatList
+        style={[styles.flatlist]}
         data={notes}
         keyExtractor={(item, index) => index.toString()}
         // setId ({notes._id});
@@ -277,6 +288,7 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
             }
           }
         }}
+        ListHeaderComponent={getHeader} // Needed to avoid error about flatlist inside scrollview, allows scrolling entire page
       />
     </View>
   );
@@ -285,9 +297,33 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
 const styles = StyleSheet.create({
   sectionContainer: {
     // marginTop: 32,
-    paddingHorizontal: 24,
-    marginBottom: 100,
+    // paddingHorizontal: 10,
+    // marginVertical: 10,
+    // paddingBottom: 30,
+    // backgroundColor: '#ededed',
+    height: '100%',
+    paddingHorizontal: 10,
+    borderRadius: 10,
     // paddingBottom: 20,
+    // borderBottomLeftRadius: 10,
+    // borderBottomRightRadius: 10,
+    // flex: 1,
+    // paddingBottom: 100,
+  },
+  header: {
+    color: 'black',
+    fontSize: 25,
+    textAlign: 'center',
+    fontWeight: 'bold',
+    // textDecorationLine: 'underline',
+    // marginTop: 5,
+    // borderTopLeftRadius: 10,
+    // borderTopRightRadius: 10,
+    // backgroundColor: 'white',
+    // elevation: 5,
+    paddingVertical: 5,
+    // marginHorizontal: 10,
+    // marginTop: 10,
   },
   sectionTitle: {
     fontSize: 24,
@@ -303,9 +339,16 @@ const styles = StyleSheet.create({
   },
   button: {
     alignItems: 'center',
-    backgroundColor: '#373cff',
+    backgroundColor: '#666aff',
+    // backgroundColor: 'white',
+    // borderWidth: 1,
+    // borderTopWidth: 1,
+    // borderBottomWidth: 1,
+    borderColor: 'black',
     padding: 10,
-    margin: 10,
+    marginHorizontal: 10,
+    elevation: 5,
+    // margin: 10,
     borderRadius: 10,
   },
   input: {
@@ -326,8 +369,18 @@ const styles = StyleSheet.create({
     margin: '2%',
     padding: 10,
   },
+  flatlist: {
+    backgroundColor: '#ffffff',
+    // borderBottomLeftRadius: 10,
+    // borderBottomRightRadius: 10,
+    // borderRadius: 10,
+    // marginHorizontal: 10,
+    // padding: -10,
+    // paddingBottom: 20,
+    elevation: 5,
+  },
   appButtonContainer: {
-    elevation: 8,
+    elevation: 5,
     borderRadius: 14,
     shadowColor: '#000', // IOS
     shadowOffset: {height: 4, width: 0}, // IOS
@@ -342,6 +395,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     justifyContent: 'flex-start',
+  },
+  icon: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    textAlign: 'right',
+    marginRight: 5,
   },
 });
 

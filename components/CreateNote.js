@@ -70,7 +70,21 @@ function NoteScreen({navigation, contents, userEmail, moduleID, moduleInfo}) {
   // Display
   return (
     <View style={[styles.sectionContainer]}>
+      <TextInput
+        style={[styles.header]}
+        placeholder={'Enter Note Name'}
+        placeholderTextColor="#383838FF"
+        multiline={true}
+        onChangeText={header => setHeader(header)}></TextInput>
+      <TextInput
+        style={[styles.textInput]}
+        editable
+        multiline={true}
+        onChangeText={newText => setContent(newText)}
+        value={content}
+      />
       <DropDownPicker
+        style={[styles.dropdown]}
         open={open}
         value={value}
         items={items}
@@ -79,21 +93,15 @@ function NoteScreen({navigation, contents, userEmail, moduleID, moduleInfo}) {
         setItems={setItems}
         hideSelectedItemIcon={true}
       />
-      <TextInput style={[styles.header]} placeholder={'Enter Note Name'} placeholderTextColor="black" onChangeText={header => setHeader(header)}></TextInput>
-      {/*Note text */}
-      <TextInput
-        style={[styles.textInput]}
-        editable
-        multiline={true}
-        onChangeText={newText => setContent(newText)}
-        value={content}
-      />
-      <Button
-        style={[styles.button]}
-        styleDisabled={{color: 'red'}}
-        onPress={() => createNote()}
-        title="Save"
-      />
+      {/*<Button*/}
+      {/*  style={[styles.button]}*/}
+      {/*  styleDisabled={{color: 'red'}}*/}
+      {/*  onPress={() => createNote()}*/}
+      {/*  title="Save"*/}
+      {/*/>*/}
+      <TouchableOpacity style={[styles.button]} onPress={() => createNote()}>
+        <Text style={{color: 'white'}}>Create a new note</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -102,9 +110,10 @@ const styles = StyleSheet.create({
   sectionContainer: {
     textAlignVertical: 'top',
     // marginTop: 20,
-    paddingHorizontal: 14,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
     shadowColor: '#000', // IOS
-    height: '95%',
+    height: '100%',
     backgroundColor: '#ededed',
     // margin: '2%',
   },
@@ -115,24 +124,50 @@ const styles = StyleSheet.create({
     color: 'black',
     // borderColor: 'gray',
     width: '100%',
-    // borderWidth: 1,
-    borderRadius: 10,
+    // borderBottomWidth: 1,
+    // borderBottomLeftRadius: 10,
+    // borderBottomRightRadius: 10,
     padding: 10,
     height: '100%',
-    marginVertical: 20,
+    // marginBottom: 10,
     flex: 1,
   },
   button: {
     fontSize: 20,
     color: 'green',
+    // borderRadius: 10,
+    alignItems: 'center',
+    backgroundColor: '#666aff',
+    padding: 10,
+    // marginVertical: 10,
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+    elevation: 6,
+    // marginBottom: 10,
     // margin: '20px',
-    textAlignVertical: 'bottom',
+    // textAlignVertical: 'bottom',
   },
   header: {
     fontWeight: 'bold',
     textAlign: 'center',
     fontSize: 25,
     color: 'black',
+    elevation: 6,
+    borderBottomWidth: 1,
+    backgroundColor: '#ffffff',
+    borderStyle: 'solid',
+    // borderWidth: 1,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    padding: 5,
+    // marginTop: 5,
+  },
+  dropdown: {
+    // marginVertical: 5,
+    borderRadius: 0,
+    borderWidth: 0,
+    borderTopWidth: 1,
+    elevation: 3,
   },
 });
 
