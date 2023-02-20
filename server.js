@@ -42,9 +42,7 @@ const User = mongoose.model('User', {
   email: String,
   Groups: [
     {
-      Rooms: [
-        {Room_name:String},
-      ],
+      Rooms: [{Room_name: String}],
       Group_name: String,
     },
   ],
@@ -139,13 +137,35 @@ app.get('/getUser', (req, res) => {
 
 app.get('/getComment', (req, res) => {
   console.log('Getting Comment');
-  console.log('Id to find is: ' + req.body._id);
-  Comment.find({_id: req.body._id})
+  let id = req.body._id;
+  console.log('Id to find is: ' + id);
+  Comment.findById(id, function(err, comment){
+    if(err){
+      console.log(err);
+    } else {
+      console.log('comment: ' + comment);
+      res.send(comment);
+    }
+  });
+  // Comment.findById(id)
+  // Comment.findOne({_id: id },
+  //   .then(data => {
+  //     console.log('data: ' + data);
+  //     // console.log('Groups: ' + data[0].Groups);
+  //     // console.log('rooms: ' + data[0].Groups[0].Rooms);
+  //     // console.log('rooms2: ' + data.Groups[0]);
+  //     res.send(data);
+  //   })
+  //   .catch(err => {
+  //     console.log(err);
+  //   });
+});
+
+app.get('/getComments', (req, res) => {
+  console.log('Getting Comments');
+  Comment.find()
     .then(data => {
       console.log('data: ' + data);
-      // console.log('Groups: ' + data[0].Groups);
-      // console.log('rooms: ' + data[0].Groups[0].Rooms);
-      // console.log('rooms2: ' + data.Groups[0]);
       res.send(data);
     })
     .catch(err => {
@@ -233,5 +253,17 @@ app.post('/deleteNote', (req, res) => {
     });
 });
 
+app.post('/deleteComment', (req, res) => {
+  console.log('Going to delete comment with id:  ', req.body.id);
+  Comment.findByIdAndRemove(req.body.id)
+    .then(data => {
+      console.log('data ', data);
+      res.send(data);
+    })
+    .catch(err => {
+      console.log('error', err);
+    });
+});
+
 // start the server listening for requests
-app.listen(process.env.PORT || 3000, () => console.log('Server is running...'));
+app.listen(process.env.PORT || 3001, () => console.log('Server is running...'));

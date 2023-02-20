@@ -13,6 +13,7 @@ import NoteButton from './Buttons/NoteButton';
 import {useRoute} from '@react-navigation/native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import {HeaderBackButton} from '@react-navigation/elements';
+const { ObjectID } = require('mongodb');
 
 function NoteScreen({
   navigation,
@@ -101,17 +102,46 @@ function NoteScreen({
   };
 
   const getComment = commentID => {
+    // var axios = require('axios');
+    // console.log(commentID);
+    // var data = JSON.stringify({
+    //   _id: commentID,
+    // });
+    //
+    // var config = {
+    //   method: 'get',
+    //   maxBodyLength: Infinity,
+    //   url: 'https://gavin-fyp.herokuapp.com/getComment',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    //   data: data,
+    // };
+    //
+    // axios(config)
+    //   .then(function (response) {
+    //     console.log(JSON.stringify(response.data));
+    //   })
+    //   .catch(function (error) {
+    //     console.log(error);
+    //   });
+
+    if (!ObjectID.isValid(commentID)) {
+      console.log('Invalid ID');
+      return;
+    }
     console.log('GET Comment -> The id is: ' + commentID);
     // console.log('The content is: ' + content);
     axios
       .get('https://gavin-fyp.herokuapp.com/getComment', {
-        data: {
+        params: {
           _id: commentID,
         },
       })
       .then(response => {
         // handle success
-        console.log('Made request');
+        console.log('\nMade request');
+        console.log('ID was: ' + commentID);
         console.log('Response:  ' + response.data);
         console.log('Response:  ' + response[0]);
         console.log('Response:  ' + response);

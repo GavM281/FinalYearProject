@@ -32,6 +32,7 @@ const WikiScreen = ({navigation}) => {
   const getRooms = () => {
     axios
       .get('https://gavin-fyp.herokuapp.com/getModules')
+      // .get('http://89.101.96.182:3001/getModules')
       // .get('http://192.168.2.135:3000/getModules')
       .then(response => {
         // console.log('main res', response);
