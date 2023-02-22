@@ -92,7 +92,7 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
             id: id,
             name: title,
             contents: content,
-            comments: comments,
+            commentsIDs: comments,
             editable: editable,
             privacy: privacy,
             moduleInfo: moduleInfo,

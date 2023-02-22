@@ -17,32 +17,56 @@ import axios from 'axios';
 import WikiModule from './Buttons/WikiModule';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const ListNotes = ({navigation}) => {
+const ListNotes = ({navigation, currentUserEmail, noteID}) => {
   const route = useRoute();
 
   const {loggedIn, userData} = useContext(AuthContext);
   const [notes, setNotes] = useState(null);
   const [name, setName] = useState('');
-
-
+  const [comments, setComments] = useState('');
+  const [newComment, setNewComment] = useState('');
 
   console.log('');
   console.log(' || Comments ||');
-  // const currentUsersEmail = userData.email;
-  // const currentModuleCode = route.params.moduleCode;
-  // const noteIDs = route.params.moduleNotes;
-  // const currentModuleID = route.params.moduleID;
+  console.log('userEmail: ' + route.params.currentUserEmail);
+  console.log('noteID: ' + route.params.noteID);
+  let currentUsersEmail = route.params.currentUserEmail;
+  let notesID = route.params.noteID;
 
-  // const moduleInfo = [currentModuleCode, noteIDs, currentModuleID];
-  // console.log('ListNotes moduleInfo: ');
-  // console.log('  currentModuleCode: ' + moduleInfo[0]);
-  // // console.log('noteIDs: ' + moduleInfo[1]);
-  // console.log('  currentModuleID: ' + moduleInfo[2]);
-  // //
-  // console.log('email: ' + userData.email);
-  // console.log('code: ' + currentModuleCode);
-  // console.log('Module ID: ' + currentModuleID);
-  // console.log('IDs: ' + noteIDs);
+
+  const getComment = () => {
+    axios
+      .get('https://gavin-fyp.herokuapp.com/getComments', {
+        // params: {
+        //   _id: commentID,
+        // },
+      })
+      .then(response => {
+        // handle success
+        console.log('\nMade request');
+        // console.log('ID was: ' + commentID);
+        console.log('Response:  ' + response.data);
+        console.log('Response:  ' + response[0]);
+        console.log('Response:  ' + response);
+        console.log('Response:  ' + response.content);
+        console.log('Response:  ' + response.id);
+        console.log('Response:  ' + response._id);
+        // console.log('Response:  ' + response[0].data);
+        let responseData = JSON.parse(JSON.stringify(response.data));
+        // console.log('The id is: ' + responseData._id);
+        // console.log('The id is: ' + responseData.id);
+        // console.log('The content is: ' + responseData.content);
+        console.log('Response:  ' + responseData);
+        // setComment(responseData.content);
+        // setCommentEmail(responseData.userEmail);
+        setComments(responseData);
+      })
+      .catch(error => {
+        console.log('Failed request');
+        // handle error
+        console.log(error);
+      });
+  };
 
   // const deleteNote = id => {
   //   axios
@@ -58,41 +82,38 @@ const ListNotes = ({navigation}) => {
   //     });
   // };
 
-  //
+  React.useEffect(() => {
+    // getNotes();
+    console.log('On Comments page');
+    const unsubscribe = navigation.addListener('focus', () => {
+      // When the screen is focused (like loading from another screen), call function to refresh data
+      getComment();
+      console.log('Getting notes on ListNotes');
+    });
 
-  // React.useEffect(() => {
-  //   getNotes();
-  //   console.log('On ListNotes page');
-  //   const unsubscribe = navigation.addListener('focus', () => {
-  //     // When the screen is focused (like loading from another screen), call function to refresh data
-  //     getNotes();
-  //     console.log('Getting notes on ListNotes');
-  //   });
-  //
-  //   // Return the function to unsubscribe from the event so it gets removed on unmount
-  //   return unsubscribe;
-  // }, [navigation]);
+    // Return the function to unsubscribe from the event so it gets removed on unmount
+    return unsubscribe;
+  }, [navigation]);
 
-
-
-  // const createNote = () => {
-  //   axios
-  //     .post('https://gavin-fyp.herokuapp.com/createNote', {
-  //       name: name,
-  //       content: '',
-  //       userEmail: currentUsersEmail,
-  //       privacy: value,
-  //       groupID: currentModuleID,
-  //     })
-  //     .then(response => {
-  //       let responseData = JSON.parse(JSON.stringify(response.data));
-  //       console.log('RESPONSE DATA: ', responseData);
-  //       getNotes();
-  //     })
-  //     .catch(error => {
-  //       console.log(error);
-  //     });
-  // };
+  const createComment = () => {
+    console.log(
+      'Creating comment with: ' + newComment + '  and ' + currentUsersEmail,
+    );
+    axios
+      .post('https://gavin-fyp.herokuapp.com/createComment', {
+        content: newComment,
+        userEmail: currentUsersEmail,
+        noteID: notesID,
+      })
+      .then(response => {
+        let responseData = JSON.parse(JSON.stringify(response.data));
+        console.log('RESPONSE DATA: ', responseData);
+        // getNotes();
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  };
 
   useEffect(() => {
     if (loggedIn === false) {
@@ -101,22 +122,37 @@ const ListNotes = ({navigation}) => {
   }, [loggedIn, navigation]);
   //
 
-  const getHeader = () => {
+  const Comment = ({commentContent, userEmail}) => {
+    return (
+      <View style={[styles.comment]}>
+        <Text style={[styles.text]}>{commentContent}</Text>
+        <Text style={[styles.text]}>{userEmail}</Text>
+      </View>
+    );
+  };
+
+  const handleAdditionalCommentsChanged = text => {
+    setNewComment(text);
+  };
+
+  const getFooter = () => {
     return (
       <View>
-        <Text> COMMENTS </Text>
-        {/*<Text style={[styles.header]}>{currentModuleCode}</Text>*/}
-        {/*<TouchableOpacity*/}
-        {/*  style={[styles.button]}*/}
-        {/*  onPress={() =>*/}
-        {/*    navigation.navigate('CreateNote', {*/}
-        {/*      userEmail: currentUsersEmail,*/}
-        {/*      moduleID: currentModuleID,*/}
-        {/*      moduleInfo: moduleInfo,*/}
-        {/*    })*/}
-        {/*  }>*/}
-        {/*  <Text style={{color: 'white', fontSize: 17}}>Create</Text>*/}
-        {/*</TouchableOpacity>*/}
+        <TextInput
+          style={[styles.commentBox]}
+          placeholder="New Comment"
+          placeholderTextColor="#333332"
+          multiline={true}
+          editable
+          onChangeText={handleAdditionalCommentsChanged}
+          value={newComment}
+          // onChangeText={newText => setNewComment(newText)}
+          // value={newComment}
+        >
+        </TextInput>
+        <TouchableOpacity style={[styles.button]} onPress={() => createComment()}>
+          <Text style={{color: 'white'}}>Post Comment</Text>
+        </TouchableOpacity>
       </View>
     );
   };
@@ -124,54 +160,43 @@ const ListNotes = ({navigation}) => {
   // TESTING: True to show all users notes regardless of creator. False to only show current users notes
   let showAllUsers = false;
   return (
-    <Text> COMMENTS </Text>
-  //     <FlatList
-  //       style={[styles.flatlist]}
-  //       data={notes}
-  //       keyExtractor={(item, index) => index.toString()}
-  //       // setId ({notes._id});
-  //       renderItem={({item}) => {
-  //         let editableDoc = false;
-  //         if (
-  //           ((item.userEmail === currentUsersEmail ||
-  //             item.privacy === 'public') &&
-  //             noteIDs.includes(item._id)) ||
-  //           showAllUsers == true
-  //         ) {
-  //           // if ( item.userEmail === currentUsersEmail || item.privacy === "public" || showAllUsers == true){
-  //           if (item.userEmail === currentUsersEmail) {
-  //             editableDoc = true;
-  //             return (
-  //               <NoteButton
-  //                 title={item.name}
-  //                 content={item.content}
-  //                 buttonColour={'#30B283'}
-  //                 navigation={navigation}
-  //                 id={item._id}
-  //                 userEmail={item.userEmail}
-  //                 privacy={item.privacy}
-  //                 editable={editableDoc}
-  //               />
-  //             );
-  //           } else {
-  //             return (
-  //               <NoteButton
-  //                 title={item.name}
-  //                 content={item.content}
-  //                 buttonColour={'#30B283'}
-  //                 navigation={navigation}
-  //                 id={item._id}
-  //                 userEmail={item.userEmail}
-  //                 privacy={item.privacy}
-  //                 editable={editableDoc}
-  //               />
-  //             );
-  //           }
-  //         }
-  //       }}
-  //       ListHeaderComponent={getHeader} // Needed to avoid error about flatlist inside scrollview, allows scrolling entire page
-  //     />
-  //   </View>
+    <View style={[styles.sectionContainer]}>
+      <Text style={[styles.header]}> COMMENTS </Text>
+      {/*<Text> {route.params.comments} </Text>*/}
+      <FlatList
+        style={[styles.flatlist]}
+        data={comments}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({item}) => {
+          console.log('item is : ' + item);
+          console.log('item is : ' + item.content);
+          console.log('item is : ' + item.userEmail);
+          // getComment(item);
+
+          return (
+            <Comment commentContent={item.content} userEmail={item.userEmail} />
+          );
+        }}
+        // contentContainerStyle={{flexGrow: 1}}
+        // ListFooterComponentStyle={{flex: 1, justifyContent: 'flex-end'}}
+        // ListFooterComponent={getFooter}
+      />
+      <View>
+        <TextInput
+          style={[styles.commentBox]}
+          placeholder="New Comment"
+          placeholderTextColor="#636363"
+          multiline={true}
+          editable
+          // onChangeText={handleAdditionalCommentsChanged}
+          // value={newComment}
+          onChangeText={newText => setNewComment(newText)}
+          value={newComment}></TextInput>
+        <TouchableOpacity style={[styles.button]} onPress={() => createComment()}>
+          <Text style={{color: 'white'}}>Post Comment</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 };
 
@@ -184,7 +209,7 @@ const styles = StyleSheet.create({
     // backgroundColor: '#ededed',
     height: '100%',
     paddingHorizontal: 10,
-    borderRadius: 10,
+    // borderRadius: 10,
     // paddingBottom: 20,
     // borderBottomLeftRadius: 10,
     // borderBottomRightRadius: 10,
@@ -198,39 +223,60 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     // textDecorationLine: 'underline',
     // marginTop: 5,
-    // borderTopLeftRadius: 10,
-    // borderTopRightRadius: 10,
-    // backgroundColor: 'white',
-    // elevation: 5,
-    paddingVertical: 5,
+    // borderRadius: 10,
+    backgroundColor: 'white',
+    elevation: 5,
+    padding: 5,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    borderBottomWidth: 1,
     // marginHorizontal: 10,
-    // marginTop: 10,
+    textAlignVertical: 'bottom',
+    // marginHorizontal: 10,
+    marginTop: 10,
   },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
+  commentBox: {
+    color: 'black',
+    fontSize: 20,
+    textAlign: 'center',
+    fontWeight: 'bold',
+    // borderRadius: 10,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    borderTopWidth: 1,
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    backgroundColor: '#ffffff',
+    // height: '20%',
+    elevation: 5,
+    padding: 5,
+    // textAlignVertical: 'bottom',
   },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
+  comment: {
+    textAlign: 'center',
+    // backgroundColor: 'lightblue',
+    borderBottomWidth: 1,
+    // borderRadius: 10,
+    marginVertical: 5,
   },
-  highlight: {
-    fontWeight: '700',
+  text: {
+    color: 'black',
   },
   button: {
     alignItems: 'center',
     backgroundColor: '#666aff',
     // backgroundColor: 'white',
-    // borderWidth: 1,
-    // borderTopWidth: 1,
+    borderWidth: 1,
+    borderTopWidth: 0,
     // borderBottomWidth: 1,
     borderColor: 'black',
     padding: 10,
-    marginHorizontal: 10,
-    elevation: 5,
+    marginBottom: 10,
+    // marginHorizontal: 10,
+    // elevation: 5,
     // margin: 10,
-    borderRadius: 10,
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
   },
   input: {
     height: 40,
@@ -252,13 +298,14 @@ const styles = StyleSheet.create({
   },
   flatlist: {
     backgroundColor: '#ffffff',
-    // borderBottomLeftRadius: 10,
-    // borderBottomRightRadius: 10,
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
     // borderRadius: 10,
     // marginHorizontal: 10,
-    // padding: -10,
+    padding: 10,
     // paddingBottom: 20,
     elevation: 5,
+    marginBottom: 10,
   },
   appButtonContainer: {
     elevation: 5,

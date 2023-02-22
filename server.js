@@ -135,11 +135,29 @@ app.get('/getUser', (req, res) => {
     });
 });
 
+app.get('/getOneComment', (req, res) => {
+  console.log('Id to find, using req.body: ' + req.body.id);
+  console.log('Id to find, using req.params: ' + req.params.id);
+  console.log('Id to find, using req.query: ' + req.query.id);
+  Comment.find({_id: req.body.id})
+    .then(data => {
+      console.log('data: ' + data);
+      res.send(data);
+    })
+    .catch(err => {
+      console.log(err);
+    });
+});
+
 app.get('/getComment', (req, res) => {
   console.log('Getting Comment');
-  let id = req.body._id;
+  let id = req.body.id;
   console.log('Id to find is: ' + id);
-  Comment.findById(id, function(err, comment){
+  console.log('Id to find, using req.params: ' + req.params.id);
+  console.log('Id to find, using req.body: ' + req.body.id);
+  console.log('Id to find, using req.query: ' + req.query.id);
+  console.log('Id to find, using req.body and cast: ' + mongoose.Types.ObjectId(req.query.id));
+  Comment.findById(id, function (err, comment) {
     if(err){
       console.log(err);
     } else {
@@ -206,8 +224,8 @@ app.post('/createComment', (req, res) => {
   const comment = new Comment({
     content: req.body.content,
     userEmail: req.body.userEmail,
-    noteID: req.body.noteID,
-  }); //
+    noteID: mongoose.Types.ObjectId(req.body.noteID),
+  });
   comment.save(function (err, note) {
     if (err) {
       return res.send(err);
@@ -242,9 +260,16 @@ app.put('/updateNote', (req, res) => {
 });
 
 app.post('/deleteNote', (req, res) => {
-  console.log('Going to delete note with id:  ', req.body.id);
+  console.log('Going to delete note with id:  ' +  req.body.id + ' for the group with id ' + req.body.groupID);
   Note.findByIdAndRemove(req.body.id)
     .then(data => {
+      Group.updateOne(
+        {_id: req.body.groupID},
+        {$pull: {notes: req.body.id}},
+        groupData => {
+          console.log('Group data: ' + groupData);
+        },
+      );
       console.log('data ', data);
       res.send(data);
     })
@@ -252,11 +277,18 @@ app.post('/deleteNote', (req, res) => {
       console.log('error', err);
     });
 });
-
+//
 app.post('/deleteComment', (req, res) => {
-  console.log('Going to delete comment with id:  ', req.body.id);
+  console.log('Going to delete comment with id:  ', req.body.id + ' for the note with id ' + req.body.noteID);
   Comment.findByIdAndRemove(req.body.id)
     .then(data => {
+      Note.updateOne(
+        {_id: req.body.noteID},
+        {$pull: {comments: req.body.id}},
+        noteData => {
+          console.log('Note data: ' + noteData);
+        },
+      );
       console.log('data ', data);
       res.send(data);
     })

@@ -20,7 +20,7 @@ function NoteScreen({
   id,
   name,
   contents,
-  comments,
+  commentsIDs,
   editable,
   privacy,
   moduleInfo,
@@ -30,6 +30,7 @@ function NoteScreen({
   const [notes, setNotes] = useState(null);
   const [content, setContent] = useState(contents);
   const [comment, setComment] = useState('comment');
+  const [comments, setComments] = useState();
   const [commentEmail, setCommentEmail] = useState('commentEmail');
   const [header, setHeader] = useState(name);
 
@@ -41,6 +42,7 @@ function NoteScreen({
   ]);
   const editableDoc = route.params.editable;
   let moduleInfos = route.params.moduleInfo;
+  let noteID = route.params.id;
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       // When the screen is focused (like loading from another screen), call function to refresh data
@@ -49,11 +51,12 @@ function NoteScreen({
       console.log('### id is:  ' + route.params.id);
       console.log('contents: ', route.params.contents);
       console.log('editable: ' + editableDoc);
-      console.log('commentID: ' + route.params.comments);
+      console.log('commentID: ' + route.params.commentsIDs);
       console.log('currentModuleCode: ' + moduleInfos[0]);
       // console.log('noteIDs: ' + moduleInfos[1]);
       console.log('currentModuleID: ' + moduleInfos[2]);
       setContent(route.params.contents);
+      getComment();
       navigation.setOptions({
         headerLeft: () => (
           // <TouchableOpacity style={[styles.button]}
@@ -101,7 +104,7 @@ function NoteScreen({
       });
   };
 
-  const getComment = commentID => {
+  const getComment = () => {
     // var axios = require('axios');
     // console.log(commentID);
     // var data = JSON.stringify({
@@ -125,23 +128,18 @@ function NoteScreen({
     //   .catch(function (error) {
     //     console.log(error);
     //   });
-
-    if (!ObjectID.isValid(commentID)) {
-      console.log('Invalid ID');
-      return;
-    }
-    console.log('GET Comment -> The id is: ' + commentID);
+    // console.log('GET Comment -> The id is: ' + commentID);
     // console.log('The content is: ' + content);
     axios
-      .get('https://gavin-fyp.herokuapp.com/getComment', {
-        params: {
-          _id: commentID,
-        },
+      .get('https://gavin-fyp.herokuapp.com/getComments', {
+        // params: {
+        //   _id: commentID,
+        // },
       })
       .then(response => {
         // handle success
         console.log('\nMade request');
-        console.log('ID was: ' + commentID);
+        // console.log('ID was: ' + commentID);
         console.log('Response:  ' + response.data);
         console.log('Response:  ' + response[0]);
         console.log('Response:  ' + response);
@@ -156,6 +154,7 @@ function NoteScreen({
         console.log('Response:  ' + responseData);
         setComment(responseData.content);
         setCommentEmail(responseData.userEmail);
+        setComments(responseData);
       })
       .catch(error => {
         console.log('Failed request');
@@ -185,83 +184,92 @@ function NoteScreen({
       });
   };
 
-  const Comment = ({commentContent, userEmail}) => {
-    return (
-      <View>
-        <Text>{commentContent}</Text>
-        <Text>{userEmail}</Text>
-      </View>
-    );
-  };
+  // const Comment = ({commentContent, userEmail}) => {
+  //   return (
+  //     <View>
+  //       <Text style={{color: 'black'}}>Content: {commentContent}</Text>
+  //       <Text>Email: {userEmail}</Text>
+  //     </View>
+  //   );
+  // };
 
   // Display
   return (
     <View style={[styles.sectionContainer]}>
-      <TextInput
-        style={[styles.header]}
-        editable={editableDoc}
-        onChangeText={header => setHeader(header)}>
-        {route.params.name}
-      </TextInput>
-      {/*Note text */}
-      <TextInput
-        style={[styles.textInput]}
-        editable={editableDoc}
-        multiline={true}
-        onChangeText={newText => setContent(newText)}
-        value={content}
-      />
-
-      <DropDownPicker
-        style={[styles.dropdown]}
-        open={open}
-        value={value}
-        items={items}
-        setOpen={setOpen}
-        setValue={setValue}
-        setItems={setItems}
-        // hideSelectedItemIcon={true}
-        disabled={!editableDoc}
-        // ArrowDownIconComponent = ArrowUpIconComponent;
-      />
-      {/*<Button*/}
-      {/*  style={[styles.button]}*/}
-      {/*  styleDisabled={{color: 'red'}}*/}
-      {/*  onPress={() => saveNoteContent()}*/}
-      {/*  title="Save"*/}
-      {/*/>*/}
-      <TouchableOpacity
-        style={[styles.button]}
-        onPress={() => navigation.navigate('Comments')}>
-        <Text style={{color: 'white'}}>Comments</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={{
-          ...styles.button,
-          borderBottomLeftRadius: 10,
-          borderBottomRightRadius: 10,
-          backgroundColor: '#666aff',
-        }}
-        onPress={() => saveNoteContent('Comments')}>
-        <Text style={{color: 'white'}}>Save</Text>
-      </TouchableOpacity>
-      <View>
-        <Text> Comments </Text>
-        <Text> {route.params.comments} </Text>
-        <FlatList
-          data={route.params.comments}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={({item}) => {
-            console.log('id IS: ' + item);
-            // console.log('1: ' + route.params.comments);
-            // console.log('2: ' + route.params.comments[0]);
-            // console.log('3: ' + route.params.comments[1]);
-            getComment(item);
-
-            return <Comment content={comment} userEmail={commentEmail} />;
-          }}
+      <View style={[styles.noteSection]}>
+        <TextInput
+          style={[styles.header]}
+          editable={editableDoc}
+          onChangeText={header => setHeader(header)}>
+          {route.params.name}
+        </TextInput>
+        {/*Note text */}
+        <TextInput
+          style={[styles.textInput]}
+          editable={editableDoc}
+          multiline={true}
+          onChangeText={newText => setContent(newText)}
+          value={content}
         />
+
+        <DropDownPicker
+          style={[styles.dropdown]}
+          open={open}
+          value={value}
+          items={items}
+          setOpen={setOpen}
+          setValue={setValue}
+          setItems={setItems}
+          // hideSelectedItemIcon={true}
+          disabled={!editableDoc}
+          // ArrowDownIconComponent = ArrowUpIconComponent;
+        />
+        {/*<Button*/}
+        {/*  style={[styles.button]}*/}
+        {/*  styleDisabled={{color: 'red'}}*/}
+        {/*  onPress={() => saveNoteContent()}*/}
+        {/*  title="Save"*/}
+        {/*/>*/}
+        <TouchableOpacity
+          style={[styles.button]}
+          onPress={() =>
+            navigation.navigate('Comments', {
+              currentUserEmail: 'user@email.com',
+              noteID: {noteID},
+            })
+          }>
+          <Text style={{color: 'white'}}>Comments</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{
+            ...styles.button,
+            borderBottomLeftRadius: 10,
+            borderBottomRightRadius: 10,
+            backgroundColor: '#666aff',
+          }}
+          onPress={() => saveNoteContent('Comments')}>
+          <Text style={{color: 'white'}}>Save</Text>
+        </TouchableOpacity>
       </View>
+      {/*<View style={[styles.comments]}>*/}
+      {/*  <Text> Comments </Text>*/}
+      {/*  /!*<Text> {route.params.comments} </Text>*!/*/}
+      {/*  /!*<FlatList*!/*/}
+      {/*  /!*  data={comments}*!/*/}
+      {/*  /!*  keyExtractor={(item, index) => index.toString()}*!/*/}
+      {/*  /!*  renderItem={({item}) => {*!/*/}
+      {/*  /!*    console.log('item is : ' + item);*!/*/}
+      {/*  /!*    console.log('item is : ' + item.content);*!/*/}
+      {/*  /!*    console.log('item is : ' + item.userEmail);*!/*/}
+      {/*  /!*    // console.log('1: ' + route.params.comments);*!/*/}
+      {/*  /!*    // console.log('2: ' + route.params.comments[0]);*!/*/}
+      {/*  /!*    // console.log('3: ' + route.params.comments[1]);*!/*/}
+      {/*  /!*    // getComment(item);*!/*/}
+
+      {/*  /!*    return <Comment commentContent={item.content} userEmail={item.userEmail} />;*!/*/}
+      {/*  /!*  }}*!/*/}
+      {/*/>*/}
+      {/*</View>*/}
     </View>
   );
 }
@@ -276,6 +284,23 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: '#ededed',
     // margin: '2%',
+  },
+  comments: {
+    backgroundColor: 'blue',
+    textAlign: 'center',
+    // flex: 1,
+    width: '100%',
+    height: 50,
+    // backgroundColor: '#EE5407',
+    justifyContent: 'center',
+    alignItems: 'center',
+    // position: 'absolute', //Here is the trick
+    // bottom: 0, //Here is the trick
+  },
+  noteSection: {
+    // position: 'absolute',
+    height: '100%',
+    flex: 1,
   },
   textInput: {
     textAlignVertical: 'top',
