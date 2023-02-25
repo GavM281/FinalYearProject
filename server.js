@@ -139,6 +139,9 @@ app.get('/getOneComment', (req, res) => {
   console.log('Id to find, using req.body: ' + req.body.id);
   console.log('Id to find, using req.params: ' + req.params.id);
   console.log('Id to find, using req.query: ' + req.query.id);
+  console.log('Id to find, using req.body and cast: ' + mongoose.Types.ObjectId(req.body.id));
+  console.log('Id to find, using req.params and cast: ' + mongoose.Types.ObjectId(req.params.id));
+  console.log('Id to find, using req.query and cast: ' + mongoose.Types.ObjectId(req.query.id));
   Comment.find({_id: req.body.id})
     .then(data => {
       console.log('data: ' + data);
@@ -153,10 +156,12 @@ app.get('/getComment', (req, res) => {
   console.log('Getting Comment');
   let id = req.body.id;
   console.log('Id to find is: ' + id);
-  console.log('Id to find, using req.params: ' + req.params.id);
   console.log('Id to find, using req.body: ' + req.body.id);
+  console.log('Id to find, using req.params: ' + req.params.id);
   console.log('Id to find, using req.query: ' + req.query.id);
-  console.log('Id to find, using req.body and cast: ' + mongoose.Types.ObjectId(req.query.id));
+  console.log('Id to find, using req.body and cast: ' + mongoose.Types.ObjectId(req.body.id));
+  console.log('Id to find, using req.params and cast: ' + mongoose.Types.ObjectId(req.params.id));
+  console.log('Id to find, using req.query and cast: ' + mongoose.Types.ObjectId(req.query.id));
   Comment.findById(id, function (err, comment) {
     if(err){
       console.log(err);
@@ -165,18 +170,29 @@ app.get('/getComment', (req, res) => {
       res.send(comment);
     }
   });
-  // Comment.findById(id)
-  // Comment.findOne({_id: id },
-  //   .then(data => {
-  //     console.log('data: ' + data);
-  //     // console.log('Groups: ' + data[0].Groups);
-  //     // console.log('rooms: ' + data[0].Groups[0].Rooms);
-  //     // console.log('rooms2: ' + data.Groups[0]);
-  //     res.send(data);
-  //   })
-  //   .catch(err => {
-  //     console.log(err);
-  //   });
+});
+
+app.post('/getComment1', (req, res) => {
+  console.log('Getting Comment');
+  let id = req.body.id;
+  console.log('Id to find is: ' + id);
+  console.log('Id to find, using req.body: ' + req.body.id);
+  console.log('Id to find, using req.params: ' + req.params.id);
+  console.log('Id to find, using req.query: ' + req.query.id);
+  console.log('Id to find, using req.body and cast: ' + mongoose.Types.ObjectId(req.body.id));
+  console.log('Id to find, using req.params and cast: ' + mongoose.Types.ObjectId(req.params.id));
+  console.log('Id to find, using req.query and cast: ' + mongoose.Types.ObjectId(req.query.id));
+  Comment.findOne({_id: id})
+    .then(data => {
+      console.log('data: ' + data);
+      // console.log('Groups: ' + data[0].Groups);
+      // console.log('rooms: ' + data[0].Groups[0].Rooms);
+      // console.log('rooms2: ' + data.Groups[0]);
+      res.send(data);
+    })
+    .catch(err => {
+      console.log(err);
+    });
 });
 
 app.get('/getComments', (req, res) => {

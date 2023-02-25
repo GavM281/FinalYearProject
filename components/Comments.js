@@ -16,6 +16,7 @@ import {AuthContext} from '../context/AuthContext';
 import axios from 'axios';
 import WikiModule from './Buttons/WikiModule';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import mongoose from "mongoose";
 
 const ListNotes = ({navigation, currentUserEmail, noteID}) => {
   const route = useRoute();
@@ -33,8 +34,7 @@ const ListNotes = ({navigation, currentUserEmail, noteID}) => {
   let currentUsersEmail = route.params.currentUserEmail;
   let notesID = route.params.noteID;
 
-
-  const getComment = () => {
+  const getComments = () => {
     axios
       .get('https://gavin-fyp.herokuapp.com/getComments', {
         // params: {
@@ -43,7 +43,43 @@ const ListNotes = ({navigation, currentUserEmail, noteID}) => {
       })
       .then(response => {
         // handle success
-        console.log('\nMade request');
+        console.log('\n     Made request: getComments');
+        // console.log('ID was: ' + commentID);
+        // console.log('Response:  ' + response.data);
+        // console.log('Response:  ' + response[0]);
+        // console.log('Response:  ' + response);
+        // console.log('Response:  ' + response.content);
+        // console.log('Response:  ' + response.id);
+        // console.log('Response:  ' + response._id);
+        // console.log('Response:  ' + response[0].data);
+        let responseData = JSON.parse(JSON.stringify(response.data));
+        // console.log('The id is: ' + responseData._id);
+        // console.log('The id is: ' + responseData.id);
+        // console.log('The content is: ' + responseData.content);
+        console.log('Response:  ' + responseData);
+        // setComment(responseData.content);
+        // setCommentEmail(responseData.userEmail);
+        setComments(responseData);
+      })
+      .catch(error => {
+        console.log('Failed request');
+        // handle error
+        console.log(error);
+      });
+  };
+
+  const getComment = async() => {
+    console.log('\n\nGETCOMMENT\n');
+    await axios
+      .get('https://gavin-fyp.herokuapp.com/getComment', {
+        body: {
+          id: '63f1791d7dfb51047211028c',
+        // id: '63f551b9469a48ffdb421e48',
+        },
+      })
+      .then(response => {
+        // handle success
+        console.log('\n   Made request: getComment');
         // console.log('ID was: ' + commentID);
         console.log('Response:  ' + response.data);
         console.log('Response:  ' + response[0]);
@@ -68,26 +104,57 @@ const ListNotes = ({navigation, currentUserEmail, noteID}) => {
       });
   };
 
-  // const deleteNote = id => {
-  //   axios
-  //     .post('https://gavin-fyp.herokuapp.com/deleteNote', {
-  //       id: id,
-  //     })
-  //     .then(response => {
-  //       console.log('Deleted ', id);
-  //       getNotes(); // Refresh list of notes
-  //     })
-  //     .catch(error => {
-  //       console.log(error);
-  //     });
-  // };
+  const getOneComment = () => {
+    console.log('\n\nGETONECOMMENT\n');
+    axios
+      .get('https://gavin-fyp.herokuapp.com/getOneComment', {
+        body: {
+          "id": "63f1791d7dfb51047211028c",
+          // id: '63f551b9469a48ffdb421e48',
+        },
+      })
+      .then(response => {
+        // handle success
+        console.log('\n   Made request: getOneComment');
+        // console.log('ID was: ' + commentID);
+        console.log('Response:  ' + response.data);
+        console.log('Response:  ' + response[0]);
+        console.log('Response:  ' + response);
+        console.log('Response:  ' + response.content);
+        console.log('Response:  ' + response.id);
+        console.log('Response:  ' + response._id);
+        // console.log('Response:  ' + response[0].data);
+        let responseData = JSON.parse(JSON.stringify(response.data));
+        // console.log('The id is: ' + responseData._id);
+        // console.log('The id is: ' + responseData.id);
+        // console.log('The content is: ' + responseData.content);
+        console.log('Response:  ' + responseData);
+        // setComment(responseData.content);
+        // setCommentEmail(responseData.userEmail);
+        // setComments(responseData);
+      })
+      .catch(error => {
+        console.log('Failed request');
+        // handle error
+        console.log(error);
+      });
+  };
 
+  // getOneComment();
+  // getComment();
   React.useEffect(() => {
     // getNotes();
     console.log('On Comments page');
+    // getOneComment();
+    // getComment();
+    // getComments();
     const unsubscribe = navigation.addListener('focus', () => {
       // When the screen is focused (like loading from another screen), call function to refresh data
+      getOneComment();
       getComment();
+      //
+      getComments();
+
       console.log('Getting notes on ListNotes');
     });
 
@@ -108,7 +175,23 @@ const ListNotes = ({navigation, currentUserEmail, noteID}) => {
       .then(response => {
         let responseData = JSON.parse(JSON.stringify(response.data));
         console.log('RESPONSE DATA: ', responseData);
-        // getNotes();
+        getComments();
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  };
+
+  const deleteComment = id => {
+    console.log('current module id for deleting note: ' + notesID);
+    axios
+      .post('https://gavin-fyp.herokuapp.com/deleteComment', {
+        id: id,
+        noteID: notesID,
+      })
+      .then(response => {
+        console.log('Deleted ', id);
+        getComments(); // Refresh list of Comments
       })
       .catch(error => {
         console.log(error);
@@ -122,17 +205,53 @@ const ListNotes = ({navigation, currentUserEmail, noteID}) => {
   }, [loggedIn, navigation]);
   //
 
-  const Comment = ({commentContent, userEmail}) => {
-    return (
-      <View style={[styles.comment]}>
-        <Text style={[styles.text]}>{commentContent}</Text>
-        <Text style={[styles.text]}>{userEmail}</Text>
-      </View>
-    );
-  };
-
-  const handleAdditionalCommentsChanged = text => {
-    setNewComment(text);
+  const Comment = ({commentContent, userEmail, id}) => {
+    if (currentUsersEmail === userEmail) {
+      // If current user made comment, show delete option
+      return (
+        <View style={[styles.comment]}>
+          <View
+            style={{
+              justifyContent: 'space-between',
+              // paddingHorizontal: 10,
+              paddingVertical: -5,
+              flexDirection: 'row',
+              alignItems: 'center',
+              // marginTop: '-10%',
+            }}>
+            <Text style={[styles.text]}>{commentContent}</Text>
+            <Icon
+              style={[styles.icon]}
+              name="delete"
+              color="#ccc"
+              size={20}
+              onPress={() => {
+                deleteComment(id);
+              }}
+            />
+          </View>
+          <Text style={[styles.textSecondary]}>{userEmail}</Text>
+        </View>
+      );
+    } else {
+      // Comment made by other user, don't show delete option
+      return (
+        <View style={[styles.comment]}>
+          <View
+            style={{
+              justifyContent: 'space-between',
+              // paddingHorizontal: 10,
+              paddingVertical: -5,
+              flexDirection: 'row',
+              alignItems: 'center',
+              // marginTop: '-10%',
+            }}>
+            <Text style={[styles.text]}>{commentContent}</Text>
+          </View>
+          <Text style={[styles.textSecondary]}>{userEmail}</Text>
+        </View>
+      );
+    }
   };
 
   const getFooter = () => {
@@ -144,10 +263,10 @@ const ListNotes = ({navigation, currentUserEmail, noteID}) => {
           placeholderTextColor="#333332"
           multiline={true}
           editable
-          onChangeText={handleAdditionalCommentsChanged}
-          value={newComment}
-          // onChangeText={newText => setNewComment(newText)}
+          // onChangeText={handleAdditionalCommentsChanged}
           // value={newComment}
+          onChangeText={newText => setNewComment(newText)}
+          value={newComment}
         >
         </TextInput>
         <TouchableOpacity style={[styles.button]} onPress={() => createComment()}>
@@ -168,13 +287,13 @@ const ListNotes = ({navigation, currentUserEmail, noteID}) => {
         data={comments}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({item}) => {
-          console.log('item is : ' + item);
-          console.log('item is : ' + item.content);
-          console.log('item is : ' + item.userEmail);
+          // console.log('\nitem is : ' + item);
+          // console.log('item is : ' + item.content);
+          // console.log('item is : ' + item.userEmail);
           // getComment(item);
 
           return (
-            <Comment commentContent={item.content} userEmail={item.userEmail} />
+            <Comment commentContent={item.content} userEmail={item.userEmail} id={item._id} />
           );
         }}
         // contentContainerStyle={{flexGrow: 1}}
@@ -192,7 +311,9 @@ const ListNotes = ({navigation, currentUserEmail, noteID}) => {
           // value={newComment}
           onChangeText={newText => setNewComment(newText)}
           value={newComment}></TextInput>
-        <TouchableOpacity style={[styles.button]} onPress={() => createComment()}>
+        <TouchableOpacity
+          style={[styles.button]}
+          onPress={() => createComment()}>
           <Text style={{color: 'white'}}>Post Comment</Text>
         </TouchableOpacity>
       </View>
@@ -261,6 +382,12 @@ const styles = StyleSheet.create({
   },
   text: {
     color: 'black',
+    fontSize: 15,
+  },
+  textSecondary: {
+    color: '#616161',
+    fontSize: 11,
+    marginVertical: 2,
   },
   button: {
     alignItems: 'center',

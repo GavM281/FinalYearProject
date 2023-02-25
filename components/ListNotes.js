@@ -50,9 +50,11 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
   // console.log('IDs: ' + noteIDs);
 
   const deleteNote = id => {
+    console.log('current module id for deleting note: ' + currentModuleID);
     axios
       .post('https://gavin-fyp.herokuapp.com/deleteNote', {
-        id: id,
+        id: id, // ID of note
+        groupID: currentModuleID, // The ID of the module this note is part of, used to delete id from array
       })
       .then(response => {
         console.log('Deleted ', id);
@@ -96,6 +98,7 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
             editable: editable,
             privacy: privacy,
             moduleInfo: moduleInfo,
+            userEmail: currentUsersEmail,
           })
         }>
         <View
