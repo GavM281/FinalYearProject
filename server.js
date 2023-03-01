@@ -120,6 +120,20 @@ app.get('/getNote', (req, res) => {
     });
 });
 
+app.post('/getSingleNote', (req, res) => {
+  console.log('Getting Note with id: ' + req.body.id);
+  Note.findById(req.body.id)
+    .then(data => {
+      console.log('data: ', data);
+      console.log('name: ', data.name);
+      console.log('content: ', data.content);
+      res.send(data);
+    })
+    .catch(err => {
+      console.log(err);
+    });
+});
+
 app.get('/getUser', (req, res) => {
   console.log('Getting User');
   User.find({})
@@ -163,7 +177,7 @@ app.get('/getComment', (req, res) => {
   console.log('Id to find, using req.params and cast: ' + mongoose.Types.ObjectId(req.params.id));
   console.log('Id to find, using req.query and cast: ' + mongoose.Types.ObjectId(req.query.id));
   Comment.findById(id, function (err, comment) {
-    if(err){
+    if (err) {
       console.log(err);
     } else {
       console.log('comment: ' + comment);

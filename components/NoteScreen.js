@@ -45,6 +45,12 @@ function NoteScreen({
   let moduleInfos = route.params.moduleInfo;
   let noteID = route.params.id;
   let currentUserEmail = route.params.userEmail;
+  let noteCommentIDs = route.params.commentsIDs;
+  console.log('#####  ' + noteCommentIDs);
+  if (noteCommentIDs == null) {
+    noteCommentIDs = [];
+  }
+  let commentList = [];
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       // When the screen is focused (like loading from another screen), call function to refresh data
@@ -58,7 +64,8 @@ function NoteScreen({
       // console.log('noteIDs: ' + moduleInfos[1]);
       console.log('currentModuleID: ' + moduleInfos[2]);
       setContent(route.params.contents);
-      getComment();
+      commentList = [];
+      getCommentsFromList();
       navigation.setOptions({
         headerLeft: () => (
           // <TouchableOpacity style={[styles.button]}
@@ -188,6 +195,43 @@ function NoteScreen({
       });
   };
 
+  const getCommentsFromList = async () => {
+    console.log('\n\nGetCommentFromList\n');
+    if (noteCommentIDs === 0) {
+      commentList = [];
+      setComments(commentList);
+    } else {
+      for (let i = 0; i < noteCommentIDs.length; i++) {
+        let id = noteCommentIDs[i];
+        console.log(i);
+        // commentList = getComment1(commentsIDs[i]);
+        // console.log(i + ' commentList[i] is ' + commentList[i]);
+        // }
+        await axios
+          .post('https://gavin-fyp.herokuapp.com/getComment1', {
+            id: id,
+            // id: '63f1791d7dfb51047211028c',
+            // id: '63f551b9469a48ffdb421e48',
+          })
+          .then(response => {
+            console.log('\n   Made request: getComment1');
+            let responseData = JSON.parse(JSON.stringify(response.data));
+            console.log('Comment Content: ' + responseData.content);
+            console.log('Comment User: ' + responseData.userEmail);
+            console.log('Comment noteID: ' + responseData.noteID);
+            commentList.push(responseData);
+            setComments(commentList);
+            return responseData;
+          })
+          .catch(error => {
+            console.log('Failed request');
+            // handle error
+            console.log(error);
+          });
+      }
+    }
+  };
+
   // const Comment = ({commentContent, userEmail}) => {
   //   return (
   //     <View>
@@ -196,7 +240,9 @@ function NoteScreen({
   //     </View>
   //   );
   // };
+  if (comments == null){
 
+  }
   // Display
   return (
     <View style={[styles.sectionContainer]}>
@@ -240,8 +286,11 @@ function NoteScreen({
             navigation.navigate('Comments', {
               currentUserEmail: currentUserEmail,
               noteID: noteID,
+              commentIDs: noteCommentIDs,
+              commentsList: comments,
             })
           }>
+          {/*<Text style={{color: 'white'}}>Comments ({noteCommentIDs.length})</Text>*/}
           <Text style={{color: 'white'}}>Comments</Text>
         </TouchableOpacity>
         <TouchableOpacity

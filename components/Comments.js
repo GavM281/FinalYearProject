@@ -16,106 +16,134 @@ import {AuthContext} from '../context/AuthContext';
 import axios from 'axios';
 import WikiModule from './Buttons/WikiModule';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
-const ListNotes = ({navigation, currentUserEmail, noteID}) => {
+const ListNotes = ({
+  navigation,
+  currentUserEmail,
+  noteID,
+  commentIDs,
+  commentsList,
+}) => {
   const route = useRoute();
 
   const {loggedIn, userData} = useContext(AuthContext);
   const [notes, setNotes] = useState(null);
   const [name, setName] = useState('');
-  const [comments, setComments] = useState('');
+  // const [comments, setComments] = useState(route.params.commentsList);
+  const [comments, setComments] = useState(route.params.commentsList);
+  // const [commentsIDs, setCommentsIDs] = useState(route.params.commentIDs);
   const [newComment, setNewComment] = useState('');
 
+  console.log('');
+  console.log('');
   console.log('');
   console.log(' || Comments ||');
   console.log('userEmail: ' + route.params.currentUserEmail);
   console.log('noteID: ' + route.params.noteID);
+  console.log('commentIDs: ' + route.params.commentIDs);
+  console.log('comments: ' + route.params.commentsList);
+  // console.log('comments[0]: ' + route.params.commentsList[0].content);
+
   let currentUsersEmail = route.params.currentUserEmail;
   let notesID = route.params.noteID;
+  let commentsIDs = route.params.commentIDs; // The IDs of comments, passed from NoteScreen
+  // let commentList = [];
+  let commentList = route.params.commentsList; // Stores list of comments after retrieving
+  // if(commentList == null){
+  //   commentList = [];
+  // }
+  // let commentList = getCommentsFromList();
+  // setComments(commentList);
+  // console.log(commentList[0]);
+
+  React.useEffect(() => {
+    // getNotes();
+    console.log('On Comments page');
+    // commentsIDs = route.params.commentIDs; // The IDs of comments, passed from NoteScreen
+    setComments(commentList);
+    // getOneComment();
+    // getComment();
+    // getNote();
+    // getComments();
+    // getCommentsFromList();
+    const unsubscribe = navigation.addListener('focus', () => {
+      // When the screen is focused (like loading from another screen), call function to refresh data
+      // getOneComment();
+      // getComment().then(r => console.log('The Response for getComment is: ' + r));
+      // getComment1();
+      // getCommentsFromList();
+      // getComments();
+      // for (let i = 0; i < commentsIDs.length; i++) {
+      //   commentList = getComment1(commentsIDs[i]);
+      //   console.log(i + ' commentList[i] is ' + commentList[i]);
+      // }
+
+      console.log('Getting notes on ListNotes');
+    });
+
+    // Return the function to unsubscribe from the event so it gets removed on unmount
+    return unsubscribe;
+  }, [navigation]);
 
   const getComments = () => {
+    // commentList = [];
     axios
-      .get('https://gavin-fyp.herokuapp.com/getComments', {
-        // params: {
-        //   _id: commentID,
+      .get('https://gavin-fyp.herokuapp.com/getComments')
+      .then(response => {
+        // handle success
+        console.log('\n     Made request: getComments');
+        let responseData = JSON.parse(JSON.stringify(response.data));
+        console.log('Response:  ' + responseData);
+        // setComment(responseData.content);
+        // setCommentEmail(responseData.userEmail);
+        commentList = responseData;
+        setComments(responseData);
+      })
+      .catch(error => {
+        console.log('Failed request');
+        // handle error
+        console.log(error);
+      });
+  };
+
+  const getNote = () => {
+    console.log('Getting note info for id: ' + notesID);
+    axios
+      .get('https://gavin-fyp.herokuapp.com/getNote', {
+        id: noteID,
+        // id: '63f1791d7dfb51047211028c',
+        // id: '63f551b9469a48ffdb421e48',
+      })
+      .then(response => {
+        console.log('\n   Made request: getNote');
+        let responseData = JSON.parse(JSON.stringify(response.data));
+        console.log('Note Content: ' + responseData.content);
+        console.log('Note User: ' + responseData.userEmail);
+        // console.log(' noteID: ' + responseData.noteID);
+        // setComments(responseData);
+        // commentList.push(responseData);
+        return responseData;
+      })
+      .catch(error => {
+        console.log('Failed request');
+        // handle error
+        console.log(error);
+      });
+  };
+
+  const getComment = async () => {
+    console.log('\n\nGETCOMMENT\n');
+    await axios
+      .get('https://gavin-fyp.herokuapp.com/getComment', {
+        // body: {
+        id: '63f1791d7dfb51047211028c',
+        // id: '63f551b9469a48ffdb421e48',
         // },
       })
       .then(response => {
         // handle success
-        console.log('\n     Made request: getComments');
-        // console.log('ID was: ' + commentID);
-        // console.log('Response:  ' + response.data);
-        // console.log('Response:  ' + response[0]);
-        // console.log('Response:  ' + response);
-        // console.log('Response:  ' + response.content);
-        // console.log('Response:  ' + response.id);
-        // console.log('Response:  ' + response._id);
-        // console.log('Response:  ' + response[0].data);
-        let responseData = JSON.parse(JSON.stringify(response.data));
-        // console.log('The id is: ' + responseData._id);
-        // console.log('The id is: ' + responseData.id);
-        // console.log('The content is: ' + responseData.content);
-        console.log('Response:  ' + responseData);
-        // setComment(responseData.content);
-        // setCommentEmail(responseData.userEmail);
-        setComments(responseData);
-      })
-      .catch(error => {
-        console.log('Failed request');
-        // handle error
-        console.log(error);
-      });
-  };
-
-  const getComment = async() => {
-    console.log('\n\nGETCOMMENT\n');
-    await axios
-      .get('https://gavin-fyp.herokuapp.com/getComment', {
-        body: {
-          id: '63f1791d7dfb51047211028c',
-        // id: '63f551b9469a48ffdb421e48',
-        },
-      })
-      .then(response => {
-        // handle success
         console.log('\n   Made request: getComment');
-        // console.log('ID was: ' + commentID);
-        console.log('Response:  ' + response.data);
-        console.log('Response:  ' + response[0]);
-        console.log('Response:  ' + response);
-        console.log('Response:  ' + response.content);
-        console.log('Response:  ' + response.id);
-        console.log('Response:  ' + response._id);
-        // console.log('Response:  ' + response[0].data);
-        let responseData = JSON.parse(JSON.stringify(response.data));
-        // console.log('The id is: ' + responseData._id);
-        // console.log('The id is: ' + responseData.id);
-        // console.log('The content is: ' + responseData.content);
-        console.log('Response:  ' + responseData);
-        // setComment(responseData.content);
-        // setCommentEmail(responseData.userEmail);
-        setComments(responseData);
-      })
-      .catch(error => {
-        console.log('Failed request');
-        // handle error
-        console.log(error);
-      });
-  };
-
-  const getOneComment = () => {
-    console.log('\n\nGETONECOMMENT\n');
-    axios
-      .get('https://gavin-fyp.herokuapp.com/getOneComment', {
-        body: {
-          "id": "63f1791d7dfb51047211028c",
-          // id: '63f551b9469a48ffdb421e48',
-        },
-      })
-      .then(response => {
-        // handle success
-        console.log('\n   Made request: getOneComment');
         // console.log('ID was: ' + commentID);
         console.log('Response:  ' + response.data);
         console.log('Response:  ' + response[0]);
@@ -140,50 +168,164 @@ const ListNotes = ({navigation, currentUserEmail, noteID}) => {
       });
   };
 
+  const getComment1 = async id => {
+    console.log('\n\nGETCOMMENT1\n');
+    await axios
+      .post('https://gavin-fyp.herokuapp.com/getComment1', {
+        id: id,
+        // id: '63f1791d7dfb51047211028c',
+        // id: '63f551b9469a48ffdb421e48',
+      })
+      .then(response => {
+        console.log('\n   Made request: getComment1');
+        let responseData = JSON.parse(JSON.stringify(response.data));
+        console.log('Comment Content: ' + responseData.content);
+        console.log('Comment User: ' + responseData.userEmail);
+        console.log('Comment noteID: ' + responseData.noteID);
+        // setComments(responseData);
+        // commentList.push(responseData);
+        return responseData;
+      })
+      .catch(error => {
+        console.log('Failed request');
+        // handle error
+        console.log(error);
+      });
+  };
+
+  const getCommentsFromList = async () => {
+    console.log('\n\nGetCommentFromList\n');
+    console.log('commentsIDs is length:  ' + commentsIDs.length);
+    // let fullList = [];
+    commentList = [];
+    for (let i = 0; i < commentsIDs.length; i++) {
+      let id = commentsIDs[i];
+
+      console.log(i);
+      // commentList = getComment1(commentsIDs[i]);
+      // console.log(i + ' commentList[i] is ' + commentList[i]);
+      // }
+      await axios
+        .post('https://gavin-fyp.herokuapp.com/getComment1', {
+          id: id,
+          // id: '63f1791d7dfb51047211028c',
+          // id: '63f551b9469a48ffdb421e48',
+        })
+        .then(response => {
+          console.log('\n     Made request: getComment1');
+          let responseData = JSON.parse(JSON.stringify(response.data));
+          console.log('Comment Content: ' + responseData.content);
+          console.log('Comment User: ' + responseData.userEmail);
+          console.log('Comment noteID: ' + responseData.noteID);
+          console.log('RESPONSE in getFromList: ' + responseData);
+          if (responseData != null) {
+            commentList.push(responseData);
+            // setComments(responseData);
+            // console.log('COMMENTS IS NOW: ' + comments[0].content);
+            console.log('COMMENTS in getFromList IS NOW: ' + comments);
+            console.log('COMMENTS in getFromList IS NOW: ' + commentList);
+            setComments(commentList);
+            // fullList.push(responseData);
+          }
+          // setComments(comments + responseData);
+          // commentList.push(responseData);
+          // return responseData;
+        })
+        .catch(error => {
+          console.log('Failed request');
+          // handle error
+          console.log(error);
+        });
+    }
+    return commentList;
+  };
+
+  const getOneComment = () => {
+    console.log('\n\nGETONECOMMENT\n');
+    axios
+      .get('https://gavin-fyp.herokuapp.com/getOneComment', {
+        // body: {
+        id: '63f1791d7dfb51047211028c',
+        // id: '63f551b9469a48ffdb421e48',
+        // },
+      })
+      .then(response => {
+        // handle success
+        console.log('\n   Made request: getOneComment');
+        // console.log('ID was: ' + commentID);
+        console.log('Response1:  ' + response.data);
+        console.log('Response2:  ' + response.data[0]);
+        console.log('Response3:  ' + response.data.content);
+        console.log('Response4:  ' + response[0]);
+        console.log('Response5:  ' + response);
+        console.log('Response6:  ' + response.content);
+        console.log('Response7:  ' + response.id);
+        console.log('Response8:  ' + response._id);
+        // console.log('Response:  ' + response[0].data);
+        let responseData = JSON.parse(JSON.stringify(response.data));
+        // console.log('The id is: ' + responseData._id);
+        // console.log('The id is: ' + responseData.id);
+        // console.log('The content is: ' + responseData.content);
+        console.log('Response:  ' + responseData);
+        // setComment(responseData.content);
+        // setCommentEmail(responseData.userEmail);
+        // setComments(responseData);
+      })
+      .catch(error => {
+        console.log('Failed request');
+        // handle error
+        console.log(error);
+      });
+  };
+
   // getOneComment();
   // getComment();
-  React.useEffect(() => {
-    // getNotes();
-    console.log('On Comments page');
-    // getOneComment();
-    // getComment();
-    // getComments();
-    const unsubscribe = navigation.addListener('focus', () => {
-      // When the screen is focused (like loading from another screen), call function to refresh data
-      getOneComment();
-      getComment();
-      //
-      getComments();
-
-      console.log('Getting notes on ListNotes');
-    });
-
-    // Return the function to unsubscribe from the event so it gets removed on unmount
-    return unsubscribe;
-  }, [navigation]);
 
   const createComment = () => {
     console.log(
       'Creating comment with: ' + newComment + '  and ' + currentUsersEmail,
     );
-    axios
-      .post('https://gavin-fyp.herokuapp.com/createComment', {
-        content: newComment,
-        userEmail: currentUsersEmail,
-        noteID: notesID,
-      })
-      .then(response => {
-        let responseData = JSON.parse(JSON.stringify(response.data));
-        console.log('RESPONSE DATA: ', responseData);
-        getComments();
-      })
-      .catch(error => {
-        console.log(error);
-      });
+    if (newComment != null) {
+      axios
+        .post('https://gavin-fyp.herokuapp.com/createComment', {
+          content: newComment,
+          userEmail: currentUsersEmail,
+          noteID: notesID,
+        })
+        .then(response => {
+          let responseData = JSON.parse(JSON.stringify(response.data));
+          console.log('RESPONSE DATA: ', responseData);
+          // getComments();
+          // comments
+          console.log('Comment Content: ' + responseData.content);
+          console.log('Comment User: ' + responseData.userEmail);
+          console.log('Comment noteID: ' + responseData.noteID);
+          console.log('Comment id: ' + responseData._id);
+
+          // setCommentsIDs(commentsIDs + responseData._id);
+          commentsIDs.push(responseData._id);
+          setComments(comments + responseData);
+          commentList.push(responseData);
+
+          console.log(
+            'Last element of id array is: ' +
+              commentsIDs[commentsIDs.length - 1] +
+              ' and comment id is: ' +
+              responseData._id,
+          );
+          getCommentsFromList();
+          // setComments(getCommentsFromList());
+          // getComments();
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    }
   };
 
   const deleteComment = id => {
     console.log('current module id for deleting note: ' + notesID);
+    console.log('1 length of commentsIDs is: ' + commentsIDs.length);
     axios
       .post('https://gavin-fyp.herokuapp.com/deleteComment', {
         id: id,
@@ -191,7 +333,22 @@ const ListNotes = ({navigation, currentUserEmail, noteID}) => {
       })
       .then(response => {
         console.log('Deleted ', id);
-        getComments(); // Refresh list of Comments
+        console.log('Deletion response: ', response);
+        // commentsIDs.shift(id);
+        // commentList = [];
+        let index = commentsIDs.indexOf(id);
+        // delete commentsIDs[index];i
+        // setCommentsIDs(
+
+        (commentsIDs = commentsIDs.filter(function (item) {
+          return item !== id;
+        })),
+          // );
+          console.log('2 length of commentsIDs is: ' + commentsIDs.length);
+        // setComments(commentList);
+        // setComments(getCommentsFromList()); // Refresh list of Comments
+        getCommentsFromList();
+        // getComments();
       })
       .catch(error => {
         console.log(error);
@@ -254,28 +411,6 @@ const ListNotes = ({navigation, currentUserEmail, noteID}) => {
     }
   };
 
-  const getFooter = () => {
-    return (
-      <View>
-        <TextInput
-          style={[styles.commentBox]}
-          placeholder="New Comment"
-          placeholderTextColor="#333332"
-          multiline={true}
-          editable
-          // onChangeText={handleAdditionalCommentsChanged}
-          // value={newComment}
-          onChangeText={newText => setNewComment(newText)}
-          value={newComment}
-        >
-        </TextInput>
-        <TouchableOpacity style={[styles.button]} onPress={() => createComment()}>
-          <Text style={{color: 'white'}}>Post Comment</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  };
-
   // TESTING: True to show all users notes regardless of creator. False to only show current users notes
   let showAllUsers = false;
   return (
@@ -284,17 +419,37 @@ const ListNotes = ({navigation, currentUserEmail, noteID}) => {
       {/*<Text> {route.params.comments} </Text>*/}
       <FlatList
         style={[styles.flatlist]}
+        // data={comments}
         data={comments}
+        extraData={commentList}
+        // data={commentList}
+        // extraData={comments}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({item}) => {
           // console.log('\nitem is : ' + item);
-          // console.log('item is : ' + item.content);
-          // console.log('item is : ' + item.userEmail);
-          // getComment(item);
-
-          return (
-            <Comment commentContent={item.content} userEmail={item.userEmail} id={item._id} />
-          );
+          // console.log('\nitem is : ' + comments);
+          // console.log('\nitem is : ' + comments.content);
+          // console.log('item content is : ' + item.content);
+          // console.log('item email is : ' + item.userEmail);
+          // getComment1(item);
+          // console.log(
+          //   'commentsIDs: ' + commentsIDs + ' and item id is =:  ' + item._id,
+          // );
+          // if(!commentsIDs.includes(item._id)) {
+          //   commentsIDs += commentsIDs;
+          // }
+          if (item.content != null
+            // && commentsIDs.includes(item._id)
+          ) {
+            return (
+              // <Comment commentContent={item.content} userEmail={item.userEmail} id={item._id} />
+              <Comment
+                commentContent={item.content}
+                userEmail={item.userEmail}
+                id={item._id}
+              />
+            );
+          }
         }}
         // contentContainerStyle={{flexGrow: 1}}
         // ListFooterComponentStyle={{flex: 1, justifyContent: 'flex-end'}}
@@ -307,10 +462,9 @@ const ListNotes = ({navigation, currentUserEmail, noteID}) => {
           placeholderTextColor="#636363"
           multiline={true}
           editable
-          // onChangeText={handleAdditionalCommentsChanged}
-          // value={newComment}
           onChangeText={newText => setNewComment(newText)}
-          value={newComment}></TextInput>
+          value={newComment}
+        />
         <TouchableOpacity
           style={[styles.button]}
           onPress={() => createComment()}>

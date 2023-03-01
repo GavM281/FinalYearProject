@@ -159,7 +159,7 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
   };
 
   React.useEffect(() => {
-    getNotes();
+    // getNotes();
     console.log('On ListNotes page');
     const unsubscribe = navigation.addListener('focus', () => {
       // When the screen is focused (like loading from another screen), call function to refresh data
@@ -256,10 +256,10 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
         // setId ({notes._id});
         renderItem={({item}) => {
           let editableDoc = false;
-          console.log("comments:  " + item.comments);
+          console.log('comments:  ' + item.comments);
           // console.log("comments:  " + item.comments[0]);
           // console.log("comments:  " + item[0].comments[0]);
-          console.log("item:   " + item);
+          console.log('item:   ' + item);
           if (
             ((item.userEmail === currentUsersEmail ||
               item.privacy === 'public') &&
