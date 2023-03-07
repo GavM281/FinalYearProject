@@ -22,8 +22,9 @@ function NoteScreen({navigation, contents, userEmail, moduleID, moduleInfo}) {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState('private');
   const [items, setItems] = useState([
-    {label: 'Private', value: 'private'},
-    {label: 'Public', value: 'public'},
+    {label: 'Private  - Only you can view it', value: 'private'},
+    {label: 'Public(editable)  - Everyone can view and edit', value: 'public(editable)'},
+    {label: 'Public(not editable)  - Everyone can view but can\'t edit', value: 'public'},
   ]);
   const route = useRoute();
   const currentUsersEmail = route.params.userEmail;
@@ -58,7 +59,9 @@ function NoteScreen({navigation, contents, userEmail, moduleID, moduleInfo}) {
           name: header,
           contents: content,
           editable: true,
+          privacy: value,
           moduleInfo: route.params.moduleInfo,
+          userEmail: currentUsersEmail,
         });
         // getNotes();
       })
@@ -93,12 +96,6 @@ function NoteScreen({navigation, contents, userEmail, moduleID, moduleInfo}) {
         setItems={setItems}
         hideSelectedItemIcon={true}
       />
-      {/*<Button*/}
-      {/*  style={[styles.button]}*/}
-      {/*  styleDisabled={{color: 'red'}}*/}
-      {/*  onPress={() => createNote()}*/}
-      {/*  title="Save"*/}
-      {/*/>*/}
       <TouchableOpacity style={[styles.button]} onPress={() => createNote()}>
         <Text style={{color: 'white'}}>Create a new note</Text>
       </TouchableOpacity>

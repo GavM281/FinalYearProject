@@ -31,7 +31,7 @@ const ListNotes = ({
   const [notes, setNotes] = useState(null);
   const [name, setName] = useState('');
   // const [comments, setComments] = useState(route.params.commentsList);
-  const [comments, setComments] = useState(route.params.commentsList);
+  const [comments, setComments] = useState();
   // const [commentsIDs, setCommentsIDs] = useState(route.params.commentIDs);
   const [newComment, setNewComment] = useState('');
 
@@ -47,7 +47,7 @@ const ListNotes = ({
 
   let currentUsersEmail = route.params.currentUserEmail;
   let notesID = route.params.noteID;
-  let commentsIDs = route.params.commentIDs; // The IDs of comments, passed from NoteScreen
+  // let commentsIDs = route.params.commentIDs; // The IDs of comments, passed from NoteScreen
   // let commentList = [];
   let commentList = route.params.commentsList; // Stores list of comments after retrieving
   // if(commentList == null){
@@ -64,7 +64,7 @@ const ListNotes = ({
     setComments(commentList);
     // getOneComment();
     // getComment();
-    // getNote();
+    getNote();
     // getComments();
     // getCommentsFromList();
     const unsubscribe = navigation.addListener('focus', () => {
@@ -110,8 +110,8 @@ const ListNotes = ({
   const getNote = () => {
     console.log('Getting note info for id: ' + notesID);
     axios
-      .get('https://gavin-fyp.herokuapp.com/getNote', {
-        id: noteID,
+      .post('https://gavin-fyp.herokuapp.com/getSingleNote', {
+        id: notesID,
         // id: '63f1791d7dfb51047211028c',
         // id: '63f551b9469a48ffdb421e48',
       })
@@ -120,10 +120,12 @@ const ListNotes = ({
         let responseData = JSON.parse(JSON.stringify(response.data));
         console.log('Note Content: ' + responseData.content);
         console.log('Note User: ' + responseData.userEmail);
+        let commentsIDs = responseData.comments;
+        getCommentsFromList(commentsIDs);
         // console.log(' noteID: ' + responseData.noteID);
         // setComments(responseData);
         // commentList.push(responseData);
-        return responseData;
+        // return responseData;
       })
       .catch(error => {
         console.log('Failed request');
@@ -193,7 +195,7 @@ const ListNotes = ({
       });
   };
 
-  const getCommentsFromList = async () => {
+  const getCommentsFromList = async commentsIDs => {
     console.log('\n\nGetCommentFromList\n');
     console.log('commentsIDs is length:  ' + commentsIDs.length);
     // let fullList = [];
@@ -224,7 +226,7 @@ const ListNotes = ({
             // console.log('COMMENTS IS NOW: ' + comments[0].content);
             console.log('COMMENTS in getFromList IS NOW: ' + comments);
             console.log('COMMENTS in getFromList IS NOW: ' + commentList);
-            setComments(commentList);
+            // setComments(commentList);
             // fullList.push(responseData);
           }
           // setComments(comments + responseData);
@@ -237,6 +239,7 @@ const ListNotes = ({
           console.log(error);
         });
     }
+    setComments(commentList);
     return commentList;
   };
 
@@ -303,19 +306,20 @@ const ListNotes = ({
           console.log('Comment id: ' + responseData._id);
 
           // setCommentsIDs(commentsIDs + responseData._id);
-          commentsIDs.push(responseData._id);
-          setComments(comments + responseData);
-          commentList.push(responseData);
+          // commentsIDs.push(responseData._id);
+          // setComments(comments + responseData);
+          // commentList.push(responseData);
 
-          console.log(
-            'Last element of id array is: ' +
-              commentsIDs[commentsIDs.length - 1] +
-              ' and comment id is: ' +
-              responseData._id,
-          );
-          getCommentsFromList();
+          // console.log(
+          //   'Last element of id array is: ' +
+          //     commentsIDs[commentsIDs.length - 1] +
+          //     ' and comment id is: ' +
+          //     responseData._id,
+          // );
+          // getCommentsFromList();
           // setComments(getCommentsFromList());
           // getComments();
+          getNote();
         })
         .catch(error => {
           console.log(error);
@@ -325,7 +329,7 @@ const ListNotes = ({
 
   const deleteComment = id => {
     console.log('current module id for deleting note: ' + notesID);
-    console.log('1 length of commentsIDs is: ' + commentsIDs.length);
+    // console.log('1 length of commentsIDs is: ' + commentsIDs.length);
     axios
       .post('https://gavin-fyp.herokuapp.com/deleteComment', {
         id: id,
@@ -336,18 +340,19 @@ const ListNotes = ({
         console.log('Deletion response: ', response);
         // commentsIDs.shift(id);
         // commentList = [];
-        let index = commentsIDs.indexOf(id);
+        // let index = commentsIDs.indexOf(id);
         // delete commentsIDs[index];i
         // setCommentsIDs(
 
-        (commentsIDs = commentsIDs.filter(function (item) {
-          return item !== id;
-        })),
+        // (commentsIDs = commentsIDs.filter(function (item) {
+        //   return item !== id;
+        // })),
           // );
-          console.log('2 length of commentsIDs is: ' + commentsIDs.length);
+          // console.log('2 length of commentsIDs is: ' + commentsIDs.length);
         // setComments(commentList);
         // setComments(getCommentsFromList()); // Refresh list of Comments
-        getCommentsFromList();
+        // getCommentsFromList();
+        getNote();
         // getComments();
       })
       .catch(error => {

@@ -13,7 +13,6 @@ import NoteButton from './Buttons/NoteButton';
 import {useRoute} from '@react-navigation/native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import {HeaderBackButton} from '@react-navigation/elements';
-const { ObjectID } = require('mongodb');
 
 function NoteScreen({
   navigation,
@@ -39,9 +38,18 @@ function NoteScreen({
   const [value, setValue] = useState(route.params.privacy); // Set value of dropdown to value of privacy that was passed in
   const [items, setItems] = useState([
     {label: 'Private', value: 'private'},
-    {label: 'Public', value: 'public'},
+    {label: 'Public(editable)', value: 'public(editable)'},
+    {label: 'Public(not editable)', value: 'public'},
   ]);
-  const editableDoc = route.params.editable;
+  let editableDoc = route.params.editable;
+  let dropdownDisabled;
+  let notePrivacy = route.params.privacy;
+  if (notePrivacy.includes('public')) {
+    dropdownDisabled = true;
+  } else {
+    dropdownDisabled = false;
+  }
+
   let moduleInfos = route.params.moduleInfo;
   let noteID = route.params.id;
   let currentUserEmail = route.params.userEmail;
@@ -64,6 +72,7 @@ function NoteScreen({
       // console.log('noteIDs: ' + moduleInfos[1]);
       console.log('currentModuleID: ' + moduleInfos[2]);
       setContent(route.params.contents);
+      getNote();
       commentList = [];
       getCommentsFromList();
       navigation.setOptions({
@@ -91,10 +100,10 @@ function NoteScreen({
     console.log('GET NOTE -> The id is: ' + route.params.id);
     // console.log('The content is: ' + content);
     axios
-      .get('https://gavin-fyp.herokuapp.com/getNote', {
-        params: {
+      .post('https://gavin-fyp.herokuapp.com/getSingleNote', {
+        // params: {
           id: route.params.id,
-        },
+        // },
       })
       .then(response => {
         // handle success
@@ -111,67 +120,6 @@ function NoteScreen({
         // handle error
         console.log(error);
       });
-  };
-
-  const getComment = () => {
-    var axios = require('axios');
-    // console.log(commentID);
-    var data = JSON.stringify({
-      id: '63f1791d7dfb51047211028c',
-    });
-
-    var config = {
-      method: 'get',
-      maxBodyLength: Infinity,
-      url: 'https://gavin-fyp.herokuapp.com/getComment',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      data: data,
-    };
-
-    axios(config)
-      .then(function (response) {
-        console.log(JSON.stringify(response.data));
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-    // console.log('GET Comment -> The id is: ' + commentID);
-    // console.log('The content is: ' + content);
-
-
-    // axios
-    //   .get('https://gavin-fyp.herokuapp.com/getComment', {
-    //     params: {
-    //       id: '63f1791d7dfb51047211028c',
-    //     },
-    //   })
-    //   .then(response => {
-    //     // handle success
-    //     console.log('\n   Made request with id:   63f1791d7dfb51047211028c');
-    //     // console.log('ID was: ' + commentID);
-    //     console.log('Response:  ' + response.data);
-    //     console.log('Response:  ' + response[0]);
-    //     console.log('Response:  ' + response);
-    //     console.log('Response:  ' + response.content);
-    //     console.log('Response:  ' + response.id);
-    //     console.log('Response:  ' + response._id);
-    //     // console.log('Response:  ' + response[0].data);
-    //     let responseData = JSON.parse(JSON.stringify(response.data));
-    //     // console.log('The id is: ' + responseData._id);
-    //     // console.log('The id is: ' + responseData.id);
-    //     // console.log('The content is: ' + responseData.content);
-    //     console.log('Response:  ' + responseData);
-    //     setComment(responseData.content);
-    //     setCommentEmail(responseData.userEmail);
-    //     setComments(responseData);
-    //   })
-    //   .catch(error => {
-    //     console.log('Failed request');
-    //     // handle error
-    //     console.log(error);
-    //   });
   };
 
   const saveNoteContent = () => {
@@ -271,7 +219,7 @@ function NoteScreen({
           setValue={setValue}
           setItems={setItems}
           // hideSelectedItemIcon={true}
-          disabled={!editableDoc}
+          disabled={dropdownDisabled}
           // ArrowDownIconComponent = ArrowUpIconComponent;
         />
         {/*<Button*/}

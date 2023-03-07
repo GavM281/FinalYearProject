@@ -1,5 +1,11 @@
-const sum = require('../components/sum');
+import React from 'react';
 
-test('adds 1 + 2 to equal 3', () => {
-  expect(sum(1, 2)).toBe(3);
-});
+// import { render, fireEvent, act } from "@testing-library/react-native";
+//
+// import NoteScreen from '../components/NoteScreen';
+//
+// test('renders correctly', () => {
+//   // const tree = create(<NoteScreen />);
+//   // expect(tree).toMatchSnapshot();
+//   render(<NoteScreen />);
+// });

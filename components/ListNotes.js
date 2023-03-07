@@ -65,6 +65,24 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
       });
   };
 
+  const DeleteIcon = ({noteEmail, id}) => {
+    if (noteEmail === currentUsersEmail) {
+      // Note made by current user, can be deleted
+      return (
+        <Icon
+          style={[styles.icon]}
+          name="delete"
+          color="#ccc"
+          size={30}
+          onPress={() => {
+            deleteNote(id);
+          }}
+        />
+      );
+    } else {
+      return null; // Note made by different user, can't be deleted
+    }
+  };
   const NoteButton = ({
     title,
     content,
@@ -123,15 +141,16 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
             {title}
           </Text>
 
-          <Icon
-            style={[styles.icon]}
-            name="delete"
-            color="#ccc"
-            size={30}
-            onPress={() => {
-              deleteNote(id);
-            }}
-          />
+          <DeleteIcon noteEmail={userEmail} id={id} />
+          {/*<Icon*/}
+          {/*  style={[styles.icon]}*/}
+          {/*  name="delete"*/}
+          {/*  color="#ccc"*/}
+          {/*  size={30}*/}
+          {/*  onPress={() => {*/}
+          {/*    deleteNote(id);*/}
+          {/*  }}*/}
+          {/*/>*/}
         </View>
         <View
           style={{
@@ -237,18 +256,6 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
   let showAllUsers = false;
   return (
     <View style={[styles.sectionContainer]}>
-    {/*//   /!*<Text style={[styles.header]}>{currentModuleCode}</Text>*!/*/}
-    {/*//   /!*<TouchableOpacity*!/*/}
-    {/*//   /!*  style={[styles.button]}*!/*/}
-    {/*//   /!*  onPress={() =>*!/*/}
-    {/*//   /!*    navigation.navigate('CreateNote', {*!/*/}
-    {/*//   /!*      userEmail: currentUsersEmail,*!/*/}
-    {/*//   /!*      moduleID: currentModuleID,*!/*/}
-    {/*//   /!*      moduleInfo: moduleInfo,*!/*/}
-    {/*//   /!*    })*!/*/}
-    {/*//   /!*  }>*!/*/}
-    {/*//   /!*  <Text style={{color: 'white', fontSize: 17}}>Create</Text>*!/*/}
-    {/*//   /!*</TouchableOpacity> *!/*/}
       <FlatList
         style={[styles.flatlist]}
         data={notes}
@@ -256,46 +263,48 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
         // setId ({notes._id});
         renderItem={({item}) => {
           let editableDoc = false;
-          console.log('comments:  ' + item.comments);
-          // console.log("comments:  " + item.comments[0]);
-          // console.log("comments:  " + item[0].comments[0]);
-          console.log('item:   ' + item);
+          // console.log('comments:  ' + item.comments);
+          // console.log('item:   ' + item);
           if (
             ((item.userEmail === currentUsersEmail ||
-              item.privacy === 'public') &&
+              item.privacy.includes('public')) &&
               noteIDs.includes(item._id)) ||
             showAllUsers == true
           ) {
             // if ( item.userEmail === currentUsersEmail || item.privacy === "public" || showAllUsers == true){
-            if (item.userEmail === currentUsersEmail) {
+            if (
+              item.userEmail === currentUsersEmail ||
+              item.privacy === 'public(editable)'
+            ) {
               editableDoc = true;
-              return (
-                <NoteButton
-                  title={item.name}
-                  content={item.content}
-                  buttonColour={'#30B283'}
-                  navigation={navigation}
-                  id={item._id}
-                  userEmail={item.userEmail}
-                  privacy={item.privacy}
-                  editable={editableDoc}
-                  comments={item.comments}
-                />
-              );
-            } else {
-              return (
-                <NoteButton
-                  title={item.name}
-                  content={item.content}
-                  buttonColour={'#30B283'}
-                  navigation={navigation}
-                  id={item._id}
-                  userEmail={item.userEmail}
-                  privacy={item.privacy}
-                  editable={editableDoc}
-                />
-              );
             }
+            return (
+              <NoteButton
+                title={item.name}
+                content={item.content}
+                buttonColour={'#30B283'}
+                navigation={navigation}
+                id={item._id}
+                userEmail={item.userEmail}
+                privacy={item.privacy}
+                editable={editableDoc}
+                comments={item.comments}
+              />
+            );
+            // } else {
+            //   return (
+            //     <NoteButton
+            //       title={item.name}
+            //       content={item.content}
+            //       buttonColour={'#30B283'}
+            //       navigation={navigation}
+            //       id={item._id}
+            //       userEmail={item.userEmail}
+            //       privacy={item.privacy}
+            //       editable={editableDoc}
+            //     />
+            //   );
+            // }
           }
         }}
         ListHeaderComponent={getHeader} // Needed to avoid error about flatlist inside scrollview, allows scrolling entire page
