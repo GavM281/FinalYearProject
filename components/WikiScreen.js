@@ -32,11 +32,7 @@ const WikiScreen = ({navigation}) => {
   const getRooms = () => {
     axios
       .get('https://gavin-fyp.herokuapp.com/getModules')
-      // .get('http://89.101.96.182:3001/getModules')
-      // .get('http://192.168.2.135:3000/getModules')
       .then(response => {
-        // console.log('main res', response);
-        // console.log('data', JSON.parse(JSON.stringify(response.data)));
         let responseData = JSON.parse(JSON.stringify(response.data));
         console.log('RESPONSE DATA: ', responseData);
         console.log();
@@ -51,10 +47,9 @@ const WikiScreen = ({navigation}) => {
 
   return (
     <View style={[styles.sectionContainer]}>
-      {/*<Button title="Get Rooms" onPress={() => getRooms()} />*/}
       <Text style={[styles.header]}>Modules</Text>
       <FlatList
-        style={[styles.flatlist]}
+        style={[styles.flatList]}
         data={rooms}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({item}) => (
@@ -63,7 +58,7 @@ const WikiScreen = ({navigation}) => {
             title={item.name}
             Notes={item.notes.length}
             ids={item.notes}
-            buttonColour={'#30B283'}
+            // buttonColour={'#30B283'}
             onPress={() => navigation.navigate('ListNotes', {moduleCode: item.name, moduleNotes: item.notes, moduleID: item._id})}
           />
         )}
@@ -78,7 +73,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     // backgroundColor: 'white',
   },
-  flatlist: {
+  flatList: {
     backgroundColor: 'white',
     elevation: 5,
     // borderWidth: .5,

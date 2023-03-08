@@ -5,11 +5,8 @@ import {
   View,
   TextInput,
   StyleSheet,
-  FlatList,
-  Button,
 } from 'react-native';
 import axios from 'axios';
-import NoteButton from './Buttons/NoteButton';
 import {useRoute} from '@react-navigation/native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import {HeaderBackButton} from "@react-navigation/elements";
@@ -74,13 +71,14 @@ function NoteScreen({navigation, contents, userEmail, moduleID, moduleInfo}) {
   return (
     <View style={[styles.sectionContainer]}>
       <TextInput
-        style={[styles.header]}
+        style={[styles.noteTitle]}
         placeholder={'Enter Note Name'}
         placeholderTextColor="#383838FF"
         multiline={true}
-        onChangeText={header => setHeader(header)}></TextInput>
+        onChangeText={header => setHeader(header)}
+      />
       <TextInput
-        style={[styles.textInput]}
+        style={[styles.noteContent]}
         editable
         multiline={true}
         onChangeText={newText => setContent(newText)}
@@ -97,7 +95,7 @@ function NoteScreen({navigation, contents, userEmail, moduleID, moduleInfo}) {
         hideSelectedItemIcon={true}
       />
       <TouchableOpacity style={[styles.button]} onPress={() => createNote()}>
-        <Text style={{color: 'white'}}>Create a new note</Text>
+        <Text style={{color: 'white'}}>Create</Text>
       </TouchableOpacity>
     </View>
   );
@@ -105,16 +103,29 @@ function NoteScreen({navigation, contents, userEmail, moduleID, moduleInfo}) {
 
 const styles = StyleSheet.create({
   sectionContainer: {
-    textAlignVertical: 'top',
-    // marginTop: 20,
-    paddingHorizontal: 10,
-    paddingVertical: 10,
+    // textAlignVertical: 'top',
+    padding: 10,
     shadowColor: '#000', // IOS
     height: '100%',
     backgroundColor: '#ededed',
     // margin: '2%',
   },
-  textInput: {
+  noteTitle: {
+    fontWeight: 'bold',
+    textAlign: 'center',
+    fontSize: 25,
+    color: 'black',
+    elevation: 6,
+    borderBottomWidth: 1,
+    backgroundColor: '#ffffff',
+    borderStyle: 'solid',
+    // borderWidth: 1,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    padding: 5,
+    // marginTop: 5,
+  },
+  noteContent: {
     textAlignVertical: 'top',
     backgroundColor: '#ffffff',
     elevation: 5,
@@ -143,21 +154,6 @@ const styles = StyleSheet.create({
     // marginBottom: 10,
     // margin: '20px',
     // textAlignVertical: 'bottom',
-  },
-  header: {
-    fontWeight: 'bold',
-    textAlign: 'center',
-    fontSize: 25,
-    color: 'black',
-    elevation: 6,
-    borderBottomWidth: 1,
-    backgroundColor: '#ffffff',
-    borderStyle: 'solid',
-    // borderWidth: 1,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-    padding: 5,
-    // marginTop: 5,
   },
   dropdown: {
     // marginVertical: 5,

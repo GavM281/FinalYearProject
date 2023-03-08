@@ -1,85 +1,34 @@
 import React from 'react';
 import {StyleSheet, TouchableOpacity, Text, View} from 'react-native';
 
-const WikiModule = ({
-  title,
-  Notes,
-  ids,
-  onPress,
-  buttonColour,
-  titleColour,
-  buttonStyle,
-  textStyle,
-}) => {
+const WikiModule = ({title, Notes, ids, onPress}) => {
   return (
-    // <Text>{title}</Text>
-    <TouchableOpacity
-      style={{
-        ...styles.appButtonContainer,
-        ...buttonStyle,
-        backgroundColor: buttonColour || '#F29947',
-      }}
-      onPress={onPress}>
-      {/*Module name*/}
-      <View
-        style={{
-          justifyContent: 'space-between',
-          paddingHorizontal: 10,
-          paddingVertical: 10,
-          // marginTop: '-10%',
-        }}>
-        <Text
-          style={{
-            ...styles.appButtonText,
-            ...textStyle,
-            color: titleColour || '#FFF6F6',
-            fontSize: 25,
-          }}>
-          {title}
-        </Text>
-      </View>
-      {/*Notes*/}
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          paddingHorizontal: 10,
-          // paddingVertical: 10,
-          // marginBottom: '-10%',
-        }}>
-        {/*<View>*/}
-        {/*  <Text*/}
-        {/*    style={{*/}
-        {/*      ...styles.appButtonText,*/}
-        {/*      ...textStyle,*/}
-        {/*      color: titleColour || '#FFF6F6',*/}
-        {/*      fontSize: 14,*/}
-        {/*    }}>*/}
-        {/*    Notes uploaded: {Notes}*/}
-        {/*  </Text>*/}
-        {/*</View>*/}
+    <TouchableOpacity style={[styles.buttonContainer]} onPress={onPress}>
+      <View>
+        <Text style={[styles.moduleName]}>{title}</Text>
       </View>
     </TouchableOpacity>
   );
 };
 const styles = StyleSheet.create({
-  // ...
-  appButtonContainer: {
+  buttonContainer: {
     elevation: 8,
     borderRadius: 14,
     shadowColor: '#000', // IOS
     shadowOffset: {height: 4, width: 0}, // IOS
     shadowOpacity: 0.3, // IOS
     shadowRadius: 4.5, //IOS
-    // padding: 6,
-    paddingVertical: 10,
+    paddingVertical: 20,
+    paddingHorizontal: 10,
+    backgroundColor: '#30B283',
     margin: '2%',
   },
 
-  appButtonText: {
-    fontSize: 18,
+  moduleName: {
     fontWeight: 'bold',
     justifyContent: 'flex-start',
+    color: '#FFF6F6',
+    fontSize: 25,
   },
 });
 

@@ -22,14 +22,14 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
 
   const {loggedIn, userData} = useContext(AuthContext);
   const [notes, setNotes] = useState(null);
-  const [name, setName] = useState('');
-
-  const [open, setOpen] = useState(false);
-  const [value, setValue] = useState('private');
-  const [items, setItems] = useState([
-    {label: 'Private', value: 'private'},
-    {label: 'Public', value: 'public'},
-  ]);
+  // const [name, setName] = useState('');
+  //
+  // const [open, setOpen] = useState(false);
+  // const [value, setValue] = useState('private');
+  // const [items, setItems] = useState([
+  //   {label: 'Private', value: 'private'},
+  //   {label: 'Public', value: 'public'},
+  // ]);
 
   console.log('');
   console.log(' || LISTNOTES ||');
@@ -48,6 +48,42 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
   console.log('code: ' + currentModuleCode);
   console.log('Module ID: ' + currentModuleID);
   // console.log('IDs: ' + noteIDs);
+
+  useEffect(() => {
+    if (loggedIn === false) {
+      navigation.dispatch(StackActions.replace('Sign In'));
+    }
+  }, [loggedIn, navigation]);
+
+  React.useEffect(() => {
+    // getNotes();
+    console.log('On ListNotes page');
+    const unsubscribe = navigation.addListener('focus', () => {
+      // When the screen is focused (like loading from another screen), call function to refresh data
+      getNotes();
+      console.log('Getting notes on ListNotes');
+    });
+
+    // Return the function to unsubscribe from the event so it gets removed on unmount
+    return unsubscribe;
+  }, [navigation]);
+
+  const getNotes = async () => {
+    await axios
+      // .get('https://staidr-heroku.herokuapp.com/groups')
+      .get('https://gavin-fyp.herokuapp.com/getNotes', {
+        // ids: ['63c73ece03e5b856270ab63b', '63c740fee0dcd7e242a5e63a'],
+      })
+      .then(response => {
+        let responseData = JSON.parse(JSON.stringify(response.data));
+        console.log('RESPONSE DATA: ', responseData);
+        setNotes(responseData);
+      })
+      .catch(error => {
+        console.log(error);
+        console.log('There was an error getting notes ^^');
+      });
+  };
 
   const deleteNote = id => {
     console.log('current module id for deleting note: ' + currentModuleID);
@@ -86,13 +122,6 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
   const NoteButton = ({
     title,
     content,
-    Notes,
-    onPress,
-    buttonColour,
-    titleColour,
-    buttonStyle,
-    textStyle,
-    navigation,
     id,
     userEmail,
     privacy,
@@ -101,12 +130,7 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
   }) => {
     return (
       <TouchableOpacity
-        style={{
-          ...styles.appButtonContainer,
-          ...buttonStyle,
-          backgroundColor: buttonColour || '#F29947',
-          paddingLeft: 10,
-        }}
+        style={[styles.noteButton]}
         onPress={() =>
           navigation.navigate('NoteScreen', {
             id: id,
@@ -119,126 +143,34 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
             userEmail: currentUsersEmail,
           })
         }>
-        <View
-          style={{
-            justifyContent: 'space-between',
-            // paddingHorizontal: 10,
-            // paddingVertical: 10,
-            flexDirection: 'row',
-            alignItems: 'center',
-            // marginTop: '-10%',
-          }}>
-          <Text
-            style={{
-              ...styles.appButtonText,
-              ...textStyle,
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              color: titleColour || '#FFF6F6',
-              fontSize: 25,
-            }}>
-            {title}
-          </Text>
+        <View style={[styles.noteButtonHeading]}>
+          <Text numberOfLines={2} style={[styles.noteTitle]}>{title}</Text>
 
           <DeleteIcon noteEmail={userEmail} id={id} />
-          {/*<Icon*/}
-          {/*  style={[styles.icon]}*/}
-          {/*  name="delete"*/}
-          {/*  color="#ccc"*/}
-          {/*  size={30}*/}
-          {/*  onPress={() => {*/}
-          {/*    deleteNote(id);*/}
-          {/*  }}*/}
-          {/*/>*/}
         </View>
-        <View
-          style={{
-            justifyContent: 'space-between',
-            // paddingHorizontal: 10,
-            paddingBottom: 5,
-            flexDirection: 'row',
-            alignItems: 'center',
-            // marginTop: '-10%',
-          }}>
-          <Text numberOfLines={1} style={{width: '100%', flex: 1}}>
+        <View style={[styles.noteContent]}>
+          <Text numberOfLines={1} style={{flex: 1}}>
             {content}
           </Text>
         </View>
         <View style={{flexDirection: 'row', alignItems: 'center'}}>
-          <Icon name="person" size={20} style={{marginRight: 5}} />
+          <Icon name="person" size={20} style={[styles.icon]} />
           <Text>{userEmail}</Text>
         </View>
         <View style={{flexDirection: 'row', alignItems: 'center'}}>
-          <Icon name="public" size={20} style={{marginRight: 5}} />
+          <Icon name="public" size={20} style={[styles.icon]} />
           <Text>{privacy}</Text>
         </View>
       </TouchableOpacity>
     );
   };
 
-  React.useEffect(() => {
-    // getNotes();
-    console.log('On ListNotes page');
-    const unsubscribe = navigation.addListener('focus', () => {
-      // When the screen is focused (like loading from another screen), call function to refresh data
-      getNotes();
-      console.log('Getting notes on ListNotes');
-    });
-
-    // Return the function to unsubscribe from the event so it gets removed on unmount
-    return unsubscribe;
-  }, [navigation]);
-
-  const getNotes = async () => {
-    await axios
-      // .get('https://staidr-heroku.herokuapp.com/groups')
-      .get('https://gavin-fyp.herokuapp.com/getNotes', {
-        // ids: ['63c73ece03e5b856270ab63b', '63c740fee0dcd7e242a5e63a'],
-      })
-      .then(response => {
-        let responseData = JSON.parse(JSON.stringify(response.data));
-        console.log('RESPONSE DATA: ', responseData);
-        setNotes(responseData);
-      })
-      .catch(error => {
-        console.log(error);
-        console.log('There was an error getting notes ^^');
-      });
-  };
-
-  const createNote = () => {
-    axios
-      .post('https://gavin-fyp.herokuapp.com/createNote', {
-        name: name,
-        content: '',
-        userEmail: currentUsersEmail,
-        privacy: value,
-        groupID: currentModuleID,
-      })
-      .then(response => {
-        let responseData = JSON.parse(JSON.stringify(response.data));
-        console.log('RESPONSE DATA: ', responseData);
-        getNotes();
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  };
-
-  useEffect(() => {
-    if (loggedIn === false) {
-      navigation.dispatch(StackActions.replace('Sign In'));
-    }
-  }, [loggedIn, navigation]);
-  //
-
   const getHeader = () => {
     return (
       <View>
-        <Text style={[styles.header]}>{currentModuleCode}</Text>
+        <Text style={[styles.moduleHeader]}>{currentModuleCode}</Text>
         <TouchableOpacity
-          style={[styles.button]}
+          style={[styles.createButton]}
           onPress={() =>
             navigation.navigate('CreateNote', {
               userEmail: currentUsersEmail,
@@ -255,56 +187,35 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
   // TESTING: True to show all users notes regardless of creator. False to only show current users notes
   let showAllUsers = false;
   return (
-    <View style={[styles.sectionContainer]}>
+    <View style={[styles.screenContainer]}>
       <FlatList
-        style={[styles.flatlist]}
+        style={[styles.flatList]}
         data={notes}
         keyExtractor={(item, index) => index.toString()}
-        // setId ({notes._id});
         renderItem={({item}) => {
           let editableDoc = false;
-          // console.log('comments:  ' + item.comments);
-          // console.log('item:   ' + item);
           if (
             ((item.userEmail === currentUsersEmail ||
               item.privacy.includes('public')) &&
               noteIDs.includes(item._id)) ||
             showAllUsers == true
           ) {
-            // if ( item.userEmail === currentUsersEmail || item.privacy === "public" || showAllUsers == true){
-            if (
-              item.userEmail === currentUsersEmail ||
-              item.privacy === 'public(editable)'
-            ) {
+            if (item.userEmail === currentUsersEmail || item.privacy === 'public(editable)') {
               editableDoc = true;
             }
             return (
               <NoteButton
                 title={item.name}
                 content={item.content}
-                buttonColour={'#30B283'}
                 navigation={navigation}
                 id={item._id}
                 userEmail={item.userEmail}
                 privacy={item.privacy}
                 editable={editableDoc}
                 comments={item.comments}
+                moduleInfo={moduleInfo}
               />
             );
-            // } else {
-            //   return (
-            //     <NoteButton
-            //       title={item.name}
-            //       content={item.content}
-            //       buttonColour={'#30B283'}
-            //       navigation={navigation}
-            //       id={item._id}
-            //       userEmail={item.userEmail}
-            //       privacy={item.privacy}
-            //       editable={editableDoc}
-            //     />
-            //   );
-            // }
           }
         }}
         ListHeaderComponent={getHeader} // Needed to avoid error about flatlist inside scrollview, allows scrolling entire page
@@ -314,106 +225,61 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
 };
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    // marginTop: 32,
-    // paddingHorizontal: 10,
-    // marginVertical: 10,
-    // paddingBottom: 30,
-    // backgroundColor: '#ededed',
+  screenContainer: {
     height: '100%',
     paddingHorizontal: 10,
-    borderRadius: 10,
-    // paddingBottom: 20,
-    // borderBottomLeftRadius: 10,
-    // borderBottomRightRadius: 10,
-    // flex: 1,
-    // paddingBottom: 100,
   },
-  header: {
+  moduleHeader: {
     color: 'black',
     fontSize: 25,
     textAlign: 'center',
     fontWeight: 'bold',
-    // textDecorationLine: 'underline',
-    // marginTop: 5,
-    // borderTopLeftRadius: 10,
-    // borderTopRightRadius: 10,
-    // backgroundColor: 'white',
-    // elevation: 5,
     paddingVertical: 5,
-    // marginHorizontal: 10,
-    // marginTop: 10,
   },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
+  noteButtonHeading: {
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-  button: {
+  createButton: {
     alignItems: 'center',
     backgroundColor: '#666aff',
-    // backgroundColor: 'white',
-    // borderWidth: 1,
-    // borderTopWidth: 1,
-    // borderBottomWidth: 1,
     borderColor: 'black',
     padding: 10,
     marginHorizontal: 10,
     elevation: 5,
-    // margin: 10,
     borderRadius: 10,
   },
-  input: {
-    height: 40,
-    marginVertical: 12,
-    borderWidth: 1,
-    borderRadius: 12,
-    paddingVertical: 10,
-    // width: 200,
-    color: 'black',
-    width: '100%',
-    textAlign: 'center',
-    backgroundColor: 'white',
-  },
-  createNote: {
-    backgroundColor: '#30B283',
-    borderRadius: 14,
-    margin: '2%',
-    padding: 10,
-  },
-  flatlist: {
+  flatList: {
     backgroundColor: '#ffffff',
-    // borderBottomLeftRadius: 10,
-    // borderBottomRightRadius: 10,
-    // borderRadius: 10,
-    // marginHorizontal: 10,
-    // padding: -10,
-    // paddingBottom: 20,
     elevation: 5,
   },
-  appButtonContainer: {
+  noteButton: {
     elevation: 5,
     borderRadius: 14,
     shadowColor: '#000', // IOS
     shadowOffset: {height: 4, width: 0}, // IOS
     shadowOpacity: 0.3, // IOS
     shadowRadius: 4.5, //IOS
-    // padding: 6,
     paddingVertical: 10,
     margin: '2%',
+    backgroundColor: '#30B283',
+    paddingLeft: 10,
   },
-
-  appButtonText: {
-    fontSize: 18,
+  noteTitle: {
     fontWeight: 'bold',
-    justifyContent: 'flex-start',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    color: '#FFF6F6',
+    fontSize: 25,
+    width: '90%',
+  },
+  noteContent: {
+    justifyContent: 'space-between',
+    paddingBottom: 5,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   icon: {
     alignItems: 'center',

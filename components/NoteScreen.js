@@ -5,11 +5,8 @@ import {
   View,
   TextInput,
   StyleSheet,
-  FlatList,
-  Button,
 } from 'react-native';
 import axios from 'axios';
-import NoteButton from './Buttons/NoteButton';
 import {useRoute} from '@react-navigation/native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import {HeaderBackButton} from '@react-navigation/elements';
@@ -27,11 +24,8 @@ function NoteScreen({
 }) {
   const route = useRoute();
 
-  const [notes, setNotes] = useState(null);
   const [content, setContent] = useState(contents);
-  const [comment, setComment] = useState('comment');
   const [comments, setComments] = useState();
-  const [commentEmail, setCommentEmail] = useState('commentEmail');
   const [header, setHeader] = useState(name);
 
   const [open, setOpen] = useState(false);
@@ -41,9 +35,10 @@ function NoteScreen({
     {label: 'Public(editable)', value: 'public(editable)'},
     {label: 'Public(not editable)', value: 'public'},
   ]);
+
   let editableDoc = route.params.editable;
-  let dropdownDisabled;
   let notePrivacy = route.params.privacy;
+  let dropdownDisabled;
   if (notePrivacy.includes('public')) {
     dropdownDisabled = true;
   } else {
@@ -92,7 +87,7 @@ function NoteScreen({
       // getNote();
     });
 
-    // Return the function to unsubscribe from the event so it gets removed on unmount
+    // Return the function to unsubscribe from the event, so it gets removed on unmount
     return unsubscribe;
   }, [navigation]);
 
@@ -101,9 +96,7 @@ function NoteScreen({
     // console.log('The content is: ' + content);
     axios
       .post('https://gavin-fyp.herokuapp.com/getSingleNote', {
-        // params: {
-          id: route.params.id,
-        // },
+        id: route.params.id,
       })
       .then(response => {
         // handle success
@@ -135,7 +128,6 @@ function NoteScreen({
       .then(response => {
         let responseData = JSON.parse(JSON.stringify(response.data));
         console.log('RESPONSE DATA: ', responseData);
-        // getNotes();
       })
       .catch(error => {
         console.log('content: ' + content);
@@ -151,15 +143,9 @@ function NoteScreen({
     } else {
       for (let i = 0; i < noteCommentIDs.length; i++) {
         let id = noteCommentIDs[i];
-        console.log(i);
-        // commentList = getComment1(commentsIDs[i]);
-        // console.log(i + ' commentList[i] is ' + commentList[i]);
-        // }
         await axios
           .post('https://gavin-fyp.herokuapp.com/getComment1', {
             id: id,
-            // id: '63f1791d7dfb51047211028c',
-            // id: '63f551b9469a48ffdb421e48',
           })
           .then(response => {
             console.log('\n   Made request: getComment1');
@@ -180,30 +166,18 @@ function NoteScreen({
     }
   };
 
-  // const Comment = ({commentContent, userEmail}) => {
-  //   return (
-  //     <View>
-  //       <Text style={{color: 'black'}}>Content: {commentContent}</Text>
-  //       <Text>Email: {userEmail}</Text>
-  //     </View>
-  //   );
-  // };
-  if (comments == null){
-
-  }
   // Display
   return (
     <View style={[styles.sectionContainer]}>
       <View style={[styles.noteSection]}>
         <TextInput
-          style={[styles.header]}
+          style={[styles.noteHeader]}
           editable={editableDoc}
           onChangeText={header => setHeader(header)}>
           {route.params.name}
         </TextInput>
-        {/*Note text */}
         <TextInput
-          style={[styles.textInput]}
+          style={[styles.noteContent]}
           editable={editableDoc}
           multiline={true}
           onChangeText={newText => setContent(newText)}
@@ -218,16 +192,8 @@ function NoteScreen({
           setOpen={setOpen}
           setValue={setValue}
           setItems={setItems}
-          // hideSelectedItemIcon={true}
           disabled={dropdownDisabled}
-          // ArrowDownIconComponent = ArrowUpIconComponent;
         />
-        {/*<Button*/}
-        {/*  style={[styles.button]}*/}
-        {/*  styleDisabled={{color: 'red'}}*/}
-        {/*  onPress={() => saveNoteContent()}*/}
-        {/*  title="Save"*/}
-        {/*/>*/}
         <TouchableOpacity
           style={[styles.button]}
           onPress={() =>
@@ -238,7 +204,6 @@ function NoteScreen({
               commentsList: comments,
             })
           }>
-          {/*<Text style={{color: 'white'}}>Comments ({noteCommentIDs.length})</Text>*/}
           <Text style={{color: 'white'}}>Comments</Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -252,25 +217,6 @@ function NoteScreen({
           <Text style={{color: 'white'}}>Save</Text>
         </TouchableOpacity>
       </View>
-      {/*<View style={[styles.comments]}>*/}
-      {/*  <Text> Comments </Text>*/}
-      {/*  /!*<Text> {route.params.comments} </Text>*!/*/}
-      {/*  /!*<FlatList*!/*/}
-      {/*  /!*  data={comments}*!/*/}
-      {/*  /!*  keyExtractor={(item, index) => index.toString()}*!/*/}
-      {/*  /!*  renderItem={({item}) => {*!/*/}
-      {/*  /!*    console.log('item is : ' + item);*!/*/}
-      {/*  /!*    console.log('item is : ' + item.content);*!/*/}
-      {/*  /!*    console.log('item is : ' + item.userEmail);*!/*/}
-      {/*  /!*    // console.log('1: ' + route.params.comments);*!/*/}
-      {/*  /!*    // console.log('2: ' + route.params.comments[0]);*!/*/}
-      {/*  /!*    // console.log('3: ' + route.params.comments[1]);*!/*/}
-      {/*  /!*    // getComment(item);*!/*/}
-
-      {/*  /!*    return <Comment commentContent={item.content} userEmail={item.userEmail} />;*!/*/}
-      {/*  /!*  }}*!/*/}
-      {/*/>*/}
-      {/*</View>*/}
     </View>
   );
 }
@@ -303,7 +249,7 @@ const styles = StyleSheet.create({
     height: '100%',
     flex: 1,
   },
-  textInput: {
+  noteContent: {
     textAlignVertical: 'top',
     backgroundColor: '#ffffff',
     // elevation: 5,
@@ -326,14 +272,8 @@ const styles = StyleSheet.create({
     // backgroundColor: '#666aff',
     backgroundColor: '#868686',
     padding: 10,
-    // marginVertical: 10,
-    // borderBottomLeftRadius: 10,
-    // borderBottomRightRadius: 10,
-    // marginBottom: 10,
-    // margin: '20px',
-    // textAlignVertical: 'bottom',
   },
-  header: {
+  noteHeader: {
     fontWeight: 'bold',
     textAlign: 'center',
     fontSize: 25,

@@ -142,6 +142,7 @@ app.get('/getOneComment', (req, res) => {
   console.log('Id to find, using req.body: ' + req.body.id);
   console.log('Id to find, using req.params: ' + req.params.id);
   console.log('Id to find, using req.query: ' + req.query.id);
+  console.log('req.query: ' + req.query);
   console.log('Id to find, using req.body and cast: ' + mongoose.Types.ObjectId(req.body.id));
   console.log('Id to find, using req.params and cast: ' + mongoose.Types.ObjectId(req.params.id));
   console.log('Id to find, using req.query and cast: ' + mongoose.Types.ObjectId(req.query.id));
@@ -278,7 +279,7 @@ app.put('/updateNote', (req, res) => {
     });
 });
 
-app.post('/deleteNote', (req, res) => {
+app.delete('/deleteNote', (req, res) => {
   console.log('Going to delete note with id:  ' +  req.body.id + ' for the group with id ' + req.body.groupID);
   Note.findByIdAndRemove(req.body.id)
     .then(data => {
@@ -297,7 +298,7 @@ app.post('/deleteNote', (req, res) => {
     });
 });
 //
-app.post('/deleteComment', (req, res) => {
+app.delete('/deleteComment', (req, res) => {
   console.log('Going to delete comment with id:  ', req.body.id + ' for the note with id ' + req.body.noteID);
   Comment.findByIdAndRemove(req.body.id)
     .then(data => {
