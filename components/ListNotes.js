@@ -22,32 +22,24 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
 
   const {loggedIn, userData} = useContext(AuthContext);
   const [notes, setNotes] = useState(null);
-  // const [name, setName] = useState('');
-  //
-  // const [open, setOpen] = useState(false);
-  // const [value, setValue] = useState('private');
-  // const [items, setItems] = useState([
-  //   {label: 'Private', value: 'private'},
-  //   {label: 'Public', value: 'public'},
-  // ]);
 
   console.log('');
   console.log(' || LISTNOTES ||');
   const currentUsersEmail = userData.email;
   const currentModuleCode = route.params.moduleCode;
-  const noteIDs = route.params.moduleNotes;
+  let noteIDs = route.params.moduleNotes;
   const currentModuleID = route.params.moduleID;
 
   const moduleInfo = [currentModuleCode, noteIDs, currentModuleID];
+  let noteList = [];
   console.log('ListNotes moduleInfo: ');
   console.log('  currentModuleCode: ' + moduleInfo[0]);
   // console.log('noteIDs: ' + moduleInfo[1]);
   console.log('  currentModuleID: ' + moduleInfo[2]);
-  //
   console.log('email: ' + userData.email);
   console.log('code: ' + currentModuleCode);
   console.log('Module ID: ' + currentModuleID);
-  // console.log('IDs: ' + noteIDs);
+  console.log('IDs: ' + noteIDs);
 
   useEffect(() => {
     if (loggedIn === false) {
@@ -60,7 +52,8 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
     console.log('On ListNotes page');
     const unsubscribe = navigation.addListener('focus', () => {
       // When the screen is focused (like loading from another screen), call function to refresh data
-      getNotes();
+      // getNotes();
+      getNoteFromList();
       console.log('Getting notes on ListNotes');
     });
 
@@ -70,10 +63,7 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
 
   const getNotes = async () => {
     await axios
-      // .get('https://staidr-heroku.herokuapp.com/groups')
-      .get('https://gavin-fyp.herokuapp.com/getNotes', {
-        // ids: ['63c73ece03e5b856270ab63b', '63c740fee0dcd7e242a5e63a'],
-      })
+      .get('https://gavin-fyp.herokuapp.com/getNotes')
       .then(response => {
         let responseData = JSON.parse(JSON.stringify(response.data));
         console.log('RESPONSE DATA: ', responseData);
@@ -85,6 +75,54 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
       });
   };
 
+  const getGroupNotes = () => {
+    console.log('Getting group info for id: ' + currentModuleID);
+    axios
+      .post('https://gavin-fyp.herokuapp.com/getSingleNote', {
+        id: currentModuleID,
+      })
+      .then(response => {
+        console.log('\n   Made request: getNote');
+        let responseData = JSON.parse(JSON.stringify(response.data));
+        console.log('Group Name: ' + responseData.name);
+        noteIDs = responseData.notes;
+        getNoteFromList(noteIDs);
+      })
+      .catch(error => {
+        console.log('Failed request');
+        // handle error
+        console.log(error);
+      });
+  };
+
+  const getNoteFromList = noteIDs => {
+    console.log('\n\nGetNoteFromList\n');
+    noteList = [];
+    for (let i = 0; i < noteIDs.length; i++) {
+      let id = noteIDs[i];
+      axios
+        .post('https://gavin-fyp.herokuapp.com/getSingleNote', {
+          id: id,
+        })
+        .then(response => {
+          console.log('\n     Made request: getComment1');
+          let responseData = JSON.parse(JSON.stringify(response.data));
+          console.log('Content: ' + responseData.content);
+          console.log('User: ' + responseData.userEmail);
+          if (responseData != null) {
+            noteList.push(responseData);
+          }
+        })
+        .catch(error => {
+          console.log('Failed request');
+          // handle error
+          console.log(error);
+        });
+    }
+    setNotes(noteList);
+    return noteList;
+  };
+
   const deleteNote = id => {
     console.log('current module id for deleting note: ' + currentModuleID);
     axios
@@ -94,7 +132,8 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
       })
       .then(response => {
         console.log('Deleted ', id);
-        getNotes(); // Refresh list of notes
+        // getNotes(); // Refresh list of notes
+        getNoteFromList();
       })
       .catch(error => {
         console.log(error);
@@ -191,6 +230,7 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
       <FlatList
         style={[styles.flatList]}
         data={notes}
+        extraData={noteList}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({item}) => {
           let editableDoc = false;

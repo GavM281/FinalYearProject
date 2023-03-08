@@ -11,7 +11,7 @@ app.use(express.static('public'));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
-const Schema = new mongoose.Schema({
+const Note = mongoose.model('Note', {
   name: String,
   content: String,
   userEmail: String,
@@ -24,9 +24,6 @@ const Schema = new mongoose.Schema({
     },
   ],
 });
-//
-mongoose.model('Note', Schema);
-const Note = mongoose.model('Note');
 
 const Group = mongoose.model('Group', {
   name: String,
@@ -83,6 +80,7 @@ app.get('/getNotes', (req, res) => {
     });
 });
 
+// Get all modules
 app.get('/getModules', (req, res) => {
   console.log('Getting Module');
   Group.find({})
@@ -95,6 +93,7 @@ app.get('/getModules', (req, res) => {
     });
 });
 
+// Get single note
 app.get('/getNote', (req, res) => {
   console.log('Getting Note');
   Note.findById(req.body.id)
@@ -109,6 +108,7 @@ app.get('/getNote', (req, res) => {
     });
 });
 
+// Get single note
 app.post('/getSingleNote', (req, res) => {
   console.log('Getting Note with id: ' + req.body.id);
   Note.findById(req.body.id)
@@ -123,6 +123,19 @@ app.post('/getSingleNote', (req, res) => {
     });
 });
 
+app.post('/getSingleGroup', (req, res) => {
+  console.log('Getting Group with id: ' + req.body.id);
+  Group.findById(req.body.id)
+    .then(data => {
+      console.log('data: ', data);
+      res.send(data);
+    })
+    .catch(err => {
+      console.log(err);
+    });
+});
+
+// Get user
 app.get('/getUser', (req, res) => {
   console.log('Getting User');
   User.find({})
@@ -138,60 +151,14 @@ app.get('/getUser', (req, res) => {
     });
 });
 
-app.get('/getOneComment', (req, res) => {
-  console.log('Id to find, using req.body: ' + req.body.id);
-  console.log('Id to find, using req.params: ' + req.params.id);
-  console.log('Id to find, using req.query: ' + req.query.id);
-  console.log('req.query: ' + req.query);
-  console.log('Id to find, using req.body and cast: ' + mongoose.Types.ObjectId(req.body.id));
-  console.log('Id to find, using req.params and cast: ' + mongoose.Types.ObjectId(req.params.id));
-  console.log('Id to find, using req.query and cast: ' + mongoose.Types.ObjectId(req.query.id));
-  Comment.find({_id: req.body.id})
-    .then(data => {
-      console.log('data: ' + data);
-      res.send(data);
-    })
-    .catch(err => {
-      console.log(err);
-    });
-});
-
-app.get('/getComment', (req, res) => {
+// Get comment
+app.post('/getComment', (req, res) => {
   console.log('Getting Comment');
   let id = req.body.id;
   console.log('Id to find is: ' + id);
-  console.log('Id to find, using req.body: ' + req.body.id);
-  console.log('Id to find, using req.params: ' + req.params.id);
-  console.log('Id to find, using req.query: ' + req.query.id);
-  console.log('Id to find, using req.body and cast: ' + mongoose.Types.ObjectId(req.body.id));
-  console.log('Id to find, using req.params and cast: ' + mongoose.Types.ObjectId(req.params.id));
-  console.log('Id to find, using req.query and cast: ' + mongoose.Types.ObjectId(req.query.id));
-  Comment.findById(id, function (err, comment) {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log('comment: ' + comment);
-      res.send(comment);
-    }
-  });
-});
-
-app.post('/getComment1', (req, res) => {
-  console.log('Getting Comment');
-  let id = req.body.id;
-  console.log('Id to find is: ' + id);
-  console.log('Id to find, using req.body: ' + req.body.id);
-  console.log('Id to find, using req.params: ' + req.params.id);
-  console.log('Id to find, using req.query: ' + req.query.id);
-  console.log('Id to find, using req.body and cast: ' + mongoose.Types.ObjectId(req.body.id));
-  console.log('Id to find, using req.params and cast: ' + mongoose.Types.ObjectId(req.params.id));
-  console.log('Id to find, using req.query and cast: ' + mongoose.Types.ObjectId(req.query.id));
-  Comment.findOne({_id: id})
+  Comment.findById(id)
     .then(data => {
       console.log('data: ' + data);
-      // console.log('Groups: ' + data[0].Groups);
-      // console.log('rooms: ' + data[0].Groups[0].Rooms);
-      // console.log('rooms2: ' + data.Groups[0]);
       res.send(data);
     })
     .catch(err => {
@@ -219,16 +186,16 @@ app.post('/createNote', (req, res) => {
     userEmail: req.body.userEmail,
     privacy: req.body.privacy,
     groupID: mongoose.Types.ObjectId(req.body.group),
-  }); //
+  });
   note.save(function (err, note) {
     if (err) {
       return res.send(err);
     }
-    Group.findById(req.body.groupID, function (err, group) {
+    Group.findById(req.body.groupID, function (err, group) { // Get group that note is a part of
       if (err) {
         return res.send(err);
       }
-      group.notes.push(note);
+      group.notes.push(note); // Add note to array in group
       group.save(function (err) {
         if (err) {
           return res.send(err);
@@ -250,11 +217,11 @@ app.post('/createComment', (req, res) => {
     if (err) {
       return res.send(err);
     }
-    Note.findById(req.body.noteID, function (err, note) {
+    Note.findById(req.body.noteID, function (err, note) { // Get note that comment is on
       if (err) {
         return res.send(err);
       }
-      note.comments.push(comment);
+      note.comments.push(comment); // Add comment to array in note
       note.save(function (err) {
         if (err) {
           return res.send(err);
@@ -279,6 +246,7 @@ app.put('/updateNote', (req, res) => {
     });
 });
 
+// Delete note and remove id from group
 app.delete('/deleteNote', (req, res) => {
   console.log('Going to delete note with id:  ' +  req.body.id + ' for the group with id ' + req.body.groupID);
   Note.findByIdAndRemove(req.body.id)
@@ -297,7 +265,7 @@ app.delete('/deleteNote', (req, res) => {
       console.log('error', err);
     });
 });
-//
+// Delete comment and remove id from note
 app.delete('/deleteComment', (req, res) => {
   console.log('Going to delete comment with id:  ', req.body.id + ' for the note with id ' + req.body.noteID);
   Comment.findByIdAndRemove(req.body.id)
@@ -317,5 +285,5 @@ app.delete('/deleteComment', (req, res) => {
     });
 });
 
-// start the server listening for requests
+// Start server
 app.listen(process.env.PORT || 3001, () => console.log('Server is running...'));

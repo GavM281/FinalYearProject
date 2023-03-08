@@ -77,25 +77,19 @@ const ListNotes = ({
 
   const getCommentsFromList = async commentsIDs => {
     console.log('\n\nGetCommentFromList\n');
-    console.log('commentsIDs is length:  ' + commentsIDs.length);
     commentList = [];
     for (let i = 0; i < commentsIDs.length; i++) {
       let id = commentsIDs[i];
-      console.log(i);
       await axios
-        .get('https://gavin-fyp.herokuapp.com/getOneComment', {
+        .post('https://gavin-fyp.herokuapp.com/getComment', {
           id: id,
         })
-        // .post('https://gavin-fyp.herokuapp.com/getComment1', {
-        //   id: id,
-        // })
         .then(response => {
           console.log('\n     Made request: getComment1');
           let responseData = JSON.parse(JSON.stringify(response.data));
           console.log('Comment Content: ' + responseData.content);
           console.log('Comment User: ' + responseData.userEmail);
           console.log('Comment noteID: ' + responseData.noteID);
-          console.log('RESPONSE in getFromList: ' + responseData);
           if (responseData != null) {
             commentList.push(responseData);
           }
