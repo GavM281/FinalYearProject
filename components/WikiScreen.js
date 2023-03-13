@@ -22,14 +22,14 @@ const WikiScreen = ({navigation}) => {
       // When the screen is focused (like loading from another screen), call function to refresh data
       console.log('');
       console.log('  || WIKISCREEN ||');
-      getRooms();
+      getGroups();
     });
 
     // Return the function to unsubscribe from the event so it gets removed on unmount
     return unsubscribe;
   }, [navigation]);
 
-  const getRooms = () => {
+  const getGroups = () => {
     axios
       .get('https://gavin-fyp.herokuapp.com/getModules')
       .then(response => {

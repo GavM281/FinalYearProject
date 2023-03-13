@@ -4,30 +4,25 @@ import {
   Text,
   StyleSheet,
   FlatList,
-  TextInput,
   TouchableOpacity,
-  ScrollView,
-  SafeAreaView,
 } from 'react-native';
 import {StackActions, useRoute} from '@react-navigation/native';
-import DropDownPicker from 'react-native-dropdown-picker';
 import {AuthContext} from '../context/AuthContext';
-// import NoteButton from './Buttons/NoteButton';
 import axios from 'axios';
-import WikiModule from './Buttons/WikiModule';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
   const route = useRoute();
 
   const {loggedIn, userData} = useContext(AuthContext);
-  const [notes, setNotes] = useState(null);
+  const [notes, setNotes] = useState();
 
   console.log('');
   console.log(' || LISTNOTES ||');
   const currentUsersEmail = userData.email;
   const currentModuleCode = route.params.moduleCode;
   let noteIDs = route.params.moduleNotes;
+  // let noteIDs;
   const currentModuleID = route.params.moduleID;
 
   const moduleInfo = [currentModuleCode, noteIDs, currentModuleID];
@@ -48,12 +43,13 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
   }, [loggedIn, navigation]);
 
   React.useEffect(() => {
-    // getNotes();
+    setNotes(noteList);
+    getGroup();
     console.log('On ListNotes page');
     const unsubscribe = navigation.addListener('focus', () => {
       // When the screen is focused (like loading from another screen), call function to refresh data
       // getNotes();
-      getNoteFromList();
+      // getNoteFromList();
       console.log('Getting notes on ListNotes');
     });
 
@@ -75,18 +71,19 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
       });
   };
 
-  const getGroupNotes = () => {
+  const getGroup = () => {
     console.log('Getting group info for id: ' + currentModuleID);
     axios
-      .post('https://gavin-fyp.herokuapp.com/getSingleNote', {
+      .post('https://gavin-fyp.herokuapp.com/getSingleGroup', {
         id: currentModuleID,
       })
       .then(response => {
-        console.log('\n   Made request: getNote');
+        console.log('\n   Made request: getGroup');
         let responseData = JSON.parse(JSON.stringify(response.data));
         console.log('Group Name: ' + responseData.name);
-        noteIDs = responseData.notes;
-        getNoteFromList(noteIDs);
+        let notesIDs = responseData.notes;
+        console.log('noteIDs is : ', notesIDs);
+        getNoteFromList(notesIDs);
       })
       .catch(error => {
         console.log('Failed request');
@@ -95,17 +92,17 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
       });
   };
 
-  const getNoteFromList = noteIDs => {
+  const getNoteFromList = async notesIDs => {
     console.log('\n\nGetNoteFromList\n');
+    console.log('notesIDs length: ', notesIDs.length);
     noteList = [];
-    for (let i = 0; i < noteIDs.length; i++) {
-      let id = noteIDs[i];
-      axios
+    for (let i = 0; i < notesIDs.length; i++) {
+      let id = notesIDs[i];
+      await axios
         .post('https://gavin-fyp.herokuapp.com/getSingleNote', {
           id: id,
         })
         .then(response => {
-          console.log('\n     Made request: getComment1');
           let responseData = JSON.parse(JSON.stringify(response.data));
           console.log('Content: ' + responseData.content);
           console.log('User: ' + responseData.userEmail);
@@ -120,20 +117,20 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
         });
     }
     setNotes(noteList);
-    return noteList;
   };
 
   const deleteNote = id => {
     console.log('current module id for deleting note: ' + currentModuleID);
     axios
-      .post('https://gavin-fyp.herokuapp.com/deleteNote', {
+      .delete('https://gavin-fyp.herokuapp.com/deleteNote', {
         id: id, // ID of note
         groupID: currentModuleID, // The ID of the module this note is part of, used to delete id from array
       })
       .then(response => {
         console.log('Deleted ', id);
         // getNotes(); // Refresh list of notes
-        getNoteFromList();
+        // getNoteFromList();
+        getGroup();
       })
       .catch(error => {
         console.log(error);

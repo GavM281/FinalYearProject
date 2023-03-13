@@ -49,7 +49,6 @@ function NoteScreen({
   let noteID = route.params.id;
   let currentUserEmail = route.params.userEmail;
   let noteCommentIDs = route.params.commentsIDs;
-  console.log('#####  ' + noteCommentIDs);
   if (noteCommentIDs == null) {
     noteCommentIDs = [];
   }
@@ -104,7 +103,6 @@ function NoteScreen({
         console.log(response);
         let responseData = JSON.parse(JSON.stringify(response.data));
         console.log('The id is: ' + responseData._id);
-        console.log('The id is: ' + responseData.id);
         console.log('The content is: ' + responseData.content);
         setContent(responseData.content);
       })

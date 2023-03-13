@@ -16,7 +16,7 @@ const Note = mongoose.model('Note', {
   content: String,
   userEmail: String,
   privacy: String,
-  groupID: {type: mongoose.Schema.ObjectId, ref: 'Group'},
+  groupID: {type: mongoose.Schema.Types.ObjectId, ref: 'Group'},
   comments: [
     {
       type: mongoose.Schema.Types.ObjectId,
@@ -35,6 +35,12 @@ const Group = mongoose.model('Group', {
   ],
 });
 
+const Comment = mongoose.model('Comment', {
+  content: String,
+  userEmail: String,
+  noteID: mongoose.Schema.Types.ObjectId,
+});
+
 const User = mongoose.model('User', {
   email: String,
   Groups: [
@@ -43,12 +49,6 @@ const User = mongoose.model('User', {
       Group_name: String,
     },
   ],
-});
-
-const Comment = mongoose.model('Comment', {
-  content: String,
-  userEmail: String,
-  noteID: mongoose.Schema.Types.ObjectId,
 });
 
 mongoose.connect(
@@ -166,6 +166,22 @@ app.post('/getComment', (req, res) => {
     });
 });
 
+app.get('/getComment1', (req, res) => {
+  console.log('Getting Comment');
+  console.log('Getting Comment, params id: ' + req.params.id);
+  console.log('Getting Comment, body id: ' + req.body.id);
+  let id = req.params.id;
+  console.log('Id to find is: ' + id);
+  Comment.findById(id)
+    .then(data => {
+      console.log('data: ' + data);
+      res.send(data);
+    })
+    .catch(err => {
+      console.log(err);
+    });
+});
+
 app.get('/getComments', (req, res) => {
   console.log('Getting Comments');
   Comment.find()
@@ -191,7 +207,8 @@ app.post('/createNote', (req, res) => {
     if (err) {
       return res.send(err);
     }
-    Group.findById(req.body.groupID, function (err, group) { // Get group that note is a part of
+    // Get group that note is a part of
+    Group.findById(req.body.groupID, function (err, group) {
       if (err) {
         return res.send(err);
       }
@@ -217,7 +234,8 @@ app.post('/createComment', (req, res) => {
     if (err) {
       return res.send(err);
     }
-    Note.findById(req.body.noteID, function (err, note) { // Get note that comment is on
+    Note.findById(req.body.noteID, function (err, note) {
+      // Get note that comment is on
       if (err) {
         return res.send(err);
       }
@@ -247,8 +265,13 @@ app.put('/updateNote', (req, res) => {
 });
 
 // Delete note and remove id from group
-app.delete('/deleteNote', (req, res) => {
-  console.log('Going to delete note with id:  ' +  req.body.id + ' for the group with id ' + req.body.groupID);
+app.post('/deleteNote', (req, res) => {
+  console.log(
+    'Going to delete note with id:  ' +
+      req.body.id +
+      ' for the group with id ' +
+      req.body.groupID,
+  );
   Note.findByIdAndRemove(req.body.id)
     .then(data => {
       Group.updateOne(
@@ -266,8 +289,11 @@ app.delete('/deleteNote', (req, res) => {
     });
 });
 // Delete comment and remove id from note
-app.delete('/deleteComment', (req, res) => {
-  console.log('Going to delete comment with id:  ', req.body.id + ' for the note with id ' + req.body.noteID);
+app.post('/deleteComment', (req, res) => {
+  console.log(
+    'Going to delete comment with id:  ',
+    req.body.id + ' for the note with id ' + req.body.noteID,
+  );
   Comment.findByIdAndRemove(req.body.id)
     .then(data => {
       Note.updateOne(
