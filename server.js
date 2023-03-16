@@ -170,6 +170,7 @@ app.get('/getComment1', (req, res) => {
   console.log('Getting Comment');
   console.log('Getting Comment, params id: ' + req.params.id);
   console.log('Getting Comment, body id: ' + req.body.id);
+  console.log('Getting Comment, query id: ' + req.query.id);
   let id = req.params.id;
   console.log('Id to find is: ' + id);
   Comment.findById(id)

@@ -1,11 +1,11 @@
 import React from 'react';
 
-// import { render, fireEvent, act } from "@testing-library/react-native";
-//
-// import NoteScreen from '../components/NoteScreen';
-//
-// test('renders correctly', () => {
-//   // const tree = create(<NoteScreen />);
-//   // expect(tree).toMatchSnapshot();
-//   render(<NoteScreen />);
-// });
+import NoteScreen from '../components/NoteScreen';
+// import {create} from 'domain';
+import renderer from 'react-test-renderer';
+test('renders correctly', () => {
+  // const tree = create(<NoteScreen />);
+  // expect(tree).toMatchSnapshot();
+  renderer.create(<NoteScreen />);
+  // render(<NoteScreen />);
+});

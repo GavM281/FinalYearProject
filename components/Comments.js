@@ -11,6 +11,7 @@ import {StackActions, useRoute} from '@react-navigation/native';
 import {AuthContext} from '../context/AuthContext';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import mongoose from "mongoose";
 
 const ListNotes = ({
   navigation,
@@ -82,6 +83,10 @@ const ListNotes = ({
       let id = commentsIDs[i];
       await axios
         .post('https://gavin-fyp.herokuapp.com/getComment', {
+        // .get('https://gavin-fyp.herokuapp.com/getComment1', {
+        //   params: {
+        //     id: JSON.stringify(id),
+        //   },
           id: id,
         })
         .then(response => {

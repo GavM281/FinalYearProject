@@ -5,17 +5,21 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
+  TextInput,
 } from 'react-native';
 import {StackActions, useRoute} from '@react-navigation/native';
 import {AuthContext} from '../context/AuthContext';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import {HeaderBackButton} from '@react-navigation/elements';
 
 const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
   const route = useRoute();
 
   const {loggedIn, userData} = useContext(AuthContext);
   const [notes, setNotes] = useState();
+  const [filteredNotes, setFilteredNotes] = useState();
+  // const [search, setSearch] = useState();
 
   console.log('');
   console.log(' || LISTNOTES ||');
@@ -44,12 +48,35 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
 
   React.useEffect(() => {
     setNotes(noteList);
+    setFilteredNotes(notes);
     getGroup();
+    navigation.setOptions({
+      title: currentModuleCode,
+      headerTitleStyle: {
+        fontWeight: 'bold',
+        fontSize: 25,
+      },
+      headerRight: () => (
+        // <TouchableOpacity style={[styles.button]}
+        <TouchableOpacity
+          style={[styles.createButton]}
+          onPress={() =>
+            navigation.navigate('CreateNote', {
+              userEmail: currentUsersEmail,
+              moduleID: currentModuleID,
+              moduleInfo: moduleInfo,
+            })
+          }>
+          <Text style={{color: 'white', fontSize: 17}}>Create</Text>
+        </TouchableOpacity>
+      ),
+    });
     console.log('On ListNotes page');
     const unsubscribe = navigation.addListener('focus', () => {
       // When the screen is focused (like loading from another screen), call function to refresh data
       // getNotes();
       // getNoteFromList();
+
       console.log('Getting notes on ListNotes');
     });
 
@@ -93,7 +120,7 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
   };
 
   const getNoteFromList = async notesIDs => {
-    console.log('\n\nGetNoteFromList\n');
+    console.log('GetNoteFromList');
     console.log('notesIDs length: ', notesIDs.length);
     noteList = [];
     for (let i = 0; i < notesIDs.length; i++) {
@@ -117,12 +144,13 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
         });
     }
     setNotes(noteList);
+    setFilteredNotes(noteList);
   };
 
   const deleteNote = id => {
     console.log('current module id for deleting note: ' + currentModuleID);
     axios
-      .delete('https://gavin-fyp.herokuapp.com/deleteNote', {
+      .post('https://gavin-fyp.herokuapp.com/deleteNote', {
         id: id, // ID of note
         groupID: currentModuleID, // The ID of the module this note is part of, used to delete id from array
       })
@@ -164,6 +192,13 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
     editable,
     comments,
   }) => {
+    // Set icon for privacy settings
+    let icon;
+    if (privacy !== 'private') {
+      icon = 'public';
+    } else {
+      icon = 'lock';
+    }
     return (
       <TouchableOpacity
         style={[styles.noteButton]}
@@ -180,7 +215,9 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
           })
         }>
         <View style={[styles.noteButtonHeading]}>
-          <Text numberOfLines={2} style={[styles.noteTitle]}>{title}</Text>
+          <Text numberOfLines={2} style={[styles.noteTitle]}>
+            {title}
+          </Text>
 
           <DeleteIcon noteEmail={userEmail} id={id} />
         </View>
@@ -194,31 +231,53 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
           <Text>{userEmail}</Text>
         </View>
         <View style={{flexDirection: 'row', alignItems: 'center'}}>
-          <Icon name="public" size={20} style={[styles.icon]} />
+          <Icon name={icon} size={20} style={[styles.icon]} />
           <Text>{privacy}</Text>
         </View>
       </TouchableOpacity>
     );
   };
 
-  const getHeader = () => {
-    return (
-      <View>
-        <Text style={[styles.moduleHeader]}>{currentModuleCode}</Text>
-        <TouchableOpacity
-          style={[styles.createButton]}
-          onPress={() =>
-            navigation.navigate('CreateNote', {
-              userEmail: currentUsersEmail,
-              moduleID: currentModuleID,
-              moduleInfo: moduleInfo,
-            })
-          }>
-          <Text style={{color: 'white', fontSize: 17}}>Create</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  };
+  // let getHeader = () => (
+  //   // return (
+  //   <View style={styles.searchSection}>
+  //     <Icon style={styles.searchIcon} name="search" size={20} color="#000" />
+  //     <TextInput
+  //       style={styles.input}
+  //       placeholder="Search..."
+  //       placeholderTextColor="#636363"
+  //       // onChangeText={(searchString) => {this.setState({searchString})}}
+  //       onChangeText={newText => {
+  //         setSearch(newText);
+  //         console.log("HELLO THERE");
+  //       }}
+  //       editable
+  //       value={search}
+  //       clearButtonMode="while-editing"
+  //       underlineColorAndroid="transparent"
+  //     />
+  //   </View>
+  // );
+  // );
+  // <View style={[styles.searchBox]}>
+  //   <TextInput
+  //     style={[styles.searchQuery]}
+  //     placeholder="Search..."
+  //     placeholderTextColor="#636363"
+  //     multiline={true}
+  //     editable
+  //     onChangeText={newText => setSearch(newText)}
+  //     value={search}
+  //   />
+  //   <Icon
+  //     style={[styles.icon]}
+  //     name="search"
+  //     color="#ccc"
+  //     size={30}
+  //     onPress={() => {
+  //       // deleteNote(id);
+  //     }}
+  //   />
 
   // TESTING: True to show all users notes regardless of creator. False to only show current users notes
   let showAllUsers = false;
@@ -226,18 +285,22 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
     <View style={[styles.screenContainer]}>
       <FlatList
         style={[styles.flatList]}
-        data={notes}
-        extraData={noteList}
+        data={filteredNotes}
+        extraData={notes}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({item}) => {
           let editableDoc = false;
           if (
+            // Check whether note should be shown
             ((item.userEmail === currentUsersEmail ||
               item.privacy.includes('public')) &&
               noteIDs.includes(item._id)) ||
             showAllUsers == true
           ) {
-            if (item.userEmail === currentUsersEmail || item.privacy === 'public(editable)') {
+            if (
+              item.userEmail === currentUsersEmail ||
+              item.privacy === 'public(editable)'
+            ) {
               editableDoc = true;
             }
             return (
@@ -255,7 +318,62 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
             );
           }
         }}
-        ListHeaderComponent={getHeader} // Needed to avoid error about flatlist inside scrollview, allows scrolling entire page
+        ListHeaderComponent={
+          <View style={styles.searchSection}>
+            <Icon
+              style={styles.searchIcon}
+              name="search"
+              size={25}
+              color="black"
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Search..."
+              placeholderTextColor="#636363"
+              // onChangeText={(searchString) => {this.setState({searchString})}}
+              // onChangeText={newText => setSearch(newText)}
+              onChangeText={async search => {
+                // await setSearch(newText);
+                console.log('noteList: ' + noteList);
+                console.log('Changed text, now search is: ' + search);
+                let filteredNoteList = [];
+                if (search === '' || search === null) {
+                  console.log('empty search, if: ' + search);
+                  getGroup();
+                } else {
+                  console.log('search, else: ' + search);
+                  console.log('noteList.length: ' + noteList.length);
+                  console.log('notes.length: ' + notes.length);
+
+                  for (let i = 0; i < notes.length; i++) {
+                    let noteContent = notes[i].content.toLowerCase();
+                    let noteName = notes[i].name.toLowerCase();
+                    console.log('search: ' + search);
+
+
+                    console.log('noteContent: ' + noteContent);
+                    console.log('noteName: ' + noteName);
+
+                    let query = search.toLowerCase();
+
+                    if (noteContent.includes(query) || noteName.includes(query)) {
+                      filteredNoteList.push(notes[i]);
+                    }
+                  }
+                  setFilteredNotes(filteredNoteList);
+                  // noteList = filteredNoteList;
+
+                  console.log('notes: ' + notes);
+                }
+              }}
+              editable
+              // value={search}
+              // clearButtonMode="while-editing"
+              // underlineColorAndroid="transparent"
+            />
+
+          </View>
+        }
       />
     </View>
   );
@@ -323,6 +441,28 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     textAlign: 'right',
     marginRight: 5,
+  },
+  searchSection: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    elevation: 5,
+    margin: 10,
+    borderWidth: 1,
+    borderRadius: 10,
+  },
+  searchIcon: {
+    padding: 10,
+  },
+  input: {
+    flex: 1,
+    padding: 10,
+    backgroundColor: '#fff',
+    color: '#424242',
+    borderColor: 'rgba(26,26,26,0.22)',
+    borderRadius: 10,
   },
 });
 
