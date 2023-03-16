@@ -14,13 +14,13 @@ import {HeaderBackButton} from '@react-navigation/elements';
 function NoteScreen({
   navigation,
   id,
-  name,
-  contents,
-  commentsIDs,
-  editable,
-  privacy,
-  moduleInfo,
-  userEmail,
+  name, // Name of note
+  contents, // Contents of note
+  commentsIDs, // List of IDs for comments
+  editable, // If note is editable
+  privacy, // Privacy Value
+  moduleInfo, // Array with Info about Module
+  userEmail, // Email of who created note
 }) {
   const route = useRoute();
 
@@ -36,15 +36,6 @@ function NoteScreen({
     {label: 'Public(not editable)', value: 'public'},
   ]);
 
-  let editableDoc = route.params.editable;
-  let notePrivacy = route.params.privacy;
-  let dropdownDisabled;
-  if (notePrivacy.includes('public')) {
-    dropdownDisabled = true;
-  } else {
-    dropdownDisabled = false;
-  }
-
   let moduleInfos = route.params.moduleInfo;
   let noteID = route.params.id;
   let currentUserEmail = route.params.userEmail;
@@ -52,6 +43,15 @@ function NoteScreen({
   if (noteCommentIDs == null) {
     noteCommentIDs = [];
   }
+  let editableDoc = route.params.editable;
+  let notePrivacy = route.params.privacy;
+  let dropdownDisabled;
+  if (notePrivacy.includes('public') && userEmail !== currentUserEmail) {
+    dropdownDisabled = true;
+  } else {
+    dropdownDisabled = false;
+  }
+
   let commentList = [];
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
@@ -100,7 +100,7 @@ function NoteScreen({
       .then(response => {
         // handle success
         console.log('Made request');
-        console.log(response);
+        // console.log(response);
         let responseData = JSON.parse(JSON.stringify(response.data));
         console.log('The id is: ' + responseData._id);
         console.log('The content is: ' + responseData.content);
@@ -191,18 +191,18 @@ function NoteScreen({
           setValue={setValue}
           setItems={setItems}
           disabled={dropdownDisabled}
+          dropDownDirection="TOP"
         />
         <TouchableOpacity
           style={[styles.button]}
           onPress={() =>
             navigation.navigate('Comments', {
-              currentUserEmail: currentUserEmail,
               noteID: noteID,
               commentIDs: noteCommentIDs,
               commentsList: comments,
             })
           }>
-          <Text style={{color: 'white'}}>Comments</Text>
+          <Text style={{color: 'white'}}>Comments ({noteCommentIDs.length})</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={{

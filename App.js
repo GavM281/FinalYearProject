@@ -13,6 +13,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {NavigationContainer} from '@react-navigation/native';
 import 'react-native-gesture-handler';
 import {HeaderBackButton} from '@react-navigation/elements';
+import { RootSiblingParent } from 'react-native-root-siblings';
 /*
 Gets Bundle identifier and displays it when app runs
 
@@ -42,48 +43,50 @@ const App = () => {
   const [modalVisible, setModalVisible] = useState(false);
 
   return (
-    <AuthContextProvider>
-      <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen
-            name="Hamburger"
-            component={HamburgerMenu}
-            options={{headerShown: false}}
-          />
-          <Stack.Screen name="Home" component={HomeScreen} />
-          <Stack.Screen name="Sign In" component={SignInScreen} />
-          <Stack.Screen name="Profile" component={ProfileScreen} />
-          <Stack.Screen name="Analytics" component={AnalyticsScreen} />
-          <Stack.Screen name="GroupHome" component={GroupHomeScreen} />
-          <Stack.Screen name="Group" component={GroupScreen} />
-          <Stack.Screen name="Wiki" component={WikiScreen} />
-          <Stack.Screen name="Comments" component={CommentsScreen} />
-          <Stack.Screen
-            name="ListNotes"
-            component={ListNotes}
-            options={({navigation}) => ({
-              title: 'Notes',
-            })}
-          />
-          <Stack.Screen
-            name="NoteScreen"
-            component={NoteScreen}
-            options={({navigation}) => ({
-              title: 'Notes',
-              headerLeft: () => (
-                <HeaderBackButton
-                  onPress={() => {
-                    navigation.navigate('ListNotes');
-                  }}
-                />
-              ),
-            })}
-          />
+    <RootSiblingParent>
+      <AuthContextProvider>
+        <NavigationContainer>
+          <Stack.Navigator>
+            <Stack.Screen
+              name="Hamburger"
+              component={HamburgerMenu}
+              options={{headerShown: false}}
+            />
+            <Stack.Screen name="Home" component={HomeScreen} />
+            <Stack.Screen name="Sign In" component={SignInScreen} />
+            <Stack.Screen name="Profile" component={ProfileScreen} />
+            <Stack.Screen name="Analytics" component={AnalyticsScreen} />
+            <Stack.Screen name="GroupHome" component={GroupHomeScreen} />
+            <Stack.Screen name="Group" component={GroupScreen} />
+            <Stack.Screen name="Wiki" component={WikiScreen} />
+            <Stack.Screen name="Comments" component={CommentsScreen} />
+            <Stack.Screen
+              name="ListNotes"
+              component={ListNotes}
+              options={({navigation}) => ({
+                title: 'Notes',
+              })}
+            />
+            <Stack.Screen
+              name="NoteScreen"
+              component={NoteScreen}
+              options={({navigation}) => ({
+                title: 'Notes',
+                headerLeft: () => (
+                  <HeaderBackButton
+                    onPress={() => {
+                      navigation.navigate('ListNotes');
+                    }}
+                  />
+                ),
+              })}
+            />
 
-          <Stack.Screen name="CreateNote" component={CreateNote} />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </AuthContextProvider>
+            <Stack.Screen name="CreateNote" component={CreateNote} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </AuthContextProvider>
+    </RootSiblingParent>
   );
 };
 

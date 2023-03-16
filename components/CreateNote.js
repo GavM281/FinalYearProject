@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {
   TouchableOpacity,
   Text,
@@ -10,8 +10,10 @@ import axios from 'axios';
 import {useRoute} from '@react-navigation/native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import {HeaderBackButton} from "@react-navigation/elements";
+import {AuthContext} from "../context/AuthContext";
 
-function NoteScreen({navigation, contents, userEmail, moduleID, moduleInfo}) {
+function NoteScreen({navigation, contents, moduleID, moduleInfo}) {
+  const {userData} = useContext(AuthContext);
   const [notes, setNotes] = useState(null);
   const [content, setContent] = useState('');
   const [header, setHeader] = useState('');
@@ -24,11 +26,12 @@ function NoteScreen({navigation, contents, userEmail, moduleID, moduleInfo}) {
     {label: 'Public(not editable)  - Everyone can view but can\'t edit', value: 'public'},
   ]);
   const route = useRoute();
-  const currentUsersEmail = route.params.userEmail;
+  const currentUsersEmail = userData.email;
   // const currentModuleID = route.params.moduleID;
   console.log('');
   console.log(' || CreateNote ||');
-  console.log('Email: ' + currentUsersEmail);
+  console.log('Email: ' + userData.email);
+  console.log('Users Name: ' + userData.name);
   // console.log('id: ' + currentModuleID);
 
   const currentModuleCode = route.params.moduleInfo[0];

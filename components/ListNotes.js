@@ -1,4 +1,5 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext, useEffect, useRef, useState} from 'react';
+
 import {
   View,
   Text,
@@ -11,7 +12,9 @@ import {StackActions, useRoute} from '@react-navigation/native';
 import {AuthContext} from '../context/AuthContext';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import {HeaderBackButton} from '@react-navigation/elements';
+import {ButtonGroup, SearchBar } from '@rneui/themed';
+import DropDownPicker from 'react-native-dropdown-picker';
+import Toast from 'react-native-root-toast';
 
 const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
   const route = useRoute();
@@ -19,10 +22,21 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
   const {loggedIn, userData} = useContext(AuthContext);
   const [notes, setNotes] = useState();
   const [filteredNotes, setFilteredNotes] = useState();
-  // const [search, setSearch] = useState();
+
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState('all'); // Set value of dropdown to value of privacy that was passed in
+  const [items, setItems] = useState([
+    {label: 'Show Everything', value: 'all'},
+    {label: 'Show Private Only', value: 'private'},
+    {label: 'Show Public Only', value: 'public'},
+  ]);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [searchQuery, setSearchQuery] = useState('');
+
 
   console.log('');
-  console.log(' || LISTNOTES ||');
+  console.log('ListNotes Screen');
+  console.log('Name: ' + userData.name);
   const currentUsersEmail = userData.email;
   const currentModuleCode = route.params.moduleCode;
   let noteIDs = route.params.moduleNotes;
@@ -31,14 +45,14 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
 
   const moduleInfo = [currentModuleCode, noteIDs, currentModuleID];
   let noteList = [];
-  console.log('ListNotes moduleInfo: ');
-  console.log('  currentModuleCode: ' + moduleInfo[0]);
-  // console.log('noteIDs: ' + moduleInfo[1]);
-  console.log('  currentModuleID: ' + moduleInfo[2]);
-  console.log('email: ' + userData.email);
-  console.log('code: ' + currentModuleCode);
-  console.log('Module ID: ' + currentModuleID);
-  console.log('IDs: ' + noteIDs);
+  // console.log('ListNotes moduleInfo: ');
+  // console.log('  currentModuleCode: ' + moduleInfo[0]);
+  // // console.log('noteIDs: ' + moduleInfo[1]);
+  // console.log('  currentModuleID: ' + moduleInfo[2]);
+  // console.log('email: ' + userData.email);
+  // console.log('code: ' + currentModuleCode);
+  // console.log('Module ID: ' + currentModuleID);
+  // console.log('IDs: ' + noteIDs);
 
   useEffect(() => {
     if (loggedIn === false) {
@@ -49,7 +63,7 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
   React.useEffect(() => {
     setNotes(noteList);
     setFilteredNotes(notes);
-    getGroup();
+    // Change page title and add create button to header
     navigation.setOptions({
       title: currentModuleCode,
       headerTitleStyle: {
@@ -62,7 +76,6 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
           style={[styles.createButton]}
           onPress={() =>
             navigation.navigate('CreateNote', {
-              userEmail: currentUsersEmail,
               moduleID: currentModuleID,
               moduleInfo: moduleInfo,
             })
@@ -74,9 +87,8 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
     console.log('On ListNotes page');
     const unsubscribe = navigation.addListener('focus', () => {
       // When the screen is focused (like loading from another screen), call function to refresh data
-      // getNotes();
-      // getNoteFromList();
-
+      setSearchQuery('');
+      getGroup();
       console.log('Getting notes on ListNotes');
     });
 
@@ -109,8 +121,11 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
         let responseData = JSON.parse(JSON.stringify(response.data));
         console.log('Group Name: ' + responseData.name);
         let notesIDs = responseData.notes;
+        notesIDs.reverse(); // Reverse array of IDs so the newest notes appear first
         console.log('noteIDs is : ', notesIDs);
-        getNoteFromList(notesIDs);
+        getNoteFromList(notesIDs)
+          .then()
+          .catch(function (error) {});
       })
       .catch(error => {
         console.log('Failed request');
@@ -131,8 +146,8 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
         })
         .then(response => {
           let responseData = JSON.parse(JSON.stringify(response.data));
-          console.log('Content: ' + responseData.content);
-          console.log('User: ' + responseData.userEmail);
+          // console.log('Content: ' + responseData.content);
+          // console.log('User: ' + responseData.userEmail);
           if (responseData != null) {
             noteList.push(responseData);
           }
@@ -143,8 +158,9 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
           console.log(error);
         });
     }
-    setNotes(noteList);
     setFilteredNotes(noteList);
+    setNotes(noteList);
+    filterResults(searchQuery, value, noteList);
   };
 
   const deleteNote = id => {
@@ -156,8 +172,15 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
       })
       .then(response => {
         console.log('Deleted ', id);
-        // getNotes(); // Refresh list of notes
-        // getNoteFromList();
+        Toast.show('Deleted Note', {
+          duration: Toast.durations.SHORT, // 2 seconds
+          position: Toast.positions.BOTTOM,
+          shadow: true,
+          animation: true,
+          hideOnPress: true,
+          delay: 0,
+        });
+
         getGroup();
       })
       .catch(error => {
@@ -238,46 +261,35 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
     );
   };
 
-  // let getHeader = () => (
-  //   // return (
-  //   <View style={styles.searchSection}>
-  //     <Icon style={styles.searchIcon} name="search" size={20} color="#000" />
-  //     <TextInput
-  //       style={styles.input}
-  //       placeholder="Search..."
-  //       placeholderTextColor="#636363"
-  //       // onChangeText={(searchString) => {this.setState({searchString})}}
-  //       onChangeText={newText => {
-  //         setSearch(newText);
-  //         console.log("HELLO THERE");
-  //       }}
-  //       editable
-  //       value={search}
-  //       clearButtonMode="while-editing"
-  //       underlineColorAndroid="transparent"
-  //     />
-  //   </View>
-  // );
-  // );
-  // <View style={[styles.searchBox]}>
-  //   <TextInput
-  //     style={[styles.searchQuery]}
-  //     placeholder="Search..."
-  //     placeholderTextColor="#636363"
-  //     multiline={true}
-  //     editable
-  //     onChangeText={newText => setSearch(newText)}
-  //     value={search}
-  //   />
-  //   <Icon
-  //     style={[styles.icon]}
-  //     name="search"
-  //     color="#ccc"
-  //     size={30}
-  //     onPress={() => {
-  //       // deleteNote(id);
-  //     }}
-  //   />
+  let filterResults = (search, privacyFilter, notesToFilter) => {
+    // console.log('noteList: ' + noteList);
+    // console.log('notesToFilter: ' + notesToFilter);
+    // console.log('Changed text, now search is: ' + search);
+
+    // console.log('search, else: ' + search);
+    // console.log('noteList.length: ' + noteList.length);
+    // console.log('notes.length: ' + notes.length);
+    // console.log('notesToFilter.length: ' + notesToFilter.length);
+    let filteredNoteList = [];
+    for (let i = 0; i < notesToFilter.length; i++) {
+      // Get note values and change to lower case
+      let noteContent = notesToFilter[i].content.toLowerCase();
+      let noteName = notesToFilter[i].name.toLowerCase();
+      let noteCreator = notesToFilter[i].userEmail.toLowerCase();
+      let notePrivacy = notesToFilter[i].privacy;
+
+      // Change query to lower case
+      let query = search.toLowerCase();
+
+      // Check Note content, title, and creator for search query
+      if ((noteContent.includes(query) || noteName.includes(query) || noteCreator.includes(query)) && (notePrivacy.includes(privacyFilter) || privacyFilter === 'all')) {
+        filteredNoteList.push(notesToFilter[i]);
+      }
+    }
+    setFilteredNotes(filteredNoteList);
+
+    console.log('notes: ' + notes);
+  };
 
   // TESTING: True to show all users notes regardless of creator. False to only show current users notes
   let showAllUsers = false;
@@ -319,59 +331,42 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
           }
         }}
         ListHeaderComponent={
-          <View style={styles.searchSection}>
-            <Icon
-              style={styles.searchIcon}
-              name="search"
-              size={25}
-              color="black"
+          <View>
+            <ButtonGroup
+              buttons={['All', 'Private', 'Public']}
+              selectedIndex={selectedIndex}
+              onPress={values => {
+                setSelectedIndex(values);
+                let privacy;
+                if (values === 0) {
+                  setValue('all');
+                  privacy = 'all';
+                } else if (values === 1) {
+                  setValue('private');
+                  privacy = 'private';
+                } else if (values === 2) {
+                  setValue('public');
+                  privacy = 'public';
+                } else {
+                  console.log("value not 0,1,2. It's: " + values);
+                }
+                console.log('Value: ' + value);
+                filterResults(searchQuery, privacy, notes);
+              }}
+              containerStyle={styles.privacyFilter}
             />
-            <TextInput
-              style={styles.input}
+            <SearchBar
+              containerStyle={styles.input}
+              platform="android"
               placeholder="Search..."
               placeholderTextColor="#636363"
-              // onChangeText={(searchString) => {this.setState({searchString})}}
-              // onChangeText={newText => setSearch(newText)}
-              onChangeText={async search => {
-                // await setSearch(newText);
-                console.log('noteList: ' + noteList);
-                console.log('Changed text, now search is: ' + search);
-                let filteredNoteList = [];
-                if (search === '' || search === null) {
-                  console.log('empty search, if: ' + search);
-                  getGroup();
-                } else {
-                  console.log('search, else: ' + search);
-                  console.log('noteList.length: ' + noteList.length);
-                  console.log('notes.length: ' + notes.length);
-
-                  for (let i = 0; i < notes.length; i++) {
-                    let noteContent = notes[i].content.toLowerCase();
-                    let noteName = notes[i].name.toLowerCase();
-                    console.log('search: ' + search);
-
-
-                    console.log('noteContent: ' + noteContent);
-                    console.log('noteName: ' + noteName);
-
-                    let query = search.toLowerCase();
-
-                    if (noteContent.includes(query) || noteName.includes(query)) {
-                      filteredNoteList.push(notes[i]);
-                    }
-                  }
-                  setFilteredNotes(filteredNoteList);
-                  // noteList = filteredNoteList;
-
-                  console.log('notes: ' + notes);
-                }
+              value={searchQuery}
+              lightTheme
+              onChangeText={async query => {
+                setSearchQuery(query);
+                filterResults(query, value, notes);
               }}
-              editable
-              // value={search}
-              // clearButtonMode="while-editing"
-              // underlineColorAndroid="transparent"
             />
-
           </View>
         }
       />
@@ -408,6 +403,7 @@ const styles = StyleSheet.create({
   flatList: {
     backgroundColor: '#ffffff',
     elevation: 5,
+    zIndex: -1,
   },
   noteButton: {
     elevation: 5,
@@ -420,6 +416,7 @@ const styles = StyleSheet.create({
     margin: '2%',
     backgroundColor: '#30B283',
     paddingLeft: 10,
+    zIndex: 0,
   },
   noteTitle: {
     fontWeight: 'bold',
@@ -442,27 +439,23 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     marginRight: 5,
   },
-  searchSection: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    elevation: 5,
-    margin: 10,
-    borderWidth: 1,
-    borderRadius: 10,
-  },
-  searchIcon: {
-    padding: 10,
+  privacyFilter: {
+    width: '100%',
+    elevation: 6,
+    marginLeft: 0,
+    marginVertical: 0,
+    // borderTopLeftRadius: 10,
+    // borderTopRightRadius: 10,
   },
   input: {
-    flex: 1,
-    padding: 10,
+    // paddingVertical doesn't work, need to use paddingTop and paddingBottom to remove default padding
+    paddingTop: 0,
+    paddingBottom: 0,
     backgroundColor: '#fff',
     color: '#424242',
-    borderColor: 'rgba(26,26,26,0.22)',
     borderRadius: 10,
+    elevation: 5,
+    margin: 10,
   },
 });
 

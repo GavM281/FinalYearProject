@@ -11,31 +11,29 @@ import {StackActions, useRoute} from '@react-navigation/native';
 import {AuthContext} from '../context/AuthContext';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import mongoose from "mongoose";
+import Toast from 'react-native-root-toast';
 
 const ListNotes = ({
   navigation,
-  currentUserEmail,
   noteID,
   commentIDs,
   commentsList,
 }) => {
   const route = useRoute();
-
   const {loggedIn, userData} = useContext(AuthContext);
   const [comments, setComments] = useState();
   const [newComment, setNewComment] = useState('');
 
+  let currentUsersEmail = userData.email; // Get Current users email
+  let notesID = route.params.noteID;
+  let commentList = route.params.commentsList; // Stores list of comments after retrieving
+
   console.log('');
   console.log(' || Comments ||');
-  console.log('userEmail: ' + route.params.currentUserEmail);
+  console.log('userEmail: ' + userData.email);
   console.log('noteID: ' + route.params.noteID);
   console.log('commentIDs: ' + route.params.commentIDs);
   console.log('comments: ' + route.params.commentsList);
-
-  let currentUsersEmail = route.params.currentUserEmail;
-  let notesID = route.params.noteID;
-  let commentList = route.params.commentsList; // Stores list of comments after retrieving
 
   React.useEffect(() => {
     console.log('On Comments page');
@@ -141,6 +139,15 @@ const ListNotes = ({
       .then(response => {
         console.log('Deleted ', id);
         console.log('Deletion response: ', response);
+        // Show confirmation message
+        Toast.show('Deleted Comment', {
+          duration: Toast.durations.SHORT, // 2 seconds
+          position: Toast.positions.BOTTOM,
+          shadow: true,
+          animation: true,
+          hideOnPress: true,
+          delay: 0,
+        });
         getNote();
       })
       .catch(error => {
