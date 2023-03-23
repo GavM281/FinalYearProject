@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useRef, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 
 import {
   View,
@@ -6,25 +6,24 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
-  TextInput,
 } from 'react-native';
 import {StackActions, useRoute} from '@react-navigation/native';
 import {AuthContext} from '../context/AuthContext';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import {ButtonGroup, SearchBar } from '@rneui/themed';
-import DropDownPicker from 'react-native-dropdown-picker';
+import {ButtonGroup, SearchBar} from '@rneui/themed';
 import Toast from 'react-native-root-toast';
+import NoteStats from './Buttons/NoteStats';
+import appStyles from '../stylesheet';
 
-const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
+const ListNotes = ({navigation, moduleCode, noteIDsList, moduleID}) => {
   const route = useRoute();
 
   const {loggedIn, userData} = useContext(AuthContext);
   const [notes, setNotes] = useState();
   const [filteredNotes, setFilteredNotes] = useState();
 
-  const [open, setOpen] = useState(false);
-  const [value, setValue] = useState('all'); // Set value of dropdown to value of privacy that was passed in
+  const [value, setValue] = useState('all'); // Set value of ButtonGroup to value of privacy that was passed in
   const [items, setItems] = useState([
     {label: 'Show Everything', value: 'all'},
     {label: 'Show Private Only', value: 'private'},
@@ -33,26 +32,16 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
 
-
   console.log('');
   console.log('ListNotes Screen');
   console.log('Name: ' + userData.name);
   const currentUsersEmail = userData.email;
   const currentModuleCode = route.params.moduleCode;
-  let noteIDs = route.params.moduleNotes;
-  // let noteIDs;
   const currentModuleID = route.params.moduleID;
+  let noteIDs = route.params.noteIDsList;
 
   const moduleInfo = [currentModuleCode, noteIDs, currentModuleID];
   let noteList = [];
-  // console.log('ListNotes moduleInfo: ');
-  // console.log('  currentModuleCode: ' + moduleInfo[0]);
-  // // console.log('noteIDs: ' + moduleInfo[1]);
-  // console.log('  currentModuleID: ' + moduleInfo[2]);
-  // console.log('email: ' + userData.email);
-  // console.log('code: ' + currentModuleCode);
-  // console.log('Module ID: ' + currentModuleID);
-  // console.log('IDs: ' + noteIDs);
 
   useEffect(() => {
     if (loggedIn === false) {
@@ -87,6 +76,7 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
     console.log('On ListNotes page');
     const unsubscribe = navigation.addListener('focus', () => {
       // When the screen is focused (like loading from another screen), call function to refresh data
+      setSelectedIndex(0);
       setSearchQuery('');
       getGroup();
       console.log('Getting notes on ListNotes');
@@ -95,20 +85,6 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
     // Return the function to unsubscribe from the event so it gets removed on unmount
     return unsubscribe;
   }, [navigation]);
-
-  const getNotes = async () => {
-    await axios
-      .get('https://gavin-fyp.herokuapp.com/getNotes')
-      .then(response => {
-        let responseData = JSON.parse(JSON.stringify(response.data));
-        console.log('RESPONSE DATA: ', responseData);
-        setNotes(responseData);
-      })
-      .catch(error => {
-        console.log(error);
-        console.log('There was an error getting notes ^^');
-      });
-  };
 
   const getGroup = () => {
     console.log('Getting group info for id: ' + currentModuleID);
@@ -188,12 +164,41 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
       });
   };
 
+  let filterResults = (search, privacyFilter, notesToFilter) => {
+    let filteredNoteList = [];
+    // Loop through every note
+    for (let i = 0; i < notesToFilter.length; i++) {
+      // Get note values and change to lower case
+      let noteContent = notesToFilter[i].content.toLowerCase();
+      let noteName = notesToFilter[i].name.toLowerCase();
+      let noteCreator = notesToFilter[i].userEmail.toLowerCase();
+      let notePrivacy = notesToFilter[i].privacy;
+
+      // Change query to lower case
+      let query = search.toLowerCase();
+
+      // Check Note content, title, and creator for search query
+      if (
+        // Check query is in note
+        (noteContent.includes(query) || noteName.includes(query)) &&
+          // Filter based off privacyFilter - Public, Personal, Or Everything
+        ((notePrivacy.includes(privacyFilter) && noteCreator !== currentUsersEmail) || // Public: Filter is set to public and current user didn't create note
+        (privacyFilter === 'personal' && noteCreator === currentUsersEmail) || // Personal: Filter set to personal, current user made note
+        privacyFilter === 'all') // Filter set to show everything
+      ) {
+        filteredNoteList.push(notesToFilter[i]);
+      }
+    }
+    setFilteredNotes(filteredNoteList);
+    console.log('notes: ' + notes);
+  };
+
   const DeleteIcon = ({noteEmail, id}) => {
     if (noteEmail === currentUsersEmail) {
       // Note made by current user, can be deleted
       return (
         <Icon
-          style={[styles.icon]}
+          style={[appStyles.icon]}
           name="delete"
           color="#ccc"
           size={30}
@@ -215,13 +220,6 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
     editable,
     comments,
   }) => {
-    // Set icon for privacy settings
-    let icon;
-    if (privacy !== 'private') {
-      icon = 'public';
-    } else {
-      icon = 'lock';
-    }
     return (
       <TouchableOpacity
         style={[styles.noteButton]}
@@ -234,14 +232,11 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
             editable: editable,
             privacy: privacy,
             moduleInfo: moduleInfo,
-            userEmail: currentUsersEmail,
+            userEmail: userEmail,
           })
         }>
         <View style={[styles.noteButtonHeading]}>
-          <Text numberOfLines={2} style={[styles.noteTitle]}>
-            {title}
-          </Text>
-
+          <Text numberOfLines={2} style={[styles.noteTitle]}>{title}</Text>
           <DeleteIcon noteEmail={userEmail} id={id} />
         </View>
         <View style={[styles.noteContent]}>
@@ -249,65 +244,29 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
             {content}
           </Text>
         </View>
-        <View style={{flexDirection: 'row', alignItems: 'center'}}>
-          <Icon name="person" size={20} style={[styles.icon]} />
-          <Text>{userEmail}</Text>
-        </View>
-        <View style={{flexDirection: 'row', alignItems: 'center'}}>
-          <Icon name={icon} size={20} style={[styles.icon]} />
-          <Text>{privacy}</Text>
-        </View>
+        <NoteStats userEmail={userEmail} privacy={privacy} numComments={comments.length} />
       </TouchableOpacity>
     );
-  };
-
-  let filterResults = (search, privacyFilter, notesToFilter) => {
-    // console.log('noteList: ' + noteList);
-    // console.log('notesToFilter: ' + notesToFilter);
-    // console.log('Changed text, now search is: ' + search);
-
-    // console.log('search, else: ' + search);
-    // console.log('noteList.length: ' + noteList.length);
-    // console.log('notes.length: ' + notes.length);
-    // console.log('notesToFilter.length: ' + notesToFilter.length);
-    let filteredNoteList = [];
-    for (let i = 0; i < notesToFilter.length; i++) {
-      // Get note values and change to lower case
-      let noteContent = notesToFilter[i].content.toLowerCase();
-      let noteName = notesToFilter[i].name.toLowerCase();
-      let noteCreator = notesToFilter[i].userEmail.toLowerCase();
-      let notePrivacy = notesToFilter[i].privacy;
-
-      // Change query to lower case
-      let query = search.toLowerCase();
-
-      // Check Note content, title, and creator for search query
-      if ((noteContent.includes(query) || noteName.includes(query) || noteCreator.includes(query)) && (notePrivacy.includes(privacyFilter) || privacyFilter === 'all')) {
-        filteredNoteList.push(notesToFilter[i]);
-      }
-    }
-    setFilteredNotes(filteredNoteList);
-
-    console.log('notes: ' + notes);
   };
 
   // TESTING: True to show all users notes regardless of creator. False to only show current users notes
   let showAllUsers = false;
   return (
-    <View style={[styles.screenContainer]}>
+    <View style={[appStyles.screenContainer]}>
       <FlatList
-        style={[styles.flatList]}
+        style={[appStyles.flatList]}
         data={filteredNotes}
         extraData={notes}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({item}) => {
+          console.log('userEmail: ' + item.userEmail);
           let editableDoc = false;
           if (
             // Check whether note should be shown
             ((item.userEmail === currentUsersEmail ||
               item.privacy.includes('public')) &&
               noteIDs.includes(item._id)) ||
-            showAllUsers == true
+            showAllUsers === true
           ) {
             if (
               item.userEmail === currentUsersEmail ||
@@ -333,7 +292,7 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
         ListHeaderComponent={
           <View>
             <ButtonGroup
-              buttons={['All', 'Private', 'Public']}
+              buttons={['All', 'Personal', 'Public']}
               selectedIndex={selectedIndex}
               onPress={values => {
                 setSelectedIndex(values);
@@ -342,8 +301,8 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
                   setValue('all');
                   privacy = 'all';
                 } else if (values === 1) {
-                  setValue('private');
-                  privacy = 'private';
+                  setValue('personal');
+                  privacy = 'personal';
                 } else if (values === 2) {
                   setValue('public');
                   privacy = 'public';
@@ -375,17 +334,6 @@ const ListNotes = ({navigation, moduleCode, moduleNotes, moduleID}) => {
 };
 
 const styles = StyleSheet.create({
-  screenContainer: {
-    height: '100%',
-    paddingHorizontal: 10,
-  },
-  moduleHeader: {
-    color: 'black',
-    fontSize: 25,
-    textAlign: 'center',
-    fontWeight: 'bold',
-    paddingVertical: 5,
-  },
   noteButtonHeading: {
     justifyContent: 'space-between',
     flexDirection: 'row',
@@ -400,11 +348,6 @@ const styles = StyleSheet.create({
     elevation: 5,
     borderRadius: 10,
   },
-  flatList: {
-    backgroundColor: '#ffffff',
-    elevation: 5,
-    zIndex: -1,
-  },
   noteButton: {
     elevation: 5,
     borderRadius: 14,
@@ -416,7 +359,6 @@ const styles = StyleSheet.create({
     margin: '2%',
     backgroundColor: '#30B283',
     paddingLeft: 10,
-    zIndex: 0,
   },
   noteTitle: {
     fontWeight: 'bold',
@@ -433,24 +375,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  icon: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    textAlign: 'right',
-    marginRight: 5,
-  },
   privacyFilter: {
     width: '100%',
     elevation: 6,
-    marginLeft: 0,
-    marginVertical: 0,
-    // borderTopLeftRadius: 10,
-    // borderTopRightRadius: 10,
+    marginLeft: 0, // Override default Style
+    borderRadius: 0, // Override default Style
+    marginVertical: 0, // Override default Style
   },
   input: {
-    // paddingVertical doesn't work, need to use paddingTop and paddingBottom to remove default padding
-    paddingTop: 0,
-    paddingBottom: 0,
+    paddingTop: 0, // Override default Style
+    paddingBottom: 0, // Override default Style
     backgroundColor: '#fff',
     color: '#424242',
     borderRadius: 10,

@@ -94,21 +94,6 @@ app.get('/getModules', (req, res) => {
 });
 
 // Get single note
-app.get('/getNote', (req, res) => {
-  console.log('Getting Note');
-  Note.findById(req.body.id)
-    .then(data => {
-      console.log('data: ', data);
-      console.log('name: ', data.name);
-      console.log('content: ', data.content);
-      res.send(data);
-    })
-    .catch(err => {
-      console.log(err);
-    });
-});
-
-// Get single note
 app.post('/getSingleNote', (req, res) => {
   console.log('Getting Note with id: ' + req.body.id);
   Note.findById(req.body.id)
@@ -155,23 +140,6 @@ app.get('/getUser', (req, res) => {
 app.post('/getComment', (req, res) => {
   console.log('Getting Comment');
   let id = req.body.id;
-  console.log('Id to find is: ' + id);
-  Comment.findById(id)
-    .then(data => {
-      console.log('data: ' + data);
-      res.send(data);
-    })
-    .catch(err => {
-      console.log(err);
-    });
-});
-
-app.get('/getComment1', (req, res) => {
-  console.log('Getting Comment');
-  console.log('Getting Comment, params id: ' + req.params.id);
-  console.log('Getting Comment, body id: ' + req.body.id);
-  console.log('Getting Comment, query id: ' + req.query.id);
-  let id = req.params.id;
   console.log('Id to find is: ' + id);
   Comment.findById(id)
     .then(data => {

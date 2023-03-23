@@ -71,9 +71,19 @@
     "react-test-renderer": "^17.0.2"
   },
   "jest": {
-    "preset": "react-native",
+    "preset": "@testing-library/react-native",
+    "transformIgnorePatterns": [
+      "node_modules/(?!((jest-)?react-native(-.*)?|@react-native(-community)?)/)"
+    ],
+    "transform": {
+      "\\.[jt]sx?$": "babel-jest",
+      "\\.ts$": ["ts-jest"]
+    },
     "setupFilesAfterEnv": [
       "@testing-library/jest-native/extend-expect"
+    ],
+    "setupFiles": [
+      "./jestSetup.js"
     ]
   },
   "main": "server.js",

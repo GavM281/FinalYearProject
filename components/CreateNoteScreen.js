@@ -9,12 +9,11 @@ import {
 import axios from 'axios';
 import {useRoute} from '@react-navigation/native';
 import DropDownPicker from 'react-native-dropdown-picker';
-import {HeaderBackButton} from "@react-navigation/elements";
-import {AuthContext} from "../context/AuthContext";
+import {AuthContext} from '../context/AuthContext';
+import appStyles from '../stylesheet';
 
-function NoteScreen({navigation, contents, moduleID, moduleInfo}) {
+function NoteScreen({navigation, moduleID, moduleInfo}) {
   const {userData} = useContext(AuthContext);
-  const [notes, setNotes] = useState(null);
   const [content, setContent] = useState('');
   const [header, setHeader] = useState('');
 
@@ -33,8 +32,6 @@ function NoteScreen({navigation, contents, moduleID, moduleInfo}) {
   console.log('Email: ' + userData.email);
   console.log('Users Name: ' + userData.name);
   // console.log('id: ' + currentModuleID);
-
-  const currentModuleCode = route.params.moduleInfo[0];
   let noteIDs = route.params.moduleInfo[1];
   const currentModuleID = route.params.moduleInfo[2];
   console.log('currentModuleCode: ' + route.params.moduleInfo[0]);
@@ -72,13 +69,13 @@ function NoteScreen({navigation, contents, moduleID, moduleInfo}) {
 
   // Display
   return (
-    <View style={[styles.sectionContainer]}>
+    <View style={{...appStyles.screenContainer, padding: 10}}>
       <TextInput
-        style={[styles.noteTitle]}
+        style={[appStyles.header]}
         placeholder={'Enter Note Name'}
         placeholderTextColor="#383838FF"
         multiline={true}
-        onChangeText={header => setHeader(header)}
+        onChangeText={headerText => setHeader(headerText)}
       />
       <TextInput
         style={[styles.noteContent]}
@@ -88,7 +85,7 @@ function NoteScreen({navigation, contents, moduleID, moduleInfo}) {
         value={content}
       />
       <DropDownPicker
-        style={[styles.dropdown]}
+        style={[appStyles.dropdown]}
         open={open}
         value={value}
         items={items}
@@ -96,6 +93,7 @@ function NoteScreen({navigation, contents, moduleID, moduleInfo}) {
         setValue={setValue}
         setItems={setItems}
         hideSelectedItemIcon={true}
+        dropDownDirection="TOP"
       />
       <TouchableOpacity style={[styles.button]} onPress={() => createNote()}>
         <Text style={{color: 'white'}}>Create</Text>
@@ -105,65 +103,25 @@ function NoteScreen({navigation, contents, moduleID, moduleInfo}) {
 }
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    // textAlignVertical: 'top',
-    padding: 10,
-    shadowColor: '#000', // IOS
-    height: '100%',
-    backgroundColor: '#ededed',
-    // margin: '2%',
-  },
-  noteTitle: {
-    fontWeight: 'bold',
-    textAlign: 'center',
-    fontSize: 25,
-    color: 'black',
-    elevation: 6,
-    borderBottomWidth: 1,
-    backgroundColor: '#ffffff',
-    borderStyle: 'solid',
-    // borderWidth: 1,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-    padding: 5,
-    // marginTop: 5,
-  },
   noteContent: {
     textAlignVertical: 'top',
     backgroundColor: '#ffffff',
     elevation: 5,
     color: 'black',
-    // borderColor: 'gray',
     width: '100%',
-    // borderBottomWidth: 1,
-    // borderBottomLeftRadius: 10,
-    // borderBottomRightRadius: 10,
     padding: 10,
     height: '100%',
-    // marginBottom: 10,
     flex: 1,
   },
   button: {
     fontSize: 20,
     color: 'green',
-    // borderRadius: 10,
     alignItems: 'center',
     backgroundColor: '#666aff',
     padding: 10,
-    // marginVertical: 10,
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
     elevation: 6,
-    // marginBottom: 10,
-    // margin: '20px',
-    // textAlignVertical: 'bottom',
-  },
-  dropdown: {
-    // marginVertical: 5,
-    borderRadius: 0,
-    borderWidth: 0,
-    borderTopWidth: 1,
-    elevation: 3,
   },
 });
 

@@ -1,11 +1,10 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {View, Button, Text, FlatList, TouchableOpacity, StyleSheet} from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {View, Text, FlatList, StyleSheet} from 'react-native';
 import {StackActions} from '@react-navigation/native';
 import {AuthContext} from '../context/AuthContext';
-import {io} from 'socket.io-client';
-import axios from 'axios';
 import WikiModule from './Buttons/WikiModule';
+import appStyles from '../stylesheet';
+import axios from 'axios';
 
 const WikiScreen = ({navigation}) => {
   const {loggedIn} = useContext(AuthContext);
@@ -47,19 +46,16 @@ const WikiScreen = ({navigation}) => {
 
   return (
     <View style={[styles.sectionContainer]}>
-      <Text style={[styles.header]}>Modules</Text>
+      <Text style={[appStyles.header]}>Modules</Text>
       <FlatList
-        style={[styles.flatList]}
+        style={{...appStyles.flatList, ...appStyles.roundBottomCorners}}
         data={rooms}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({item}) => (
           <WikiModule
             style={{elevation: 5}}
             title={item.name}
-            Notes={item.notes.length}
-            ids={item.notes}
-            // buttonColour={'#30B283'}
-            onPress={() => navigation.navigate('ListNotes', {moduleCode: item.name, moduleNotes: item.notes, moduleID: item._id})}
+            onPress={() => navigation.navigate('ListNotes', {moduleCode: item.name, noteIDsList: item.notes, moduleID: item._id})}
           />
         )}
       />
@@ -71,41 +67,6 @@ const styles = StyleSheet.create({
   sectionContainer: {
     marginTop: 10,
     paddingHorizontal: 10,
-    // backgroundColor: 'white',
-  },
-  flatList: {
-    backgroundColor: 'white',
-    elevation: 5,
-    // borderWidth: .5,
-    borderTopWidth: 0,
-    borderBottomLeftRadius: 10,
-    borderBottomRightRadius: 10,
-  },
-  header: {
-    color: 'black',
-    fontSize: 25,
-    textAlign: 'center',
-    fontWeight: 'bold',
-    // textDecorationLine: 'underline',
-    marginTop: 0,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-    backgroundColor: 'white',
-    elevation: 5,
-    paddingVertical: 5,
-    borderBottomWidth: 1,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
   },
 });
 

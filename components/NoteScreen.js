@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {
   TouchableOpacity,
   Text,
@@ -10,6 +10,9 @@ import axios from 'axios';
 import {useRoute} from '@react-navigation/native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import {HeaderBackButton} from '@react-navigation/elements';
+import Toast from 'react-native-root-toast';
+import {AuthContext} from '../context/AuthContext';
+import appStyles from '../stylesheet';
 
 function NoteScreen({
   navigation,
@@ -23,9 +26,9 @@ function NoteScreen({
   userEmail, // Email of who created note
 }) {
   const route = useRoute();
+  const {userData} = useContext(AuthContext);
 
   const [content, setContent] = useState(contents);
-  const [comments, setComments] = useState();
   const [header, setHeader] = useState(name);
 
   const [open, setOpen] = useState(false);
@@ -38,14 +41,21 @@ function NoteScreen({
 
   let moduleInfos = route.params.moduleInfo;
   let noteID = route.params.id;
-  let currentUserEmail = route.params.userEmail;
+  let currentUserEmail = userData.email;
   let noteCommentIDs = route.params.commentsIDs;
   if (noteCommentIDs == null) {
     noteCommentIDs = [];
   }
   let editableDoc = route.params.editable;
   let notePrivacy = route.params.privacy;
+
+  console.log('userEmail: ' + route.params.userEmail);
+  console.log('currentUserEmail: ' + currentUserEmail);
+  console.log('notePrivacy: ' + route.params.privacy);
+  console.log('editableDoc: ' + editableDoc);
+
   let dropdownDisabled;
+  // Dropdown to select privacy settings disabled if note is public
   if (notePrivacy.includes('public') && userEmail !== currentUserEmail) {
     dropdownDisabled = true;
   } else {
@@ -68,7 +78,7 @@ function NoteScreen({
       setContent(route.params.contents);
       getNote();
       commentList = [];
-      getCommentsFromList();
+      // getCommentsFromList();
       navigation.setOptions({
         headerLeft: () => (
           // <TouchableOpacity style={[styles.button]}
@@ -76,7 +86,7 @@ function NoteScreen({
             onPress={() => {
               navigation.navigate('ListNotes', {
                 moduleCode: moduleInfos[0],
-                moduleNotes: moduleInfos[1],
+                noteIDsList: moduleInfos[1],
                 moduleID: moduleInfos[2],
               });
             }}
@@ -126,6 +136,14 @@ function NoteScreen({
       .then(response => {
         let responseData = JSON.parse(JSON.stringify(response.data));
         console.log('RESPONSE DATA: ', responseData);
+        Toast.show('Saved Note', {
+          duration: Toast.durations.SHORT, // 2 seconds
+          position: Toast.positions.BOTTOM,
+          shadow: true,
+          animation: true,
+          hideOnPress: true,
+          delay: 0,
+        });
       })
       .catch(error => {
         console.log('content: ' + content);
@@ -133,164 +151,62 @@ function NoteScreen({
       });
   };
 
-  const getCommentsFromList = async () => {
-    console.log('\n\nGetCommentFromList\n');
-    if (noteCommentIDs === 0) {
-      commentList = [];
-      setComments(commentList);
-    } else {
-      for (let i = 0; i < noteCommentIDs.length; i++) {
-        let id = noteCommentIDs[i];
-        await axios
-          .post('https://gavin-fyp.herokuapp.com/getComment1', {
-            id: id,
-          })
-          .then(response => {
-            console.log('\n   Made request: getComment1');
-            let responseData = JSON.parse(JSON.stringify(response.data));
-            console.log('Comment Content: ' + responseData.content);
-            console.log('Comment User: ' + responseData.userEmail);
-            console.log('Comment noteID: ' + responseData.noteID);
-            commentList.push(responseData);
-            setComments(commentList);
-            return responseData;
-          })
-          .catch(error => {
-            console.log('Failed request');
-            // handle error
-            console.log(error);
-          });
-      }
-    }
-  };
-
   // Display
   return (
-    <View style={[styles.sectionContainer]}>
-      <View style={[styles.noteSection]}>
-        <TextInput
-          style={[styles.noteHeader]}
-          editable={editableDoc}
-          onChangeText={header => setHeader(header)}>
-          {route.params.name}
-        </TextInput>
-        <TextInput
-          style={[styles.noteContent]}
-          editable={editableDoc}
-          multiline={true}
-          onChangeText={newText => setContent(newText)}
-          value={content}
-        />
+    <View style={{...appStyles.screenContainer, padding: 10}}>
+      <TextInput
+        style={[appStyles.header]}
+        editable={editableDoc}
+        onChangeText={header => setHeader(header)}>
+        {route.params.name}
+      </TextInput>
+      <TextInput
+        style={[styles.noteContent]}
+        editable={editableDoc}
+        multiline={true}
+        onChangeText={newText => setContent(newText)}
+        value={content}
+      />
 
-        <DropDownPicker
-          style={[styles.dropdown]}
-          open={open}
-          value={value}
-          items={items}
-          setOpen={setOpen}
-          setValue={setValue}
-          setItems={setItems}
-          disabled={dropdownDisabled}
-          dropDownDirection="TOP"
-        />
-        <TouchableOpacity
-          style={[styles.button]}
-          onPress={() =>
-            navigation.navigate('Comments', {
-              noteID: noteID,
-              commentIDs: noteCommentIDs,
-              commentsList: comments,
-            })
-          }>
-          <Text style={{color: 'white'}}>Comments ({noteCommentIDs.length})</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={{
-            ...styles.button,
-            borderBottomLeftRadius: 10,
-            borderBottomRightRadius: 10,
-            backgroundColor: '#666aff',
-          }}
-          onPress={() => saveNoteContent('Comments')}>
-          <Text style={{color: 'white'}}>Save</Text>
-        </TouchableOpacity>
-      </View>
+      <DropDownPicker
+        style={[appStyles.dropdown]}
+        open={open}
+        value={value}
+        items={items}
+        setOpen={setOpen}
+        setValue={setValue}
+        setItems={setItems}
+        disabled={dropdownDisabled}
+        dropDownDirection="TOP"
+      />
+      <TouchableOpacity
+        style={{...appStyles.button, backgroundColor: '#868686'}}
+        onPress={() =>
+          navigation.navigate('Comments', {
+            noteID: noteID,
+            commentIDs: noteCommentIDs,
+          })
+        }>
+        <Text style={{color: 'white'}}>Comments</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={{...appStyles.button,...appStyles.roundBottomCorners,backgroundColor: '#666aff'}}
+        onPress={() => saveNoteContent('Comments')}>
+        <Text style={{color: 'white'}}>Save</Text>
+      </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    textAlignVertical: 'top',
-    // marginTop: 20,
-    paddingHorizontal: 10,
-    paddingVertical: 10,
-    shadowColor: '#000', // IOS
-    height: '100%',
-    backgroundColor: '#ededed',
-    // margin: '2%',
-  },
-  comments: {
-    backgroundColor: 'blue',
-    textAlign: 'center',
-    // flex: 1,
-    width: '100%',
-    height: 50,
-    // backgroundColor: '#EE5407',
-    justifyContent: 'center',
-    alignItems: 'center',
-    // position: 'absolute', //Here is the trick
-    // bottom: 0, //Here is the trick
-  },
-  noteSection: {
-    // position: 'absolute',
-    height: '100%',
-    flex: 1,
-  },
   noteContent: {
     textAlignVertical: 'top',
     backgroundColor: '#ffffff',
-    // elevation: 5,
     color: 'black',
-    // borderColor: 'gray',
     width: '100%',
-    // borderBottomWidth: 1,
-    // borderBottomLeftRadius: 10,
-    // borderBottomRightRadius: 10,
     padding: 10,
     height: '100%',
-    // marginBottom: 10,
     flex: 1,
-  },
-  button: {
-    fontSize: 20,
-    color: 'green',
-    // borderRadius: 10,
-    alignItems: 'center',
-    // backgroundColor: '#666aff',
-    backgroundColor: '#868686',
-    padding: 10,
-  },
-  noteHeader: {
-    fontWeight: 'bold',
-    textAlign: 'center',
-    fontSize: 25,
-    color: 'black',
-    elevation: 6,
-    borderBottomWidth: 1,
-    backgroundColor: '#ffffff',
-    borderStyle: 'solid',
-    // borderWidth: 1,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-    padding: 5,
-    // marginTop: 5,
-  },
-  dropdown: {
-    // marginVertical: 5,
-    borderRadius: 0,
-    borderWidth: 0,
-    borderTopWidth: 1,
   },
 });
 

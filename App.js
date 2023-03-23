@@ -1,19 +1,9 @@
-import React, {useState} from 'react';
-import {
-  Alert,
-  Button,
-  Modal,
-  Pressable,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {NavigationContainer} from '@react-navigation/native';
 import 'react-native-gesture-handler';
 import {HeaderBackButton} from '@react-navigation/elements';
-import { RootSiblingParent } from 'react-native-root-siblings';
+import {RootSiblingParent} from 'react-native-root-siblings';
 /*
 Gets Bundle identifier and displays it when app runs
 
@@ -34,14 +24,12 @@ import HamburgerMenu from './components/HamburgerMenu';
 import GroupScreen from './components/GroupScreen';
 import NoteScreen from './components/NoteScreen';
 import ListNotes from './components/ListNotes';
-import CreateNote from './components/CreateNote';
-import CommentsScreen from './components/Comments';
-// import {HeaderBackButton} from "@react-navigation/elements";
+import CreateNoteScreen from './components/CreateNoteScreen';
+import CommentsScreen from './components/CommentsScreen';
+
 const Stack = createNativeStackNavigator();
 
 const App = () => {
-  const [modalVisible, setModalVisible] = useState(false);
-
   return (
     <RootSiblingParent>
       <AuthContextProvider>
@@ -81,8 +69,7 @@ const App = () => {
                 ),
               })}
             />
-
-            <Stack.Screen name="CreateNote" component={CreateNote} />
+            <Stack.Screen name="CreateNote" component={CreateNoteScreen} />
           </Stack.Navigator>
         </NavigationContainer>
       </AuthContextProvider>
@@ -90,70 +77,4 @@ const App = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  centeredView: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 22,
-  },
-  modalView: {
-    margin: 20,
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 35,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  button: {
-    borderRadius: 20,
-    padding: 10,
-    elevation: 2,
-  },
-  buttonOpen: {
-    backgroundColor: '#F194FF',
-  },
-  buttonClose: {
-    backgroundColor: '#2196F3',
-  },
-  textStyle: {
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  modalText: {
-    marginBottom: 15,
-    textAlign: 'center',
-  },
-});
-/*
-
-
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontSize: 20,
-    fontWeight: '700',
-  },
-});
-*/
 export default App;

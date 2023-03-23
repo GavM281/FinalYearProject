@@ -1,7 +1,7 @@
 import React from 'react';
 import {StyleSheet, TouchableOpacity, Text, View} from 'react-native';
 
-const WikiModule = ({title, Notes, ids, onPress}) => {
+const WikiModule = ({title, onPress}) => {
   return (
     <TouchableOpacity style={[styles.buttonContainer]} onPress={onPress}>
       <View>

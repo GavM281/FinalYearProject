@@ -3,7 +3,6 @@ import {createDrawerNavigator} from '@react-navigation/drawer';
 import HomeScreen from './HomeScreen';
 import ProfileScreen from './ProfileScreen';
 import WikiScreen from './WikiScreen';
-import GroupScreen from './GroupScreen';
 import {StackActions} from '@react-navigation/native';
 
 import {AuthContext} from '../context/AuthContext';
@@ -19,23 +18,9 @@ const HamburgerMenu = ({navigation}) => {
   }, [loggedIn]);
   return (
     <Drawer.Navigator>
-      <Drawer.Screen
-        name="Home"
-        component={HomeScreen}
-        options={{
-          headerTitle: 'Home',
-          /*headerRight: () => (
-            Button
-              onPress={() => alert('This is a button!')}
-              title="Info"
-              color="#000"
-            />
-          ),*/
-        }}
-      />
+      <Drawer.Screen name="Home" component={HomeScreen} />
       <Drawer.Screen name="Profile" component={ProfileScreen} />
       <Drawer.Screen name="Wiki" component={WikiScreen} />
-      <Drawer.Screen name="Group" component={GroupScreen} />
     </Drawer.Navigator>
   );
 };
