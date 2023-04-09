@@ -1,3 +1,7 @@
+# Wiki feature
+This wiki feature allows users to create notes for their modules. It offers the ability to share these notes with other students in the module. Users can comment on notes to ask questions or start discussions.
+Users can also filter notes based off the notes privacy or a search query.
+
 ### Prerequisites
 - Install Android Studio from https://developer.android.com/studio. During installation select the following items to use the app:
     -	Android SDK
@@ -27,3 +31,34 @@
 The command
 `adb devices`
 can be used to check if your device has been detected.
+
+
+<hr>
+
+### Built Using
+- [MongoDB](https://www.mongodb.com/) - Database
+- [Express](https://expressjs.com/) - Server Framework
+- [React Native](https://reactnative.dev/) - Front End Framework
+- [NodeJS](https://nodejs.org/en/) - Server Environment
+- [Heroku](https://www.heroku.com/) - Server Hosting
+
+### Screenshots
+Module Selection
+ 
+<img src="https://user-images.githubusercontent.com/25159545/230784504-f5314782-6f85-4e8f-a28f-477e4a1d53cc.jpg" width="200" />
+
+##### List of Notes for Module
+<img src="https://user-images.githubusercontent.com/25159545/230784536-8ff58291-12c6-4b7f-b8e3-184eae58d54b.jpg" width="200" />
+
+##### Note
+<img src="https://user-images.githubusercontent.com/25159545/230784557-3224ca32-6add-4099-be1a-34081fc30fc2.jpg" width="200" />
+
+##### Comments
+<img src="https://user-images.githubusercontent.com/25159545/230784583-426cb4c7-8d35-4ad9-aae8-f764506008eb.jpg" width="200" />
+
+##### Search function
+<img src="https://user-images.githubusercontent.com/25159545/230784608-57a5653a-dbb8-43fb-908b-5c2e2c775928.jpg" width="200" />
+
+##### Filter Function
+<img src="https://user-images.githubusercontent.com/25159545/230784613-dd06f73d-8124-4e23-ac0a-5e1fb1822dc4.jpg" width="200" />
+
